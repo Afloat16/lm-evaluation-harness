@@ -1,0 +1,143 @@
+name: Validate streaming regex answer selection
+on:
+  push:
+    branches: [validation/regex-answer-selection-20261112]
+permissions:
+  contents: read
+jobs:
+  native-cpu:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      HF_HUB_OFFLINE: "1"
+      HF_DATASETS_OFFLINE: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: 6012a41d17786da4b3dbf9b89bde06df8f20f79b
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12"
+      - name: Create isolated native test environment
+        run: |
+          python -m venv "$RUNNER_TEMP/lm-eval-tests"
+          echo "$RUNNER_TEMP/lm-eval-tests/bin" >> "$GITHUB_PATH"
+      - name: Install the project and test tools
+        run: |
+          python -m pip install -e . pytest==9.2.0 ruff==0.16.3
+      - name: Run exact patched native filters and task integration
+        shell: bash
+        run: |
+          set -o pipefail
+          python -m pytest -q --junitxml=regex-patched.xml tests/test_regex_stream_selection.py tests/test_filters.py 2>&1 | tee regex-patched.log
+      - name: Measure native original and patched filter costs
+        shell: bash
+        run: |
+          set -o pipefail
+          cat > "$RUNNER_TEMP/benchmark_regex.py" <<'PY'
+          import gc
+          import importlib.util
+          import json
+          import statistics
+          import subprocess
+          import tempfile
+          import time
+          import tracemalloc
+          from pathlib import Path
+          
+          from lm_eval.filters.extraction import RegexFilter
+          
+          with tempfile.TemporaryDirectory() as directory:
+              baseline_path = Path(directory) / "original_extraction.py"
+              baseline_path.write_bytes(subprocess.check_output([
+                  "git", "show",
+                  "d6de81643928d653435c431bae19945d41d32520:lm_eval/filters/extraction.py",
+              ]))
+              spec = importlib.util.spec_from_file_location("original_extraction", baseline_path)
+              baseline = importlib.util.module_from_spec(spec)
+              spec.loader.exec_module(baseline)
+              rows = []
+              for count in (32, 100000):
+                  response = " ".join(str(100000 + number) for number in range(count))
+                  for index in (0, 1, -1, -2):
+                      metrics = {}
+                      outputs = []
+                      for label, cls in (("baseline", baseline.RegexFilter), ("patched", RegexFilter)):
+                          extractor = cls(r"(\d+)", group_select=index)
+                          def run():
+                              return extractor.apply([[response]], [{}])
+                          run()
+                          times = []
+                          for _ in range(9):
+                              start = time.perf_counter()
+                              result = run()
+                              times.append((time.perf_counter() - start) * 1000)
+                          gc.collect()
+                          tracemalloc.start()
+                          try:
+                              result = run()
+                              _, peak = tracemalloc.get_traced_memory()
+                          finally:
+                              tracemalloc.stop()
+                          outputs.append(result)
+                          metrics[label] = {"median_ms": statistics.median(times), "peak_bytes": peak}
+                      assert outputs[0] == outputs[1]
+                      rows.append({"matches": count, "group_select": index, "input_bytes": len(response),
+                                   "output": outputs[0], **metrics})
+              result = {"source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
+                        "warmups": 1, "timed_repetitions": 9, "memory_measured_separately": True,
+                        "scope": "Native RegexFilter.apply only; no model inference.", "rows": rows}
+              Path("regex-selection-benchmark.json").write_text(json.dumps(result, indent=2) + "\n")
+              print(json.dumps(result, indent=2))
+          PY
+          python "$RUNNER_TEMP/benchmark_regex.py" | tee regex-benchmark.log
+      - name: Restore the original extraction implementation
+        run: |
+          git show d6de81643928d653435c431bae19945d41d32520:lm_eval/filters/extraction.py > lm_eval/filters/extraction.py
+          python - <<'PY'
+          from pathlib import Path
+          for cached in Path("lm_eval/filters/__pycache__").glob("extraction.*.pyc"):
+              cached.unlink()
+          PY
+      - name: Confirm original memory failures and semantic controls
+        shell: bash
+        run: |
+          set +e
+          python -m pytest -q --junitxml=regex-baseline.xml tests/test_regex_stream_selection.py > regex-baseline.log 2>&1
+          result=$?
+          set -e
+          cat regex-baseline.log
+          test "$result" -eq 1
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse("regex-baseline.xml").getroot()
+          assert not root.findall(".//error")
+          failed = [case.attrib["name"] for case in root.findall(".//testcase") if case.find("failure") is not None]
+          assert len(failed) == 4, failed
+          assert all(name.startswith("test_match_storage_is_bounded_for_long_responses") for name in failed), failed
+          print("Only the four actual peak-memory limits fail on baseline:", failed)
+          PY
+      - name: Restore patch and check the changed files
+        if: always()
+        run: |
+          git restore --source=HEAD -- lm_eval/filters/extraction.py
+          python -m ruff check lm_eval/filters/extraction.py tests/test_regex_stream_selection.py
+          python -m ruff format --diff lm_eval/filters/extraction.py tests/test_regex_stream_selection.py
+          python -m ruff format --check lm_eval/filters/extraction.py tests/test_regex_stream_selection.py
+          git diff --check
+      - name: Save native execution evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: native-regex-selection-evidence
+          path: |
+            regex-patched.log
+            regex-patched.xml
+            regex-baseline.log
+            regex-baseline.xml
+            regex-benchmark.log
+            regex-selection-benchmark.json

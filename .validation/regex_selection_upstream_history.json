@@ -1,0 +1,262 @@
+[
+  {
+    "sha": "29270297165f7260a1f56f56c5c13f7414412306",
+    "message": "Fix MultiChoiceRegexFilter prefix-shadowing of choice text (#3884)\n\n* Fix MultiChoiceRegexFilter prefix-shadowing of choice text\n\nThe fallback regex joined choices in list order: re.compile(\"|\".join(choices)).\nPython regex alternation is leftmost-wins, so a choice whose text is a prefix\nof a later choice matched inside the longer choice's text. When the model named\nthe longer choice (e.g. \"Guilty of Romance\" with choices [\"Guilty\",\n\"Guilty of Romance\"]), the shorter prefix \"Guilty\" matched first and the\nanswer was mapped to the wrong letter, silently scoring a correct answer as\nexact_match=0 on tasks like bbh movie_recommendation.\n\nSort the alternation branches longest-first so the longest matching choice wins.\nchoice_to_alpha is keyed by choice text, so letter labels are unaffected.\n\n* fix: apply to bbh as well; add tests\n\n---------\n\nCo-authored-by: Baber Abbasi <baber@hey.com>",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -216,7 +216,13 @@ def filter_ignores(st):\n                 without_paren_to_target[next_alpha] = f\"({next_alpha})\"\n \n                 next_alpha = chr(ord(next_alpha) + 1)\n-            fallback_regex = re.compile(\"|\".join(fallback_regexes))\n+            # Sort branches longest-first so a choice whose text is a prefix of another\n+            # choice can't shadow it: regex alternation is leftmost-wins, so without this\n+            # \"Guilty\" would match inside \"Guilty of Romance\". choice_to_alpha is keyed by\n+            # the choice text, so branch order does not affect the letter assignment.\n+            fallback_regex = re.compile(\n+                \"|\".join(sorted(fallback_regexes, key=len, reverse=True))\n+            )\n             without_paren_fallback_regex = \"|\".join(without_paren_fallback_regexes)\n             without_paren_fallback_regex = re.compile(\n                 rf\":[\\s]*({without_paren_fallback_regex})\""
+      }
+    ]
+  },
+  {
+    "sha": "b67284a75cc80e5b519706a6d0aeacde804117a3",
+    "message": "chore: clean up deps; fix linting errors(#3748)",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -1,11 +1,17 @@\n+from __future__ import annotations\n+\n import re\n import sys\n-import unicodedata\n+from typing import TYPE_CHECKING, Any\n \n from lm_eval.api.filter import Filter\n from lm_eval.api.registry import register_filter\n \n \n+if TYPE_CHECKING:\n+    from collections.abc import Iterable, Sequence\n+\n+\n @register_filter(\"regex\")\n class RegexFilter(Filter):\n     \"\"\"A filter that extracts values from text using regex pattern matching.\n@@ -21,20 +27,19 @@ def __init__(\n         group_select: int = 0,\n         fallback: str = \"[invalid]\",\n     ) -> None:\n-        \"\"\"Pass a string `regex` to run `re.compile(r\"regex\")` on.\n+        \"\"\"Compile `regex_pattern` and set the fallback for non-matches.\n+\n         `fallback` defines the output returned if no matches for the regex are located.\n         \"\"\"\n         self.regex_pattern = regex_pattern\n         self.regex = re.compile(regex_pattern)\n         self.group_select = group_select\n         self.fallback = fallback\n \n-    def apply(self, resps: list[list[str]], docs: list[dict]) -> list[list[str]]:\n-        # here, we assume we have a list, in which each element is\n-        # a list of model responses for some particular input/target pair.\n-        # so we process each of these (same input/target response sets)\n-        # independently (and keep them a list.)\n-        def filter_set(inst):\n+    def apply(\n+        self, resps: Iterable[Sequence[str]], docs: Sequence[dict[str, Any]]\n+    ) -> Iterable[list[str]]:\n+        def filter_set(inst: Sequence[str]) -> list[str]:\n             filtered = []\n             for resp in inst:\n                 if not isinstance(resp, str):\n@@ -54,21 +59,21 @@ def filter_set(inst):\n                 filtered.append(match)\n             return filtered\n \n-        filtered_resps = list(map(lambda x: filter_set(x), resps))\n-        return filtered_resps\n+        return [filter_set(x) for x in resps]\n \n \n @register_filter(\"regex_pos\")\n class POSFilter(Filter):\n-    \"\"\" \"\"\"\n+    \"\"\"Extract part-of-speech tags from model responses.\"\"\"\n \n     def __init__(\n         self,\n         regex_pattern: str = r\"\\['(.*?)'\\]\",\n         group_select=0,\n         fallback=None,\n     ) -> None:\n-        \"\"\"Pass a string `regex` to run `re.compile(r\"regex\")` on.\n+        \"\"\"Compile `regex_pattern` and set the fallback for non-matches.\n+\n         `fallback` defines the output returned if no matches for the regex are located.\n         \"\"\"\n         if fallback is None:\n@@ -78,7 +83,7 @@ def __init__(\n         self.group_select = group_select\n         self.fallback = fallback\n \n-    def apply(self, resps, docs):\n+    def apply(self, resps: Iterable[Sequence[str]], docs: Sequence[dict[str, Any]]):\n         def extract_tagged_tokens(text):\n             # Extract tagged tokens list from text input using regex\n             tokens = re.findall(r\"\\('([^']*)', '([^']*)'\\)\", text)\n@@ -98,65 +103,65 @@ def filter_set(inst):\n                 filtered.append(match)\n             return filtered\n \n-        filtered_resps = map(lambda x: filter_set(x), resps)\n-\n-        return filtered_resps\n+        return (filter_set(x) for x in resps)\n \n \n @register_filter(\"remove_whitespace\")\n class WhitespaceFilter(Filter):\n     \"\"\"Filters out leading and trailing whitespace from responses.\"\"\"\n \n-    def apply(self, resps: list[list[str]], docs: list[dict]) -> list[list[str]]:\n-        def filter_set(inst):\n-            filtered_resp = []\n-            for resp in inst:\n-                resp = resp.strip()\n-                filtered_resp.append(resp)\n-            return filtered_resp\n-\n-        filtered_resps = [filter_set(resp) for resp in resps]\n+    def apply(\n+        self, resps: Iterable[Sequence[str]], docs: Sequence[dict[str, Any]]\n+    ) -> list[list[str]]:\n+        def filter_set(inst: Sequence[str]) -> list[str]:\n+            return [resp.strip() for resp in inst]\n \n-        return filtered_resps\n+        return [filter_set(resp) for resp in resps]\n \n \n @register_filter(\"multi_choice_regex\")\n class MultiChoiceRegexFilter(RegexFilter):\n-    \"\"\"A filter used to extract a model's answer on multiple choice questions with\n-    letter answers. assumes each document has a \"choices\" field\n-    containing the list of answer choices and that the answer label symbols\n-    are of the form (A), (B), (C), ... or A, B, C.\n+    \"\"\"Extract a model's answer on multiple choice questions with letter answers.\n+\n+    Assumes each document has a \"choices\" field containing the list of answer choices\n+    and that the answer label symbols are of the form (A), (B), (C), ... or A, B, C.\n     \"\"\"\n \n     def __init__(\n         self,\n         regex_pattern: str = r\"#### (\\-?[0-9\\.\\,]+)\",\n-        group_select=0,\n+        group_select: int = 0,\n         fallback: str = \"[invalid]\",\n-        ignore_case=False,\n-        ignore_punctuation=False,\n-        regexes_to_ignore=None,\n+        ignore_case: bool = False,\n+        ignore_punctuation: bool = False,\n+        regexes_to_ignore: list[str] | None = None,\n     ) -> None:\n-        \"\"\"Arg regex_pattern: The basic regex pattern to use. If fails to match, we will use the customized match procedure\n-                        - step 1 : We parse the choices between ([A-Z])s then try to find these choices in the response.\n-                        - step 2 : We parse the choice with regex: r's*([A-?])', where ? varies by number of choices.\n-        group_select: Selects the (group_select)th match from the findall result.\n-        ignore_case: Ignores the case during step 1 matching\n-        ignore_punctuation: Remove the punctuation during step 1 matching\n-        regexes_to_ignore: Remove these regexes during step 1 matching\n+        r\"\"\"Configure the multi-choice regex filter.\n+\n+        Args:\n+            regex_pattern: The basic regex pattern to use. If it fails to match,\n+                a customized procedure is used:\n+                step 1 — parse choices between ([A-Z])s and search in the response.\n+                step 2 — parse with regex ``r'\\s*([A-?])'``, where ``?`` varies by\n+                number of choices.\n+            group_select: Selects the (group_select)th match from the findall result.\n+            ignore_case: Ignore case during step 1 matching.\n+            ignore_punctuation: Remove punctuation during step 1 matching.\n+            regexes_to_ignore: Remove these regexes during step 1 matching.\n         \"\"\"\n         super().__init__(regex_pattern, group_select, fallback)\n         self.ignore_case = ignore_case\n         self.ignore_punctuation = ignore_punctuation\n         self.regexes_to_ignore = regexes_to_ignore\n \n-    def apply(self, resps: list[list[str]], docs: list[dict]) -> list[list[str]]:\n-        # here, we assume we have a list, in which each element is\n-        # a list of model responses for some particular input/target pair.\n-        # so we process each of these (same input/target response sets)\n-        # independently (and keep them a list.)\n+    def apply(\n+        self, resps: Iterable[Sequence[str]], docs: Sequence[dict[str, Any]]\n+    ) -> list[list[str]]:\n+        import unicodedata\n \n-        def find_match(regex, resp, convert_dict={}):\n+        def find_match(regex, resp, convert_dict: dict[str, str] | None = None):\n+            if convert_dict is None:\n+                convert_dict = {}\n             if not isinstance(resp, str):\n                 resp = \"\"\n             match = regex.findall(resp)"
+      }
+    ]
+  },
+  {
+    "sha": "182836f61b9beecdf2b6207440b73fecb743d50f",
+    "message": "Fix MultiChoiceRegexFilter.find_match IndexError on all-empty capture groups (#3708)\n\n* Fix MultiChoiceRegexFilter.find_match IndexError on all-empty capture groups",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -21,8 +21,7 @@ def __init__(\n         group_select: int = 0,\n         fallback: str = \"[invalid]\",\n     ) -> None:\n-        \"\"\"\n-        pass a string `regex` to run `re.compile(r\"regex\")` on.\n+        \"\"\"Pass a string `regex` to run `re.compile(r\"regex\")` on.\n         `fallback` defines the output returned if no matches for the regex are located.\n         \"\"\"\n         self.regex_pattern = regex_pattern\n@@ -69,8 +68,7 @@ def __init__(\n         group_select=0,\n         fallback=None,\n     ) -> None:\n-        \"\"\"\n-        pass a string `regex` to run `re.compile(r\"regex\")` on.\n+        \"\"\"Pass a string `regex` to run `re.compile(r\"regex\")` on.\n         `fallback` defines the output returned if no matches for the regex are located.\n         \"\"\"\n         if fallback is None:\n@@ -91,7 +89,7 @@ def extract_pos_tags(result):\n             if isinstance(result, str):\n                 result = extract_tagged_tokens(result)\n             pos_tags.extend(pos for _, pos in result)\n-            return pos_tags if pos_tags else self.fallback\n+            return pos_tags or self.fallback\n \n         def filter_set(inst):\n             filtered = []\n@@ -124,8 +122,7 @@ def filter_set(inst):\n \n @register_filter(\"multi_choice_regex\")\n class MultiChoiceRegexFilter(RegexFilter):\n-    \"\"\"\n-    A filter used to extract a model's answer on multiple choice questions with\n+    \"\"\"A filter used to extract a model's answer on multiple choice questions with\n     letter answers. assumes each document has a \"choices\" field\n     containing the list of answer choices and that the answer label symbols\n     are of the form (A), (B), (C), ... or A, B, C.\n@@ -140,8 +137,7 @@ def __init__(\n         ignore_punctuation=False,\n         regexes_to_ignore=None,\n     ) -> None:\n-        \"\"\"\n-        regex_pattern: The basic regex pattern to use. If fails to match, we will use the customized match procedure\n+        \"\"\"Arg regex_pattern: The basic regex pattern to use. If fails to match, we will use the customized match procedure\n                         - step 1 : We parse the choices between ([A-Z])s then try to find these choices in the response.\n                         - step 2 : We parse the choice with regex: r's*([A-?])', where ? varies by number of choices.\n         group_select: Selects the (group_select)th match from the findall result.\n@@ -167,7 +163,10 @@ def find_match(regex, resp, convert_dict={}):\n             if match:\n                 match = match[self.group_select]\n                 if isinstance(match, tuple):\n-                    match = [m for m in match if m][0]\n+                    non_empty = [m for m in match if m]\n+                    if not non_empty:\n+                        return \"\"\n+                    match = non_empty[0]\n                 match = match.strip()\n                 if match and match in convert_dict:\n                     match = convert_dict[match]\n@@ -194,7 +193,7 @@ def filter_ignores(st):\n \n         filtered_resps = []\n \n-        for r, doc in zip(resps, docs):\n+        for r, doc in zip(resps, docs, strict=True):\n             fallback_regexes = []\n             choice_to_alpha = {}\n             next_alpha = \"A\""
+      }
+    ]
+  },
+  {
+    "sha": "7ddd9667008623fe08f31d900d945c8c262464ad",
+    "message": "Avoid errors in extraction filters (#3395)",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -38,6 +38,8 @@ def apply(self, resps: list[list[str]], docs: list[dict]) -> list[list[str]]:\n         def filter_set(inst):\n             filtered = []\n             for resp in inst:\n+                if not isinstance(resp, str):\n+                    resp = \"\"\n                 match = self.regex.findall(resp)\n                 if match:\n                     match = match[self.group_select]\n@@ -159,6 +161,8 @@ def apply(self, resps: list[list[str]], docs: list[dict]) -> list[list[str]]:\n         # independently (and keep them a list.)\n \n         def find_match(regex, resp, convert_dict={}):\n+            if not isinstance(resp, str):\n+                resp = \"\"\n             match = regex.findall(resp)\n             if match:\n                 match = match[self.group_select]"
+      }
+    ]
+  },
+  {
+    "sha": "f30dda15f4f4442759ded897847e2e8dc446fa4d",
+    "message": "use `strip()` instead of `lstrip()` in `remove_whitespace` filter (#3408)",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -105,13 +105,13 @@ def filter_set(inst):\n \n @register_filter(\"remove_whitespace\")\n class WhitespaceFilter(Filter):\n-    \"\"\"Filters out leading whitespace from responses.\"\"\"\n+    \"\"\"Filters out leading and trailing whitespace from responses.\"\"\"\n \n     def apply(self, resps: list[list[str]], docs: list[dict]) -> list[list[str]]:\n         def filter_set(inst):\n             filtered_resp = []\n             for resp in inst:\n-                resp = resp.lstrip()\n+                resp = resp.strip()\n                 filtered_resp.append(resp)\n             return filtered_resp\n "
+      }
+    ]
+  },
+  {
+    "sha": "fcddf195ec6bb69c63e36d54d75354f6ecaabab7",
+    "message": "fix: remove warning (#3128)",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -141,7 +141,7 @@ def __init__(\n         \"\"\"\n         regex_pattern: The basic regex pattern to use. If fails to match, we will use the customized match procedure\n                         - step 1 : We parse the choices between ([A-Z])s then try to find these choices in the response.\n-                        - step 2 : We parse the choice with regex: r'\\s*([A-?])', where ? varies by number of choices.\n+                        - step 2 : We parse the choice with regex: r's*([A-?])', where ? varies by number of choices.\n         group_select: Selects the (group_select)th match from the findall result.\n         ignore_case: Ignores the case during step 1 matching\n         ignore_punctuation: Remove the punctuation during step 1 matching"
+      }
+    ]
+  },
+  {
+    "sha": "f3a0b55414aff5e95a3ead8efe8f879f4d3f1d3f",
+    "message": "warning for \"chat\" pretrained; disable buggy evalita configs (#3127)\n\n* check for chat for warning\n\n* add test\n\n* remove yaml extension from some evalita configs\n\n* move unitxt to own test script\n\n* fix CI test",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -141,7 +141,7 @@ def __init__(\n         \"\"\"\n         regex_pattern: The basic regex pattern to use. If fails to match, we will use the customized match procedure\n                         - step 1 : We parse the choices between ([A-Z])s then try to find these choices in the response.\n-                        - step 2 : We parse the choice with regex :[\\s]*([A-?]), where ? varies by number of choices.\n+                        - step 2 : We parse the choice with regex: r'\\s*([A-?])', where ? varies by number of choices.\n         group_select: Selects the (group_select)th match from the findall result.\n         ignore_case: Ignores the case during step 1 matching\n         ignore_punctuation: Remove the punctuation during step 1 matching"
+      }
+    ]
+  },
+  {
+    "sha": "1829799355d0377f5101fdd48fc493905cf5b17a",
+    "message": "AfroBench: How Good are Large Language Models on African Languages? (#2825)\n\n* add afrixnli to task\n\n* add chat completion\n\n* remove chat completion -untested\n\n* afrimmlu added\n\n* afrimmlu folder update\n\n* afrimmlu folder update\n\n* updated prompt\n\n* remove print\n\n* add afrimgsm -direct\n\n* add squad metric\n\n* fix bash script\n\n* remove direct util, update common yaml\n\n* remove print\n\n* add few show. metric fixes\n\n* fix direct path, add bash script for gpt models\n\n* added transate test\n\n* update afrixnli tasks\n\n* update afrixnli tasks\n\n* update metrics for afrixnli\n\n* prompt translations fix\n\n* prompt translations fix\n\n* filter and metric fix -mgsm\n\n* remove squad metric\n\n* remove squad metric\n\n* add f1 score to mgsm\n\n* add f1 score to mgsm\n\n* update native-direct with lin\n\n* change f1 function\n\n* add lin to utils\n\n* add utils\n\n* remove test limit\n\n* remove test configs\n\n* add swahili to mmlu\n\n* change eng to ewe in ewe yaml mmlu\n\n* add squad metric to mgsm, remove whitespace filter\n\n* added translate test\n\n* added afrixnli_translate\n\n* fix exact match valueError\n\n* fix exact match valueError\n\n* restructure mmlu folder\n\n* spacing\n\n* remove afrimmlu_translate folder\n\n* add utility\n\n* format task name, clean ups\n\n* modefied mgsm\n\n* update on afrimgsm\n\n* update on afrimgsm\n\n* removed utils\n\n* other mgsm varieties\n\n* other mgsm varieties\n\n* adding trasnslate direct\n\n* Update translate_direct_yaml\n\n* add manual xnli prompt, add multichoice for openai models, and adapt multichoice metric for openai model\n\n* edit for open models\n\n* Update translate_direct_yaml\n\n* add verbalizer for xnli\n\n* change xnli from multiple choice to generate\n\n* add manual accuracy scores\n\n* revert xnli to multiple choice\n\n* change afrimgsm utils\n\n* revert xnli to multiple_choice\n\n* cleanups and readmes\n\n* remove openai fixes and unused regex\n\n* pr review changes\n\n* revert metrics.py, task.py and extraction.py to main version\n\n* add afrisenti\n\n* utilities\n\n* pulled from main\n\n* add afrixnli\n\n* add afrimmlu\n\n* update afrixnli prompts\n\n* mising senti language\n\n* fix afrisenti prompt 2\n\n* fix afrisenti prompts\n\n* fix afrisenti prompts\n\n* configure task grouping\n\n* add multiple prompts to afrixnli for irokobench\n\n* add multiple prompts to afrimmlu for irokobench\n\n* Update afrixnli_yaml\n\n* fixes and moves\n\n* fixes and moves\n\n* afrimmlu multiple prompts configs\n\n* remove validation set from afrimmlu\n\n* remove eng from afrimmlu translate test\n\n* correct dataset path\n\n* multiple prompts for mgsm\n\n* file restructure\n\n* afribench grouping\n\n* repo restructuring\n\n* repo restructuring\n\n* update exact match to hugging face exact match and add new mgsm language\n\n* remove decontamination\n\n* update generation kwargs\n\n* update generation kwargs for all mgsm prompts\n\n* remove lang\n\n* update generation kwargs for afrimgsm translatetest\n\n* add afrimgsm cot for direct and translate\n\n* remove eng from translate-cot\n\n* add masakhaPOS tasks\n\n* remove changes from task script\n\n* add masakhanews tasks\n\n* add uhura arc easy\n\n* add afriqa and belebele files\n\n* add tags for easier run. add naija rc\n\n* add new metrics and transformation scripts\n\n* fix afriqa swa fewshot split\n\n* add naijarc\n\n* add afrobench lite tasks\n\n* update afrobench\n\n* update afrobench\n\n* remove unverified files to avoid bugs\n\n* remove files not needed\n\n* add afrobench tasks\n\n* add afrobench tasks\n\n* change to version 1\n\n* change to version 1\n\n* update afrobench\n\n* update afrobench\n\n* restore metric to original script\n\n* update readme instructions\n\n* add individual dataset readmes\n\n* add link to collections\n\n* correct run script\n\n* align with main\n\n* align with main\n\n* align with main\n\n* align with main\n\n* align with main\n\n* align with main\n\n* align with main\n\n* align with main\n\n* failed run fixes\n\n* failed run fixes\n\n* add afrimgsm cot\n\n* Apply precommit fixes\n\n* update mafand dataset name\n\n* pull request fixes\n\n* remove afrihate due to availability\n\n---------\n\nCo-authored-by: Israel Abebe Azime <azime@cg.uni-saarland.de>\nCo-authored-by: Israel Abebe Azime <se.israel.abebe@gmail.com>\nCo-authored-by: David Adelani <davlanade@gmail.com>\nCo-authored-by: theyorubayesian <akin.o.oladipo@gmail.com>",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -54,6 +54,51 @@ def filter_set(inst):\n             return filtered\n \n         filtered_resps = list(map(lambda x: filter_set(x), resps))\n+        return filtered_resps\n+\n+\n+@register_filter(\"regex_pos\")\n+class POSFilter(Filter):\n+    \"\"\" \"\"\"\n+\n+    def __init__(\n+        self,\n+        regex_pattern: str = r\"\\['(.*?)'\\]\",\n+        group_select=0,\n+        fallback=None,\n+    ) -> None:\n+        \"\"\"\n+        pass a string `regex` to run `re.compile(r\"regex\")` on.\n+        `fallback` defines the output returned if no matches for the regex are located.\n+        \"\"\"\n+        if fallback is None:\n+            fallback = [\"invalid\"]\n+        self.regex_pattern = regex_pattern\n+        self.regex = re.compile(regex_pattern)\n+        self.group_select = group_select\n+        self.fallback = fallback\n+\n+    def apply(self, resps, docs):\n+        def extract_tagged_tokens(text):\n+            # Extract tagged tokens list from text input using regex\n+            tokens = re.findall(r\"\\('([^']*)', '([^']*)'\\)\", text)\n+            return [(token, pos) for token, pos in tokens]\n+\n+        def extract_pos_tags(result):\n+            pos_tags = []\n+            if isinstance(result, str):\n+                result = extract_tagged_tokens(result)\n+            pos_tags.extend(pos for _, pos in result)\n+            return pos_tags if pos_tags else self.fallback\n+\n+        def filter_set(inst):\n+            filtered = []\n+            for resp in inst:\n+                match = extract_pos_tags(resp)\n+                filtered.append(match)\n+            return filtered\n+\n+        filtered_resps = map(lambda x: filter_set(x), resps)\n \n         return filtered_resps\n "
+      }
+    ]
+  },
+  {
+    "sha": "703fbffd6fe5e136bbb9d884cb40844e5503ae5d",
+    "message": "assistant prefill  (#2615)\n\n* add assistant prefix\r\n\r\n* add arc_challenge from llama\r\n\r\n* nit\r\n\r\n* nit\r\n\r\n* nit\r\n\r\n* add assistant prefix\r\n\r\n* add mmlu_llama\r\n\r\n* nit\r\n\r\n* nit\r\n\r\n* Revert \"nit\"\r\n\r\nThis reverts commit 6a97f8356237305e375212b966b30e8de59dd4bc.\r\n\r\n* fix regex bug\r\n\r\n* add assistant_prefix to vllm\r\n\r\n* add `Question:`\r\n\r\n* add mmlu_pro\r\n\r\n* add fewshot assistant_prefix\r\n\r\n* use `assistant_prefill`\r\n\r\n* typehints\r\n\r\n* nits\r\n\r\n* nits\r\n\r\n* add to docs\r\n\r\n* add readme",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -8,12 +8,17 @@\n \n @register_filter(\"regex\")\n class RegexFilter(Filter):\n-    \"\"\" \"\"\"\n+    \"\"\"A filter that extracts values from text using regex pattern matching.\n+\n+    This filter applies a regex pattern to each model response and extracts matched values.\n+    If no match is found, returns a fallback value. Useful for extracting structured data\n+    (like numbers) from unstructured model outputs.\n+    \"\"\"\n \n     def __init__(\n         self,\n         regex_pattern: str = r\"#### (\\-?[0-9\\.\\,]+)\",\n-        group_select=0,\n+        group_select: int = 0,\n         fallback: str = \"[invalid]\",\n     ) -> None:\n         \"\"\"\n@@ -25,7 +30,7 @@ def __init__(\n         self.group_select = group_select\n         self.fallback = fallback\n \n-    def apply(self, resps, docs):\n+    def apply(self, resps: list[list[str]], docs: list[dict]) -> list[list[str]]:\n         # here, we assume we have a list, in which each element is\n         # a list of model responses for some particular input/target pair.\n         # so we process each of these (same input/target response sets)\n@@ -55,12 +60,9 @@ def filter_set(inst):\n \n @register_filter(\"remove_whitespace\")\n class WhitespaceFilter(Filter):\n-    \"\"\" \"\"\"\n-\n-    def __init__(self) -> None:\n-        pass\n+    \"\"\"Filters out leading whitespace from responses.\"\"\"\n \n-    def apply(self, resps, docs):\n+    def apply(self, resps: list[list[str]], docs: list[dict]) -> list[list[str]]:\n         def filter_set(inst):\n             filtered_resp = []\n             for resp in inst:\n@@ -105,7 +107,7 @@ def __init__(\n         self.ignore_punctuation = ignore_punctuation\n         self.regexes_to_ignore = regexes_to_ignore\n \n-    def apply(self, resps, docs):\n+    def apply(self, resps: list[list[str]], docs: list[dict]) -> list[list[str]]:\n         # here, we assume we have a list, in which each element is\n         # a list of model responses for some particular input/target pair.\n         # so we process each of these (same input/target response sets)"
+      }
+    ]
+  },
+  {
+    "sha": "8d2f64c1da7d60c47b46076b11978dc8eb1b0a89",
+    "message": "fix `DeprecationWarning: invalid escape sequence '\\s'` for whitespace filter (#2560)\n\n* fix `DeprecationWarning: invalid escape sequence '\\s'`\r\n\r\n* add type hints\r\n\r\n* Revert \"add type hints\"\r\n\r\nThis reverts commit 15d8abc626a84e97f8c238ddfbf9e243d6f6eb5c.",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -164,7 +164,7 @@ def filter_ignores(st):\n             fallback_regex = re.compile(\"|\".join(fallback_regexes))\n             without_paren_fallback_regex = \"|\".join(without_paren_fallback_regexes)\n             without_paren_fallback_regex = re.compile(\n-                f\":[\\s]*({without_paren_fallback_regex})\"\n+                rf\":[\\s]*({without_paren_fallback_regex})\"\n             )\n \n             filtered = []"
+      }
+    ]
+  },
+  {
+    "sha": "5680a2e6b5cf1a1621d8ff68d3d0e83e8b2731d3",
+    "message": "Filters bugfix; add `metrics` and `filter` to logged sample (#2517)\n\n* allow !function filters\r\n\r\n* bugfix\r\n\r\n* nit\r\n\r\n* add `filter` to logged samples\r\n\r\n* add `filter` and `metric` to logged samples to identification\r\n\r\n* convert `metric` to `metrics`: list",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -37,16 +37,18 @@ def filter_set(inst):\n                 if match:\n                     match = match[self.group_select]\n                     if isinstance(match, tuple):\n-                        match = [m for m in match if m][0]\n+                        match = [m for m in match if m]\n+                        if match:\n+                            match = match[0]\n+                        else:\n+                            match = self.fallback\n                     match = match.strip()\n                 else:\n                     match = self.fallback\n                 filtered.append(match)\n             return filtered\n \n-        # print(resps)\n         filtered_resps = list(map(lambda x: filter_set(x), resps))\n-        # print(filtered_resps)\n \n         return filtered_resps\n "
+      }
+    ]
+  },
+  {
+    "sha": "56a4e7943fca2959aff06bb96a3fe5ec63255aaa",
+    "message": "formatting (#2104)",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -181,4 +181,4 @@ def filter_ignores(st):\n                 filtered.append(match)\n             filtered_resps.append(filtered)\n \n-        return filtered_resps\n\\ No newline at end of file\n+        return filtered_resps"
+      }
+    ]
+  },
+  {
+    "sha": "383bbd54bc621086e05aa1b030d8d4d5635b25e6",
+    "message": "Irokobench: Benchmark Dataset for African languages (#2042)\n\n* add afrixnli to task\r\n\r\n* add chat completion\r\n\r\n* remove chat completion -untested\r\n\r\n* afrimmlu added\r\n\r\n* afrimmlu folder update\r\n\r\n* afrimmlu folder update\r\n\r\n* updated prompt\r\n\r\n* remove print\r\n\r\n* add afrimgsm -direct\r\n\r\n* add squad metric\r\n\r\n* fix bash script\r\n\r\n* remove direct util, update common yaml\r\n\r\n* remove print\r\n\r\n* add few show. metric fixes\r\n\r\n* fix direct path, add bash script for gpt models\r\n\r\n* added transate test\r\n\r\n* update afrixnli tasks\r\n\r\n* update afrixnli tasks\r\n\r\n* update metrics for afrixnli\r\n\r\n* prompt translations fix\r\n\r\n* prompt translations fix\r\n\r\n* filter and metric fix -mgsm\r\n\r\n* remove squad metric\r\n\r\n* remove squad metric\r\n\r\n* add f1 score to mgsm\r\n\r\n* add f1 score to mgsm\r\n\r\n* update native-direct with lin\r\n\r\n* change f1 function\r\n\r\n* add lin to utils\r\n\r\n* add utils\r\n\r\n* remove test limit\r\n\r\n* remove test configs\r\n\r\n* add swahili to mmlu\r\n\r\n* change eng to ewe in ewe yaml mmlu\r\n\r\n* add squad metric to mgsm, remove whitespace filter\r\n\r\n* added translate test\r\n\r\n* added afrixnli_translate\r\n\r\n* fix exact match valueError\r\n\r\n* fix exact match valueError\r\n\r\n* restructure mmlu folder\r\n\r\n* spacing\r\n\r\n* remove afrimmlu_translate folder\r\n\r\n* add utility\r\n\r\n* format task name, clean ups\r\n\r\n* modefied mgsm\r\n\r\n* update on afrimgsm\r\n\r\n* update on afrimgsm\r\n\r\n* removed utils\r\n\r\n* other mgsm varieties\r\n\r\n* other mgsm varieties\r\n\r\n* adding trasnslate direct\r\n\r\n* Update translate_direct_yaml\r\n\r\n* add manual xnli prompt, add multichoice for openai models, and adapt multichoice metric for openai model\r\n\r\n* edit for open models\r\n\r\n* Update translate_direct_yaml\r\n\r\n* add verbalizer for xnli\r\n\r\n* change xnli from multiple choice to generate\r\n\r\n* add manual accuracy scores\r\n\r\n* revert xnli to multiple choice\r\n\r\n* change afrimgsm utils\r\n\r\n* revert xnli to multiple_choice\r\n\r\n* cleanups and readmes\r\n\r\n* remove openai fixes and unused regex\r\n\r\n* pr review changes\r\n\r\n* revert metrics.py, task.py and extraction.py to main version\r\n\r\n---------\r\n\r\nCo-authored-by: Israel Abebe Azime <azime@cg.uni-saarland.de>\r\nCo-authored-by: Israel Abebe Azime <se.israel.abebe@gmail.com>",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -181,4 +181,4 @@ def filter_ignores(st):\n                 filtered.append(match)\n             filtered_resps.append(filtered)\n \n-        return filtered_resps\n+        return filtered_resps\n\\ No newline at end of file"
+      }
+    ]
+  },
+  {
+    "sha": "9088a68fac0d94ab028a23de47f9d499db70cc62",
+    "message": "Fix strip whitespace filter (#2048)\n\n* batch commit\r\n\r\n* :Revert \"batch commit\"\r\n\r\nThis reverts commit d859d1ca3bc2d6e45979ec51379df119f2a9633d.\r\n\r\n* batch commit\r\n\r\n* checkout from main\r\n\r\n* checkout from main\r\n\r\n* checkout from main\r\n\r\n* checkout from main\r\n\r\n* checkout from main\r\n\r\n* cleanup\r\n\r\n* cleanup\r\n\r\n* cleanup\r\n\r\n* cleanup\r\n\r\n* cleanup\r\n\r\n* cleanup",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -62,11 +62,8 @@ def apply(self, resps, docs):\n         def filter_set(inst):\n             filtered_resp = []\n             for resp in inst:\n-                if resp.startswith(\" \"):\n-                    resp = resp[1:]\n-\n+                resp = resp.lstrip()\n                 filtered_resp.append(resp)\n-\n             return filtered_resp\n \n         filtered_resps = [filter_set(resp) for resp in resps]"
+      }
+    ]
+  },
+  {
+    "sha": "f64e72f565b9a8fe09690b0a3216dc67a6ca91cb",
+    "message": "Add filter registry decorator (#1750)\n\n* Add register_filter decorator\r\n\r\n* Add register_filter docs",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -3,8 +3,10 @@\n import unicodedata\n \n from lm_eval.api.filter import Filter\n+from lm_eval.api.registry import register_filter\n \n \n+@register_filter(\"regex\")\n class RegexFilter(Filter):\n     \"\"\" \"\"\"\n \n@@ -49,6 +51,7 @@ def filter_set(inst):\n         return filtered_resps\n \n \n+@register_filter(\"remove_whitespace\")\n class WhitespaceFilter(Filter):\n     \"\"\" \"\"\"\n \n@@ -71,6 +74,7 @@ def filter_set(inst):\n         return filtered_resps\n \n \n+@register_filter(\"multi_choice_regex\")\n class MultiChoiceRegexFilter(RegexFilter):\n     \"\"\"\n     A filter used to extract a model's answer on multiple choice questions with"
+      }
+    ]
+  },
+  {
+    "sha": "01108aca2723e2ce2ac8780350093534353b97b7",
+    "message": "Add a new task GPQA (the part  CoT and generative) (#1482)\n\n* Add new tasks of GPQA\r\n\r\n* Add README\r\n\r\n* Remove unused functions\r\n\r\n* Remove unused functions\r\n\r\n* Linters\r\n\r\n* Add flexible match\r\n\r\n* update\r\n\r\n* Remove deplicate function\r\n\r\n* Linter\r\n\r\n* update\r\n\r\n* Update lm_eval/filters/extraction.py\r\n\r\nCo-authored-by: Hailey Schoelkopf <65563625+haileyschoelkopf@users.noreply.github.com>\r\n\r\n* register multi_choice_regex\r\n\r\n* Update\r\n\r\n* run precommit\r\n\r\n---------\r\n\r\nCo-authored-by: Hailey Schoelkopf <65563625+haileyschoelkopf@users.noreply.github.com>\r\nCo-authored-by: haileyschoelkopf <hailey@eleuther.ai>",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -1,4 +1,6 @@\n import re\n+import sys\n+import unicodedata\n \n from lm_eval.api.filter import Filter\n \n@@ -67,3 +69,115 @@ def filter_set(inst):\n         filtered_resps = [filter_set(resp) for resp in resps]\n \n         return filtered_resps\n+\n+\n+class MultiChoiceRegexFilter(RegexFilter):\n+    \"\"\"\n+    A filter used to extract a model's answer on multiple choice questions with\n+    letter answers. assumes each document has a \"choices\" field\n+    containing the list of answer choices and that the answer label symbols\n+    are of the form (A), (B), (C), ... or A, B, C.\n+    \"\"\"\n+\n+    def __init__(\n+        self,\n+        regex_pattern: str = r\"#### (\\-?[0-9\\.\\,]+)\",\n+        group_select=0,\n+        fallback: str = \"[invalid]\",\n+        ignore_case=False,\n+        ignore_punctuation=False,\n+        regexes_to_ignore=None,\n+    ) -> None:\n+        \"\"\"\n+        regex_pattern: The basic regex pattern to use. If fails to match, we will use the customized match procedure\n+                        - step 1 : We parse the choices between ([A-Z])s then try to find these choices in the response.\n+                        - step 2 : We parse the choice with regex :[\\s]*([A-?]), where ? varies by number of choices.\n+        group_select: Selects the (group_select)th match from the findall result.\n+        ignore_case: Ignores the case during step 1 matching\n+        ignore_punctuation: Remove the punctuation during step 1 matching\n+        regexes_to_ignore: Remove these regexes during step 1 matching\n+        \"\"\"\n+        super().__init__(regex_pattern, group_select, fallback)\n+        self.ignore_case = ignore_case\n+        self.ignore_punctuation = ignore_punctuation\n+        self.regexes_to_ignore = regexes_to_ignore\n+\n+    def apply(self, resps, docs):\n+        # here, we assume we have a list, in which each element is\n+        # a list of model responses for some particular input/target pair.\n+        # so we process each of these (same input/target response sets)\n+        # independently (and keep them a list.)\n+\n+        def find_match(regex, resp, convert_dict={}):\n+            match = regex.findall(resp)\n+            if match:\n+                match = match[self.group_select]\n+                if isinstance(match, tuple):\n+                    match = [m for m in match if m][0]\n+                match = match.strip()\n+                if match and match in convert_dict:\n+                    match = convert_dict[match]\n+            return match\n+\n+        punct_tbl = dict.fromkeys(\n+            i\n+            for i in range(sys.maxunicode)\n+            if unicodedata.category(chr(i)).startswith(\"P\")\n+        )\n+\n+        def filter_ignores(st):\n+            if self.regexes_to_ignore is not None:\n+                for s in self.regexes_to_ignore:\n+                    st = re.sub(s, \"\", st)\n+\n+            if self.ignore_case:\n+                st = st.lower()\n+\n+            if self.ignore_punctuation:\n+                # https://stackoverflow.com/a/266162\n+                st = st.translate(punct_tbl)\n+            return st\n+\n+        filtered_resps = []\n+\n+        for r, doc in zip(resps, docs):\n+            fallback_regexes = []\n+            choice_to_alpha = {}\n+            next_alpha = \"A\"\n+\n+            without_paren_fallback_regexes = []\n+            without_paren_to_target = {}\n+\n+            choices = doc[\"choices\"]\n+            for c in choices:\n+                m = filter_ignores(c.strip())\n+                fallback_regexes.append(f\"{re.escape(m)}\")\n+                choice_to_alpha[m] = f\"({next_alpha})\"\n+\n+                without_paren_fallback_regexes.append(next_alpha)\n+                without_paren_to_target[next_alpha] = f\"({next_alpha})\"\n+\n+                next_alpha = chr(ord(next_alpha) + 1)\n+            fallback_regex = re.compile(\"|\".join(fallback_regexes))\n+            without_paren_fallback_regex = \"|\".join(without_paren_fallback_regexes)\n+            without_paren_fallback_regex = re.compile(\n+                f\":[\\s]*({without_paren_fallback_regex})\"\n+            )\n+\n+            filtered = []\n+            for resp in r:\n+                match = find_match(self.regex, resp)\n+                if not match:\n+                    match = find_match(\n+                        fallback_regex, filter_ignores(resp), choice_to_alpha\n+                    )\n+                    if not match:\n+                        match = find_match(\n+                            without_paren_fallback_regex, resp, without_paren_to_target\n+                        )\n+                if not match:\n+                    match = self.fallback\n+                filtered.append(match)\n+            filtered_resps.append(filtered)\n+\n+        return filtered_resps"
+      }
+    ]
+  },
+  {
+    "sha": "89deeeafc884578afdd30b7275cbb18700eff6c2",
+    "message": "update bbh, gsm8k, mmlu parsing logic and prompts (Orca2 bbh_cot_zeroshot 0% -> 42%) (#1356)\n\n* update bbh, gsm8k, mmlu parsing logic and prompts\r\n\r\n* remove the formatting prompt (bbh) + minor update (mmlu)\r\n\r\n* update bbh, gsm8k, mmlu zeroshot, revert fewshots\r\n\r\n* update bbh, gsm8k, mmlu version, forward changes to gsm8k-cot\r\n\r\n* remove take_last, update to use docs parameters\r\n\r\n* add newline\r\n\r\n* ruff formatting\r\n\r\n* Update pyproject.toml\r\n\r\n* fix format\r\n\r\n---------\r\n\r\nCo-authored-by: Hailey Schoelkopf <65563625+haileyschoelkopf@users.noreply.github.com>",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -7,14 +7,18 @@ class RegexFilter(Filter):\n     \"\"\" \"\"\"\n \n     def __init__(\n-        self, regex_pattern: str = r\"#### (\\-?[0-9\\.\\,]+)\", fallback: str = \"[invalid]\"\n+        self,\n+        regex_pattern: str = r\"#### (\\-?[0-9\\.\\,]+)\",\n+        group_select=0,\n+        fallback: str = \"[invalid]\",\n     ) -> None:\n         \"\"\"\n         pass a string `regex` to run `re.compile(r\"regex\")` on.\n         `fallback` defines the output returned if no matches for the regex are located.\n         \"\"\"\n         self.regex_pattern = regex_pattern\n         self.regex = re.compile(regex_pattern)\n+        self.group_select = group_select\n         self.fallback = fallback\n \n     def apply(self, resps, docs):\n@@ -25,9 +29,12 @@ def apply(self, resps, docs):\n         def filter_set(inst):\n             filtered = []\n             for resp in inst:\n-                match = self.regex.search(resp)\n+                match = self.regex.findall(resp)\n                 if match:\n-                    match = match.group(1).strip()\n+                    match = match[self.group_select]\n+                    if isinstance(match, tuple):\n+                        match = [m for m in match if m][0]\n+                    match = match.strip()\n                 else:\n                     match = self.fallback\n                 filtered.append(match)"
+      }
+    ]
+  },
+  {
+    "sha": "4721379e2bc7def98d742b83b94414af36b151e9",
+    "message": "Merge branch 'big-refactor' into mypy",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -17,7 +17,7 @@ def __init__(\n         self.regex = re.compile(regex_pattern)\n         self.fallback = fallback\n \n-    def apply(self, resps):\n+    def apply(self, resps, docs):\n         # here, we assume we have a list, in which each element is\n         # a list of model responses for some particular input/target pair.\n         # so we process each of these (same input/target response sets)\n@@ -46,7 +46,7 @@ class WhitespaceFilter(Filter):\n     def __init__(self) -> None:\n         pass\n \n-    def apply(self, resps):\n+    def apply(self, resps, docs):\n         def filter_set(inst):\n             filtered_resp = []\n             for resp in inst:"
+      }
+    ]
+  },
+  {
+    "sha": "fc69d84f0fdeed782fa4971b08f096d80fa9b8bc",
+    "message": "Add suggestions from autotyping\n\nThis adds a bunch of simple annotations suggested by https://github.com/JelleZijlstra/autotyping.",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -6,7 +6,9 @@\n class RegexFilter(Filter):\n     \"\"\" \"\"\"\n \n-    def __init__(self, regex_pattern=r\"#### (\\-?[0-9\\.\\,]+)\", fallback=\"[invalid]\"):\n+    def __init__(\n+        self, regex_pattern: str = r\"#### (\\-?[0-9\\.\\,]+)\", fallback: str = \"[invalid]\"\n+    ) -> None:\n         \"\"\"\n         pass a string `regex` to run `re.compile(r\"regex\")` on.\n         `fallback` defines the output returned if no matches for the regex are located.\n@@ -41,12 +43,11 @@ def filter_set(inst):\n class WhitespaceFilter(Filter):\n     \"\"\" \"\"\"\n \n-    def __init__(self):\n+    def __init__(self) -> None:\n         pass\n \n     def apply(self, resps):\n         def filter_set(inst):\n-\n             filtered_resp = []\n             for resp in inst:\n                 if resp.startswith(\" \"):"
+      }
+    ]
+  },
+  {
+    "sha": "007d485b6c84b0bb9635ba81e29b3d7c42a9ab55",
+    "message": "modified apply method to accept docs",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -15,7 +15,7 @@ def __init__(self, regex_pattern=r\"#### (\\-?[0-9\\.\\,]+)\", fallback=\"[invalid]\"):\n         self.regex = re.compile(regex_pattern)\n         self.fallback = fallback\n \n-    def apply(self, resps):\n+    def apply(self, resps, docs):\n         # here, we assume we have a list, in which each element is\n         # a list of model responses for some particular input/target pair.\n         # so we process each of these (same input/target response sets)\n@@ -44,7 +44,7 @@ class WhitespaceFilter(Filter):\n     def __init__(self):\n         pass\n \n-    def apply(self, resps):\n+    def apply(self, resps, docs):\n         def filter_set(inst):\n \n             filtered_resp = []"
+      }
+    ]
+  },
+  {
+    "sha": "87e147e171350d2d700d10890aa54864eecd3fb6",
+    "message": "reformat",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -45,7 +45,6 @@ def __init__(self):\n         pass\n \n     def apply(self, resps):\n-\n         def filter_set(inst):\n \n             filtered_resp = []\n@@ -59,4 +58,4 @@ def filter_set(inst):\n \n         filtered_resps = [filter_set(resp) for resp in resps]\n \n-        return filtered_resps\n\\ No newline at end of file\n+        return filtered_resps"
+      }
+    ]
+  },
+  {
+    "sha": "489edf2c2ee1dbbccd7e827260dfa7484831f89a",
+    "message": "added new filter to remove whitespace in the front of a prediction",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -36,3 +36,27 @@ def filter_set(inst):\n         # print(filtered_resps)\n \n         return filtered_resps\n+\n+\n+class WhitespaceFilter(Filter):\n+    \"\"\" \"\"\"\n+\n+    def __init__(self):\n+        pass\n+\n+    def apply(self, resps):\n+\n+        def filter_set(inst):\n+\n+            filtered_resp = []\n+            for resp in inst:\n+                if resp.startswith(\" \"):\n+                    resp = resp[1:]\n+\n+                filtered_resp.append(resp)\n+\n+            return filtered_resp\n+\n+        filtered_resps = [filter_set(resp) for resp in resps]\n+\n+        return filtered_resps\n\\ No newline at end of file"
+      }
+    ]
+  },
+  {
+    "sha": "232632c644f6d612eaba9e105291d15c7d8c629c",
+    "message": "[Refactor] Non-greedy generation ; WIP GSM8k yaml (#559)\n\n* add wip gsm8k yaml\r\n\r\n* cleanup tasks dir\r\n\r\n* push gsm8k yaml changes\r\n\r\n* rename gpt2.py\r\n\r\n* add updated gsm8k , triviaqa baseline\r\n\r\n* add new cot yaml\r\n\r\n* allow for multiple filter pipelines, new filter types\r\n\r\n* updated gsm8k + sampling gen configs\r\n\r\n* cleanup self-consistency yaml",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -26,8 +26,6 @@ def filter_set(inst):\n                 match = self.regex.search(resp)\n                 if match:\n                     match = match.group(1).strip()\n-                    match.replace(\",\", \"\")\n-                    # TODO: should we assume any other filtering is performed?\n                 else:\n                     match = self.fallback\n                 filtered.append(match)"
+      }
+    ]
+  },
+  {
+    "sha": "c4c20ff50a104f9512ced9a696c02def68af8bf4",
+    "message": "pre-commit stuff",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -4,10 +4,7 @@\n \n \n class RegexFilter(Filter):\n-    \"\"\"\n-\n-\n-    \"\"\"\n+    \"\"\" \"\"\"\n \n     def __init__(self, regex_pattern=r\"#### (\\-?[0-9\\.\\,]+)\", fallback=\"[invalid]\"):\n         \"\"\"\n@@ -20,7 +17,7 @@ def __init__(self, regex_pattern=r\"#### (\\-?[0-9\\.\\,]+)\", fallback=\"[invalid]\"):\n \n     def apply(self, resps):\n         # here, we assume we have a list, in which each element is\n-        # a list of model responses for some particular input/target pair. \n+        # a list of model responses for some particular input/target pair.\n         # so we process each of these (same input/target response sets)\n         # independently (and keep them a list.)\n         def filter_set(inst):"
+      }
+    ]
+  },
+  {
+    "sha": "c3dabb32649a184ca41b6a0c40edcfd601faa472",
+    "message": "updated filter process",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -9,14 +9,13 @@ class RegexFilter(Filter):\n \n     \"\"\"\n \n-    def __init__(self, regex=r\"#### (\\-?[0-9\\.\\,]+)\", fallback=\"[invalid]\"):\n+    def __init__(self, regex_pattern=r\"#### (\\-?[0-9\\.\\,]+)\", fallback=\"[invalid]\"):\n         \"\"\"\n         pass a string `regex` to run `re.compile(r\"regex\")` on.\n         `fallback` defines the output returned if no matches for the regex are located.\n         \"\"\"\n-        self.regex_pattern = regex\n-        self.regex = re.compile(regex)\n-\n+        self.regex_pattern = regex_pattern\n+        self.regex = re.compile(regex_pattern)\n         self.fallback = fallback\n \n     def apply(self, resps):\n@@ -30,7 +29,7 @@ def filter_set(inst):\n                 match = self.regex.search(resp)\n                 if match:\n                     match = match.group(1).strip()\n-                    match_str.replace(\",\", \"\")\n+                    match.replace(\",\", \"\")\n                     # TODO: should we assume any other filtering is performed?\n                 else:\n                     match = self.fallback"
+      }
+    ]
+  },
+  {
+    "sha": "d2a9b759186c08254b7e156a43bd473619460239",
+    "message": "in-place replace main with lm-eval2, keeping old git history",
+    "files": [
+      {
+        "filename": "lm_eval/filters/extraction.py",
+        "patch": "@@ -0,0 +1,44 @@\n+import re\n+\n+from lm_eval.api.filter import Filter\n+\n+\n+class RegexFilter(Filter):\n+    \"\"\"\n+\n+\n+    \"\"\"\n+\n+    def __init__(self, regex=r\"#### (\\-?[0-9\\.\\,]+)\", fallback=\"[invalid]\"):\n+        \"\"\"\n+        pass a string `regex` to run `re.compile(r\"regex\")` on.\n+        `fallback` defines the output returned if no matches for the regex are located.\n+        \"\"\"\n+        self.regex_pattern = regex\n+        self.regex = re.compile(regex)\n+\n+        self.fallback = fallback\n+\n+    def apply(self, resps):\n+        # here, we assume we have a list, in which each element is\n+        # a list of model responses for some particular input/target pair. \n+        # so we process each of these (same input/target response sets)\n+        # independently (and keep them a list.)\n+        def filter_set(inst):\n+            filtered = []\n+            for resp in inst:\n+                match = self.regex.search(resp)\n+                if match:\n+                    match = match.group(1).strip()\n+                    match_str.replace(\",\", \"\")\n+                    # TODO: should we assume any other filtering is performed?\n+                else:\n+                    match = self.fallback\n+                filtered.append(match)\n+            return filtered\n+\n+        # print(resps)\n+        filtered_resps = list(map(lambda x: filter_set(x), resps))\n+        # print(filtered_resps)\n+\n+        return filtered_resps"
+      }
+    ]
+  }
+]

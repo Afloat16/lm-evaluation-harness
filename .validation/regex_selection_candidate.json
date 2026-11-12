@@ -1,0 +1,31 @@
+{
+  "repository": "EleutherAI/lm-evaluation-harness",
+  "fork": "Afloat16/lm-evaluation-harness",
+  "base": "d6de81643928d653435c431bae19945d41d32520",
+  "base_tree": "b4b7c5d7c16a287b1025906d61720c77fb70fb8b",
+  "branch": "perf/stream-regex-answer-selection-20261112",
+  "commit": "6012a41d17786da4b3dbf9b89bde06df8f20f79b",
+  "files": [
+    "lm_eval/filters/extraction.py",
+    "tests/test_regex_stream_selection.py"
+  ],
+  "status": "pending_native_validation",
+  "validation": "No passing results claimed yet; hosted native tests and benchmark next.",
+  "dedup": {
+    "history_entries": 26,
+    "fork_heads": 145,
+    "fork_sources": 130,
+    "missing_legacy_file": 15,
+    "unique_regex_versions": 16,
+    "excluded_related_prs": [
+      4033,
+      3884,
+      3708,
+      3395,
+      1356,
+      4358,
+      4324,
+      4449
+    ]
+  }
+}
