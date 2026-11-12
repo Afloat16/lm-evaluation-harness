@@ -1,0 +1,988 @@
+﻿2026-11-12T20:57:48.2533298Z Current runner version: '2.338.2'
+2026-11-12T20:57:48.2570032Z ##[group]Runner Image Provisioner
+2026-11-12T20:57:48.2571534Z Hosted Compute Agent
+2026-11-12T20:57:48.2572611Z Version: 20261028.624
+2026-11-12T20:57:48.2573606Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+2026-11-12T20:57:48.2575135Z Build Date: 2026-10-28T21:51:42Z
+2026-11-12T20:57:48.2576266Z Worker ID: {01ee6f56-e646-4420-a5a1-15d219c7a6e2}
+2026-11-12T20:57:48.2577425Z Region: northcentralus
+2026-11-12T20:57:48.2578496Z Cloud: Azure
+2026-11-12T20:57:48.2579399Z ##[endgroup]
+2026-11-12T20:57:48.2582217Z ##[group]Operating System
+2026-11-12T20:57:48.2583329Z Ubuntu
+2026-11-12T20:57:48.2584447Z 24.04.5
+2026-11-12T20:57:48.2585525Z LTS
+2026-11-12T20:57:48.2586368Z ##[endgroup]
+2026-11-12T20:57:48.2587314Z ##[group]Runner Image
+2026-11-12T20:57:48.2588272Z Image: ubuntu-24.04
+2026-11-12T20:57:48.2588989Z Version: 20261101.360.1
+2026-11-12T20:57:48.2590487Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261101.360/images/ubuntu/Ubuntu2404-Readme.md
+2026-11-12T20:57:48.2592182Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261101.360
+2026-11-12T20:57:48.2593255Z ##[endgroup]
+2026-11-12T20:57:48.2594806Z ##[group]GITHUB_TOKEN Permissions
+2026-11-12T20:57:48.2597240Z Contents: read
+2026-11-12T20:57:48.2597898Z Metadata: read
+2026-11-12T20:57:48.2598600Z ##[endgroup]
+2026-11-12T20:57:48.2600819Z Secret source: Actions
+2026-11-12T20:57:48.2602030Z Cache mode: write
+2026-11-12T20:57:48.2603008Z Prepare workflow directory
+2026-11-12T20:57:48.3202485Z Prepare all required actions
+2026-11-12T20:57:48.3251203Z Getting action download info
+2026-11-12T20:57:48.5434875Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+2026-11-12T20:57:48.6655042Z Download action repository 'actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-11-12T20:57:48.7521781Z Download action repository 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9' (SHA:cf430e030ddbb5b0abf93d22962f4752f3646cd9)
+2026-11-12T20:57:48.9380305Z Complete job name: native-cpu
+2026-11-12T20:57:49.0270960Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+2026-11-12T20:57:49.0271977Z with:
+2026-11-12T20:57:49.0272464Z   ref: a4e9cf6d62b3c0da4f12393920fa975b8a19ffaa
+2026-11-12T20:57:49.0273071Z   fetch-depth: 2
+2026-11-12T20:57:49.0273549Z   persist-credentials: false
+2026-11-12T20:57:49.0274284Z   repository: Afloat16/lm-evaluation-harness
+2026-11-12T20:57:49.0278154Z   token: ***
+2026-11-12T20:57:49.0278600Z   ssh-strict: true
+2026-11-12T20:57:49.0279053Z   ssh-user: git
+2026-11-12T20:57:49.0279494Z   clean: true
+2026-11-12T20:57:49.0279956Z   sparse-checkout-cone-mode: true
+2026-11-12T20:57:49.0280495Z   fetch-tags: false
+2026-11-12T20:57:49.0280962Z   show-progress: true
+2026-11-12T20:57:49.0281428Z   lfs: false
+2026-11-12T20:57:49.0281910Z   submodules: false
+2026-11-12T20:57:49.0282400Z   set-safe-directory: true
+2026-11-12T20:57:49.0282921Z   allow-unsafe-pr-checkout: false
+2026-11-12T20:57:49.0283662Z env:
+2026-11-12T20:57:49.0284081Z   HF_HUB_OFFLINE: 1
+2026-11-12T20:57:49.0284704Z   HF_DATASETS_OFFLINE: 1
+2026-11-12T20:57:49.0285193Z   OPENBLAS_NUM_THREADS: 1
+2026-11-12T20:57:49.0285696Z   PYTEST_DISABLE_PLUGIN_AUTOLOAD: 1
+2026-11-12T20:57:49.0286233Z ##[endgroup]
+2026-11-12T20:57:49.3115055Z Syncing repository: Afloat16/lm-evaluation-harness
+2026-11-12T20:57:49.3118039Z ##[group]Getting Git version info
+2026-11-12T20:57:49.3119517Z Working directory is '/home/runner/work/lm-evaluation-harness/lm-evaluation-harness'
+2026-11-12T20:57:49.3121601Z [command]/usr/bin/git version
+2026-11-12T20:57:49.3222978Z git version 2.56.0
+2026-11-12T20:57:49.3245848Z ##[endgroup]
+2026-11-12T20:57:49.3263152Z Temporarily overriding HOME='/home/runner/work/_temp/36e74f05-7b69-48c0-8e5b-aca44578203c' before making global git config changes
+2026-11-12T20:57:49.3266005Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-12T20:57:49.3278005Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/lm-evaluation-harness/lm-evaluation-harness
+2026-11-12T20:57:49.3340291Z Deleting the contents of '/home/runner/work/lm-evaluation-harness/lm-evaluation-harness'
+2026-11-12T20:57:49.3344339Z ##[group]Determining repository object format
+2026-11-12T20:57:49.3345962Z ##[endgroup]
+2026-11-12T20:57:49.3347667Z ##[group]Initializing the repository
+2026-11-12T20:57:49.3352208Z [command]/usr/bin/git init /home/runner/work/lm-evaluation-harness/lm-evaluation-harness
+2026-11-12T20:57:49.3478557Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-12T20:57:49.3480317Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-12T20:57:49.3481399Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-12T20:57:49.3482246Z hint: call:
+2026-11-12T20:57:49.3482752Z hint:
+2026-11-12T20:57:49.3483346Z hint: 	git config --global init.defaultBranch <name>
+2026-11-12T20:57:49.3484049Z hint:
+2026-11-12T20:57:49.3485221Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-12T20:57:49.3486253Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-12T20:57:49.3487089Z hint:
+2026-11-12T20:57:49.3487573Z hint: 	git branch -m <name>
+2026-11-12T20:57:49.3488105Z hint:
+2026-11-12T20:57:49.3489025Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-12T20:57:49.3496682Z Initialized empty Git repository in /home/runner/work/lm-evaluation-harness/lm-evaluation-harness/.git/
+2026-11-12T20:57:49.3510842Z [command]/usr/bin/git remote add origin https://github.com/Afloat16/lm-evaluation-harness
+2026-11-12T20:57:49.3567011Z ##[endgroup]
+2026-11-12T20:57:49.3567930Z ##[group]Disabling automatic garbage collection
+2026-11-12T20:57:49.3573830Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-12T20:57:49.3620477Z ##[endgroup]
+2026-11-12T20:57:49.3622256Z ##[group]Setting up auth
+2026-11-12T20:57:49.3623185Z Removing SSH command configuration
+2026-11-12T20:57:49.3628306Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-12T20:57:49.3672895Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-12T20:57:49.4133792Z Removing HTTP extra header
+2026-11-12T20:57:49.4139718Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-12T20:57:49.4190145Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-12T20:57:49.4462208Z Removing includeIf entries pointing to credentials config files
+2026-11-12T20:57:49.4469920Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-12T20:57:49.4541372Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-12T20:57:49.4821080Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-5f328bf8-115c-41f5-841f-2c917ab9669e.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-12T20:57:49.4876897Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/lm-evaluation-harness/lm-evaluation-harness/.git.path /home/runner/work/_temp/git-credentials-5f328bf8-115c-41f5-841f-2c917ab9669e.config
+2026-11-12T20:57:49.4926455Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/lm-evaluation-harness/lm-evaluation-harness/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-5f328bf8-115c-41f5-841f-2c917ab9669e.config
+2026-11-12T20:57:49.4975469Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-5f328bf8-115c-41f5-841f-2c917ab9669e.config
+2026-11-12T20:57:49.5024796Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-5f328bf8-115c-41f5-841f-2c917ab9669e.config
+2026-11-12T20:57:49.5071059Z ##[endgroup]
+2026-11-12T20:57:49.5072465Z ##[group]Fetching the repository
+2026-11-12T20:57:49.5079496Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=2 origin a4e9cf6d62b3c0da4f12393920fa975b8a19ffaa
+2026-11-12T20:57:50.1837204Z From https://github.com/Afloat16/lm-evaluation-harness
+2026-11-12T20:57:50.1839986Z  * branch              a4e9cf6d62b3c0da4f12393920fa975b8a19ffaa -> FETCH_HEAD
+2026-11-12T20:57:50.1853699Z [command]/usr/bin/git rev-parse --verify --quiet a4e9cf6d62b3c0da4f12393920fa975b8a19ffaa^{object}
+2026-11-12T20:57:50.1902990Z a4e9cf6d62b3c0da4f12393920fa975b8a19ffaa
+2026-11-12T20:57:50.1916843Z ##[endgroup]
+2026-11-12T20:57:50.1919157Z ##[group]Determining the checkout info
+2026-11-12T20:57:50.1921178Z ##[endgroup]
+2026-11-12T20:57:50.1922566Z [command]/usr/bin/git sparse-checkout disable
+2026-11-12T20:57:50.1989532Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-12T20:57:50.2044469Z ##[group]Checking out the ref
+2026-11-12T20:57:50.2049270Z [command]/usr/bin/git checkout --progress --force a4e9cf6d62b3c0da4f12393920fa975b8a19ffaa
+2026-11-12T20:57:50.8223601Z Note: switching to 'a4e9cf6d62b3c0da4f12393920fa975b8a19ffaa'.
+2026-11-12T20:57:50.8224428Z 
+2026-11-12T20:57:50.8224796Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-12T20:57:50.8225612Z changes and commit them, and you can discard any commits you make in this
+2026-11-12T20:57:50.8226339Z state without impacting any branches by switching back to a branch.
+2026-11-12T20:57:50.8226768Z 
+2026-11-12T20:57:50.8227057Z If you want to create a new branch to retain commits you create, you may
+2026-11-12T20:57:50.8227838Z do so (now or later) by using -c with the switch command. Example:
+2026-11-12T20:57:50.8229018Z 
+2026-11-12T20:57:50.8229647Z   git switch -c <new-branch-name>
+2026-11-12T20:57:50.8229955Z 
+2026-11-12T20:57:50.8230177Z Or undo this operation with:
+2026-11-12T20:57:50.8230442Z 
+2026-11-12T20:57:50.8230569Z   git switch -
+2026-11-12T20:57:50.8230760Z 
+2026-11-12T20:57:50.8231087Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-12T20:57:50.8231557Z 
+2026-11-12T20:57:50.8231820Z HEAD is now at a4e9cf6d perf: stream indexed regex answer selection
+2026-11-12T20:57:50.8243456Z ##[endgroup]
+2026-11-12T20:57:50.8307904Z [command]/usr/bin/git log -1 --format=%H
+2026-11-12T20:57:50.8350998Z a4e9cf6d62b3c0da4f12393920fa975b8a19ffaa
+2026-11-12T20:57:50.8361511Z ##[group]Removing auth
+2026-11-12T20:57:50.8361997Z Removing SSH command configuration
+2026-11-12T20:57:50.8366525Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-12T20:57:50.8416084Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-12T20:57:50.8707990Z Removing HTTP extra header
+2026-11-12T20:57:50.8712316Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-12T20:57:50.8763801Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-12T20:57:50.9052284Z Removing includeIf entries pointing to credentials config files
+2026-11-12T20:57:50.9056486Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-12T20:57:50.9099584Z includeif.gitdir:/home/runner/work/lm-evaluation-harness/lm-evaluation-harness/.git.path
+2026-11-12T20:57:50.9101295Z includeif.gitdir:/home/runner/work/lm-evaluation-harness/lm-evaluation-harness/.git/worktrees/*.path
+2026-11-12T20:57:50.9101896Z includeif.gitdir:/github/workspace/.git.path
+2026-11-12T20:57:50.9102306Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-12T20:57:50.9111040Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/lm-evaluation-harness/lm-evaluation-harness/.git.path
+2026-11-12T20:57:50.9155058Z /home/runner/work/_temp/git-credentials-5f328bf8-115c-41f5-841f-2c917ab9669e.config
+2026-11-12T20:57:50.9166863Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/lm-evaluation-harness/lm-evaluation-harness/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-5f328bf8\-115c\-41f5\-841f\-2c917ab9669e\.config
+2026-11-12T20:57:50.9225601Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/lm-evaluation-harness/lm-evaluation-harness/.git/worktrees/*.path
+2026-11-12T20:57:50.9263723Z /home/runner/work/_temp/git-credentials-5f328bf8-115c-41f5-841f-2c917ab9669e.config
+2026-11-12T20:57:50.9273203Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/lm-evaluation-harness/lm-evaluation-harness/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-5f328bf8\-115c\-41f5\-841f\-2c917ab9669e\.config
+2026-11-12T20:57:50.9329660Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-11-12T20:57:50.9369363Z /github/runner_temp/git-credentials-5f328bf8-115c-41f5-841f-2c917ab9669e.config
+2026-11-12T20:57:50.9376645Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-5f328bf8\-115c\-41f5\-841f\-2c917ab9669e\.config
+2026-11-12T20:57:50.9426792Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-12T20:57:50.9464860Z /github/runner_temp/git-credentials-5f328bf8-115c-41f5-841f-2c917ab9669e.config
+2026-11-12T20:57:50.9552510Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-5f328bf8\-115c\-41f5\-841f\-2c917ab9669e\.config
+2026-11-12T20:57:50.9555185Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-12T20:57:50.9804790Z Removing credentials config '/home/runner/work/_temp/git-credentials-5f328bf8-115c-41f5-841f-2c917ab9669e.config'
+2026-11-12T20:57:50.9814072Z ##[endgroup]
+2026-11-12T20:57:51.0085190Z ##[group]Run actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+2026-11-12T20:57:51.0085652Z with:
+2026-11-12T20:57:51.0085888Z   python-version: 3.12
+2026-11-12T20:57:51.0086134Z   check-latest: false
+2026-11-12T20:57:51.0088580Z   token: ***
+2026-11-12T20:57:51.0088816Z   update-environment: true
+2026-11-12T20:57:51.0089085Z   allow-prereleases: false
+2026-11-12T20:57:51.0089332Z   freethreaded: false
+2026-11-12T20:57:51.0089577Z env:
+2026-11-12T20:57:51.0089781Z   HF_HUB_OFFLINE: 1
+2026-11-12T20:57:51.0090009Z   HF_DATASETS_OFFLINE: 1
+2026-11-12T20:57:51.0090266Z   OPENBLAS_NUM_THREADS: 1
+2026-11-12T20:57:51.0090519Z   PYTEST_DISABLE_PLUGIN_AUTOLOAD: 1
+2026-11-12T20:57:51.0090794Z ##[endgroup]
+2026-11-12T20:57:51.1524496Z ##[group]Installed versions
+2026-11-12T20:57:51.1642082Z (node:2442) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-12T20:57:51.1643294Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-12T20:57:51.1643934Z Successfully set up CPython (3.12.16)
+2026-11-12T20:57:51.1644891Z ##[endgroup]
+2026-11-12T20:57:51.1829286Z ##[group]Run python -m venv "$RUNNER_TEMP/lm-eval-tests"
+2026-11-12T20:57:51.1829796Z [36;1mpython -m venv "$RUNNER_TEMP/lm-eval-tests"[0m
+2026-11-12T20:57:51.1830200Z [36;1mecho "$RUNNER_TEMP/lm-eval-tests/bin" >> "$GITHUB_PATH"[0m
+2026-11-12T20:57:51.1866658Z shell: /usr/bin/bash -e {0}
+2026-11-12T20:57:51.1867196Z env:
+2026-11-12T20:57:51.1867412Z   HF_HUB_OFFLINE: 1
+2026-11-12T20:57:51.1867636Z   HF_DATASETS_OFFLINE: 1
+2026-11-12T20:57:51.1867873Z   OPENBLAS_NUM_THREADS: 1
+2026-11-12T20:57:51.1868120Z   PYTEST_DISABLE_PLUGIN_AUTOLOAD: 1
+2026-11-12T20:57:51.1868455Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:57:51.1868911Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-12T20:57:51.1869339Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:57:51.1869718Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:57:51.1870147Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:57:51.1870525Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-12T20:57:51.1870854Z ##[endgroup]
+2026-11-12T20:57:54.2879098Z ##[group]Run python -m pip install -e . pytest==9.2.0 ruff==0.16.3
+2026-11-12T20:57:54.2879614Z [36;1mpython -m pip install -e . pytest==9.2.0 ruff==0.16.3[0m
+2026-11-12T20:57:54.2903885Z shell: /usr/bin/bash -e {0}
+2026-11-12T20:57:54.2904283Z env:
+2026-11-12T20:57:54.2904482Z   HF_HUB_OFFLINE: 1
+2026-11-12T20:57:54.2904704Z   HF_DATASETS_OFFLINE: 1
+2026-11-12T20:57:54.2904934Z   OPENBLAS_NUM_THREADS: 1
+2026-11-12T20:57:54.2905179Z   PYTEST_DISABLE_PLUGIN_AUTOLOAD: 1
+2026-11-12T20:57:54.2905510Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:57:54.2905941Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-12T20:57:54.2906362Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:57:54.2906746Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:57:54.2907134Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:57:54.2907548Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-12T20:57:54.2907877Z ##[endgroup]
+2026-11-12T20:57:54.6772553Z Obtaining file:///home/runner/work/lm-evaluation-harness/lm-evaluation-harness
+2026-11-12T20:57:54.6800298Z   Installing build dependencies: started
+2026-11-12T20:57:55.8723400Z   Installing build dependencies: finished with status 'done'
+2026-11-12T20:57:55.8730393Z   Checking if build backend supports build_editable: started
+2026-11-12T20:57:56.0551334Z   Checking if build backend supports build_editable: finished with status 'done'
+2026-11-12T20:57:56.0560515Z   Getting requirements to build editable: started
+2026-11-12T20:57:57.0134610Z   Getting requirements to build editable: finished with status 'done'
+2026-11-12T20:57:57.0143865Z   Preparing editable metadata (pyproject.toml): started
+2026-11-12T20:57:57.9605327Z   Preparing editable metadata (pyproject.toml): finished with status 'done'
+2026-11-12T20:57:58.0518745Z Collecting pytest==9.2.0
+2026-11-12T20:57:58.0824873Z   Downloading pytest-9.2.0-py3-none-any.whl.metadata (7.9 kB)
+2026-11-12T20:57:58.3936521Z Collecting ruff==0.16.3
+2026-11-12T20:57:58.3977033Z   Downloading ruff-0.16.3-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (26 kB)
+2026-11-12T20:57:58.4111018Z Collecting iniconfig>=2 (from pytest==9.2.0)
+2026-11-12T20:57:58.4225215Z   Downloading iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+2026-11-12T20:57:58.4382445Z Collecting packaging>=24 (from pytest==9.2.0)
+2026-11-12T20:57:58.4416803Z   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+2026-11-12T20:57:58.4538993Z Collecting pluggy<2,>=1.6 (from pytest==9.2.0)
+2026-11-12T20:57:58.4573602Z   Downloading pluggy-1.7.0-py3-none-any.whl.metadata (5.0 kB)
+2026-11-12T20:57:58.4756914Z Collecting pygments>=2.15 (from pytest==9.2.0)
+2026-11-12T20:57:58.4791755Z   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+2026-11-12T20:57:58.5056461Z Collecting datasets>=2.16.0 (from lm_eval==0.4.14.dev0)
+2026-11-12T20:57:58.5092681Z   Downloading datasets-5.2.0-py3-none-any.whl.metadata (24 kB)
+2026-11-12T20:57:58.7018812Z Collecting numpy (from lm_eval==0.4.14.dev0)
+2026-11-12T20:57:58.7058169Z   Downloading numpy-2.5.4-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+2026-11-12T20:57:58.7181171Z Collecting evaluate>=0.4.0 (from lm_eval==0.4.14.dev0)
+2026-11-12T20:57:58.7216522Z   Downloading evaluate-0.4.6-py3-none-any.whl.metadata (9.5 kB)
+2026-11-12T20:57:58.7448743Z Collecting jinja2 (from lm_eval==0.4.14.dev0)
+2026-11-12T20:57:58.7484381Z   Downloading jinja2-3.1.6-py3-none-any.whl.metadata (2.9 kB)
+2026-11-12T20:57:58.7735086Z Collecting pytablewriter (from lm_eval==0.4.14.dev0)
+2026-11-12T20:57:58.7774332Z   Downloading pytablewriter-1.2.1-py3-none-any.whl.metadata (38 kB)
+2026-11-12T20:57:58.8025930Z Collecting rouge-score>=0.0.4 (from lm_eval==0.4.14.dev0)
+2026-11-12T20:57:58.8062813Z   Downloading rouge_score-0.1.2.tar.gz (17 kB)
+2026-11-12T20:57:58.8172665Z   Installing build dependencies: started
+2026-11-12T20:57:59.9334454Z   Installing build dependencies: finished with status 'done'
+2026-11-12T20:57:59.9339534Z   Getting requirements to build wheel: started
+2026-11-12T20:58:00.1117369Z   Getting requirements to build wheel: finished with status 'done'
+2026-11-12T20:58:00.1126047Z   Preparing metadata (pyproject.toml): started
+2026-11-12T20:58:00.2899435Z   Preparing metadata (pyproject.toml): finished with status 'done'
+2026-11-12T20:58:00.3065129Z Collecting sacrebleu>=1.5.0 (from lm_eval==0.4.14.dev0)
+2026-11-12T20:58:00.3103329Z   Downloading sacrebleu-2.6.0-py3-none-any.whl.metadata (39 kB)
+2026-11-12T20:58:00.3954073Z Collecting scikit-learn>=0.24.1 (from lm_eval==0.4.14.dev0)
+2026-11-12T20:58:00.3993307Z   Downloading scikit_learn-1.9.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (9.3 kB)
+2026-11-12T20:58:00.4196591Z Collecting sqlitedict (from lm_eval==0.4.14.dev0)
+2026-11-12T20:58:00.4231562Z   Downloading sqlitedict-2.1.0.tar.gz (21 kB)
+2026-11-12T20:58:00.4319830Z   Installing build dependencies: started
+2026-11-12T20:58:01.5286494Z   Installing build dependencies: finished with status 'done'
+2026-11-12T20:58:01.5293035Z   Getting requirements to build wheel: started
+2026-11-12T20:58:01.7046172Z   Getting requirements to build wheel: finished with status 'done'
+2026-11-12T20:58:01.7055468Z   Preparing metadata (pyproject.toml): started
+2026-11-12T20:58:01.8912465Z   Preparing metadata (pyproject.toml): finished with status 'done'
+2026-11-12T20:58:01.9029788Z Collecting dill (from lm_eval==0.4.14.dev0)
+2026-11-12T20:58:01.9066084Z   Downloading dill-0.4.1-py3-none-any.whl.metadata (10 kB)
+2026-11-12T20:58:01.9184816Z Collecting word2number (from lm_eval==0.4.14.dev0)
+2026-11-12T20:58:01.9220028Z   Downloading word2number-1.1.zip (9.7 kB)
+2026-11-12T20:58:01.9273283Z   Installing build dependencies: started
+2026-11-12T20:58:03.0357373Z   Installing build dependencies: finished with status 'done'
+2026-11-12T20:58:03.0385138Z   Getting requirements to build wheel: started
+2026-11-12T20:58:03.2178527Z   Getting requirements to build wheel: finished with status 'done'
+2026-11-12T20:58:03.2187336Z   Preparing metadata (pyproject.toml): started
+2026-11-12T20:58:03.4007897Z   Preparing metadata (pyproject.toml): finished with status 'done'
+2026-11-12T20:58:03.4154379Z Collecting more_itertools (from lm_eval==0.4.14.dev0)
+2026-11-12T20:58:03.4191193Z   Downloading more_itertools-11.2.1-py3-none-any.whl.metadata (42 kB)
+2026-11-12T20:58:03.4357429Z Collecting typing_extensions (from lm_eval==0.4.14.dev0)
+2026-11-12T20:58:03.4392824Z   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+2026-11-12T20:58:03.4691788Z Collecting tqdm>=4.59.0 (from lm_eval==0.4.14.dev0)
+2026-11-12T20:58:03.4731565Z   Downloading tqdm-4.70.1-py3-none-any.whl.metadata (57 kB)
+2026-11-12T20:58:03.5056502Z Collecting filelock (from datasets>=2.16.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:03.5092949Z   Downloading filelock-4.2.10-py3-none-any.whl.metadata (2.3 kB)
+2026-11-12T20:58:03.5885060Z Collecting pyarrow>=24.0.0 (from datasets>=2.16.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:03.5923159Z   Downloading pyarrow-26.0.1-cp312-cp312-manylinux_2_28_x86_64.whl.metadata (3.0 kB)
+2026-11-12T20:58:03.6934670Z Collecting pandas (from datasets>=2.16.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:03.6974308Z   Downloading pandas-3.1.1-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (16 kB)
+2026-11-12T20:58:03.8771177Z Collecting xxhash (from datasets>=2.16.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:03.8810254Z   Downloading xxhash-4.1.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (18 kB)
+2026-11-12T20:58:03.9002131Z Collecting multiprocess<0.70.20 (from datasets>=2.16.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:03.9039819Z   Downloading multiprocess-0.70.19-py312-none-any.whl.metadata (7.5 kB)
+2026-11-12T20:58:03.9289892Z Collecting fsspec<=2026.9.0,>=2023.1.0 (from datasets>=2.16.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:03.9331974Z   Downloading fsspec-2026.9.0-py3-none-any.whl.metadata (10 kB)
+2026-11-12T20:58:04.0097530Z Collecting huggingface-hub<3.0,>=1.31.0 (from datasets>=2.16.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:04.0164439Z   Downloading huggingface_hub-2.4.0-py3-none-any.whl.metadata (16 kB)
+2026-11-12T20:58:04.0638227Z Collecting pyyaml>=5.1 (from datasets>=2.16.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:04.0676344Z   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+2026-11-12T20:58:04.1061553Z Collecting requests>=2.19.0 (from evaluate>=0.4.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:04.1098626Z   Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+2026-11-12T20:58:04.2066627Z Collecting absl-py (from rouge-score>=0.0.4->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:04.2102541Z   Downloading absl_py-2.5.1-py3-none-any.whl.metadata (3.3 kB)
+2026-11-12T20:58:04.2250982Z Collecting nltk (from rouge-score>=0.0.4->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:04.2286801Z   Downloading nltk-3.10.4-py3-none-any.whl.metadata (5.0 kB)
+2026-11-12T20:58:04.2429382Z Collecting six>=1.14.0 (from rouge-score>=0.0.4->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:04.2464817Z   Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+2026-11-12T20:58:04.2618944Z Collecting portalocker (from sacrebleu>=1.5.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:04.2654372Z   Downloading portalocker-4.4.2-py3-none-any.whl.metadata (10 kB)
+2026-11-12T20:58:04.5935634Z Collecting regex (from sacrebleu>=1.5.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:04.5976651Z   Downloading regex-2026.11.9-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+2026-11-12T20:58:04.6110599Z Collecting tabulate>=0.8.9 (from sacrebleu>=1.5.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:04.6149726Z   Downloading tabulate-0.10.0-py3-none-any.whl.metadata (40 kB)
+2026-11-12T20:58:04.6328371Z Collecting colorama (from sacrebleu>=1.5.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:04.6365104Z   Downloading colorama-0.4.6-py2.py3-none-any.whl.metadata (17 kB)
+2026-11-12T20:58:04.8689547Z Collecting lxml (from sacrebleu>=1.5.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:04.8728160Z   Downloading lxml-6.1.3-cp312-cp312-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl.metadata (3.3 kB)
+2026-11-12T20:58:04.9833712Z Collecting scipy>=1.10.0 (from scikit-learn>=0.24.1->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:04.9872061Z   Downloading scipy-1.18.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+2026-11-12T20:58:05.0205493Z Collecting joblib>=1.4.0 (from scikit-learn>=0.24.1->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:05.0241045Z   Downloading joblib-1.6.0-py3-none-any.whl.metadata (6.5 kB)
+2026-11-12T20:58:05.0662693Z Collecting narwhals>=2.0.1 (from scikit-learn>=0.24.1->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:05.0718643Z   Downloading narwhals-2.28.0-py3-none-any.whl.metadata (15 kB)
+2026-11-12T20:58:05.0868358Z Collecting threadpoolctl>=3.5.0 (from scikit-learn>=0.24.1->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:05.0905068Z   Downloading threadpoolctl-3.8.0-py3-none-any.whl.metadata (29 kB)
+2026-11-12T20:58:05.1410148Z Collecting MarkupSafe>=2.0 (from jinja2->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:05.1450927Z   Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.7 kB)
+2026-11-12T20:58:05.2535992Z Collecting setuptools>=38.3.0 (from pytablewriter->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:05.2550032Z   Using cached setuptools-84.2.1-py3-none-any.whl.metadata (6.6 kB)
+2026-11-12T20:58:05.3083659Z Collecting DataProperty<2,>=1.1.0 (from pytablewriter->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:05.3121917Z   Downloading dataproperty-1.1.1-py3-none-any.whl.metadata (12 kB)
+2026-11-12T20:58:05.3276610Z Collecting mbstrdecoder<2,>=1.0.0 (from pytablewriter->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:05.3313429Z   Downloading mbstrdecoder-1.1.5-py3-none-any.whl.metadata (4.3 kB)
+2026-11-12T20:58:05.3548408Z Collecting pathvalidate<4,>=2.3.0 (from pytablewriter->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:05.3583067Z   Downloading pathvalidate-3.3.1-py3-none-any.whl.metadata (12 kB)
+2026-11-12T20:58:05.3782940Z Collecting tabledata<2,>=1.3.1 (from pytablewriter->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:05.3819517Z   Downloading tabledata-1.3.5-py3-none-any.whl.metadata (4.0 kB)
+2026-11-12T20:58:05.3946592Z Collecting tcolorpy<1,>=0.0.5 (from pytablewriter->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:05.4005134Z   Downloading tcolorpy-0.1.7-py3-none-any.whl.metadata (6.3 kB)
+2026-11-12T20:58:05.4176410Z Collecting typepy<2,>=1.3.2 (from typepy[datetime]<2,>=1.3.2->pytablewriter->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:05.4212109Z   Downloading typepy-1.3.5-py3-none-any.whl.metadata (9.6 kB)
+2026-11-12T20:58:05.8981125Z Collecting aiohttp!=4.0.0a0,!=4.0.0a1 (from fsspec[http]>=2021.05.0->evaluate>=0.4.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:05.9031657Z   Downloading aiohttp-3.14.5-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (8.3 kB)
+2026-11-12T20:58:05.9258185Z Collecting click<9.0.0,>=8.4.2 (from huggingface-hub<3.0,>=1.31.0->datasets>=2.16.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:05.9297392Z   Downloading click-8.5.1-py3-none-any.whl.metadata (2.6 kB)
+2026-11-12T20:58:05.9761280Z Collecting hf-xet<2.0.0,>=1.6.0 (from huggingface-hub<3.0,>=1.31.0->datasets>=2.16.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:05.9797191Z   Downloading hf_xet-1.8.0-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (4.9 kB)
+2026-11-12T20:58:05.9927198Z Collecting httpx2<3,>=2.0.0 (from huggingface-hub<3.0,>=1.31.0->datasets>=2.16.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:05.9962472Z   Downloading httpx2-2.16.0-py3-none-any.whl.metadata (10 kB)
+2026-11-12T20:58:06.0336456Z Collecting cloudpickle>=3.0 (from joblib>=1.4.0->scikit-learn>=0.24.1->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:06.0373445Z   Downloading cloudpickle-3.1.2-py3-none-any.whl.metadata (7.1 kB)
+2026-11-12T20:58:06.0726813Z Collecting chardet<7,>=3.0.4 (from mbstrdecoder<2,>=1.0.0->pytablewriter->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:06.0766629Z   Downloading chardet-6.0.0.post1-py3-none-any.whl.metadata (3.3 kB)
+2026-11-12T20:58:06.1867188Z Collecting charset_normalizer<4,>=2 (from requests>=2.19.0->evaluate>=0.4.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:06.1905408Z   Downloading charset_normalizer-3.5.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (46 kB)
+2026-11-12T20:58:06.2089108Z Collecting idna<4,>=2.5 (from requests>=2.19.0->evaluate>=0.4.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:06.2124924Z   Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+2026-11-12T20:58:06.2374433Z Collecting urllib3<3,>=1.26 (from requests>=2.19.0->evaluate>=0.4.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:06.2411677Z   Downloading urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
+2026-11-12T20:58:06.2605438Z Collecting certifi>=2023.5.7 (from requests>=2.19.0->evaluate>=0.4.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:06.2643328Z   Downloading certifi-2026.10.23-py3-none-any.whl.metadata (2.5 kB)
+2026-11-12T20:58:06.3144042Z Collecting python-dateutil<3.0.0,>=2.8.0 (from typepy[datetime]<2,>=1.3.2->pytablewriter->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:06.3178624Z   Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+2026-11-12T20:58:06.3532239Z Collecting pytz>=2018.9 (from typepy[datetime]<2,>=1.3.2->pytablewriter->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:06.3570327Z   Downloading pytz-2026.6-py2.py3-none-any.whl.metadata (22 kB)
+2026-11-12T20:58:06.3750067Z Collecting defusedxml (from nltk->rouge-score>=0.0.4->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:06.3785953Z   Downloading defusedxml-0.7.1-py2.py3-none-any.whl.metadata (32 kB)
+2026-11-12T20:58:06.4307547Z Collecting aiohappyeyeballs>=2.5.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]>=2021.05.0->evaluate>=0.4.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:06.4342486Z   Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl.metadata (5.9 kB)
+2026-11-12T20:58:06.4455216Z Collecting aiosignal>=1.4.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]>=2021.05.0->evaluate>=0.4.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:06.4491025Z   Downloading aiosignal-1.4.0-py3-none-any.whl.metadata (3.7 kB)
+2026-11-12T20:58:06.4634276Z Collecting attrs>=17.3.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]>=2021.05.0->evaluate>=0.4.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:06.4669917Z   Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+2026-11-12T20:58:06.5192272Z Collecting frozenlist>=1.1.1 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]>=2021.05.0->evaluate>=0.4.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:06.5230409Z   Downloading frozenlist-1.8.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (20 kB)
+2026-11-12T20:58:06.8004071Z Collecting multidict<8.0,>=4.5 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]>=2021.05.0->evaluate>=0.4.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:06.8046040Z   Downloading multidict-7.2.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (6.1 kB)
+2026-11-12T20:58:06.8628023Z Collecting propcache>=0.2.0 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]>=2021.05.0->evaluate>=0.4.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:06.8672853Z   Downloading propcache-0.5.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (25 kB)
+2026-11-12T20:58:07.0778332Z Collecting yarl<2.0,>=1.25.1 (from aiohttp!=4.0.0a0,!=4.0.0a1->fsspec[http]>=2021.05.0->evaluate>=0.4.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:07.0818362Z   Downloading yarl-1.25.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (111 kB)
+2026-11-12T20:58:07.1217405Z Collecting anyio>=4.10 (from httpx2<3,>=2.0.0->huggingface-hub<3.0,>=1.31.0->datasets>=2.16.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:07.1255352Z   Downloading anyio-4.16.0-py3-none-any.whl.metadata (4.7 kB)
+2026-11-12T20:58:07.1386105Z Collecting httpcore2==2.16.0 (from httpx2<3,>=2.0.0->huggingface-hub<3.0,>=1.31.0->datasets>=2.16.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:07.1421376Z   Downloading httpcore2-2.16.0-py3-none-any.whl.metadata (27 kB)
+2026-11-12T20:58:07.1601631Z Collecting truststore>=0.10 (from httpx2<3,>=2.0.0->huggingface-hub<3.0,>=1.31.0->datasets>=2.16.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:07.1637127Z   Downloading truststore-0.10.5-py3-none-any.whl.metadata (4.5 kB)
+2026-11-12T20:58:07.1816258Z Collecting h11>=0.16 (from httpcore2==2.16.0->httpx2<3,>=2.0.0->huggingface-hub<3.0,>=1.31.0->datasets>=2.16.0->lm_eval==0.4.14.dev0)
+2026-11-12T20:58:07.1850770Z   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+2026-11-12T20:58:07.2594432Z Downloading pytest-9.2.0-py3-none-any.whl (411 kB)
+2026-11-12T20:58:07.2670010Z Downloading ruff-0.16.3-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (11.1 MB)
+2026-11-12T20:58:07.3061593Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 11.1/11.1 MB 302.2 MB/s eta 0:00:00
+2026-11-12T20:58:07.3104607Z Downloading datasets-5.2.0-py3-none-any.whl (608 kB)
+2026-11-12T20:58:07.3160847Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 608.3/608.3 kB 117.0 MB/s eta 0:00:00
+2026-11-12T20:58:07.3197817Z Downloading dill-0.4.1-py3-none-any.whl (120 kB)
+2026-11-12T20:58:07.3254722Z Downloading evaluate-0.4.6-py3-none-any.whl (84 kB)
+2026-11-12T20:58:07.3309883Z Downloading iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+2026-11-12T20:58:07.3364473Z Downloading numpy-2.5.4-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.7 MB)
+2026-11-12T20:58:07.3925154Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.7/16.7 MB 308.1 MB/s eta 0:00:00
+2026-11-12T20:58:07.3968966Z Downloading packaging-26.3-py3-none-any.whl (129 kB)
+2026-11-12T20:58:07.4029577Z Downloading pluggy-1.7.0-py3-none-any.whl (27 kB)
+2026-11-12T20:58:07.4086640Z Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+2026-11-12T20:58:07.4156838Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 235.0 MB/s eta 0:00:00
+2026-11-12T20:58:07.4200049Z Downloading sacrebleu-2.6.0-py3-none-any.whl (100 kB)
+2026-11-12T20:58:07.4258426Z Downloading scikit_learn-1.9.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (9.2 MB)
+2026-11-12T20:58:07.4539308Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.2/9.2 MB 351.6 MB/s eta 0:00:00
+2026-11-12T20:58:07.4577847Z Downloading tqdm-4.70.1-py3-none-any.whl (80 kB)
+2026-11-12T20:58:07.4632238Z Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+2026-11-12T20:58:07.4686035Z Downloading more_itertools-11.2.1-py3-none-any.whl (74 kB)
+2026-11-12T20:58:07.4739237Z Downloading pytablewriter-1.2.1-py3-none-any.whl (91 kB)
+2026-11-12T20:58:07.4794331Z Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+2026-11-12T20:58:07.4848263Z Downloading dataproperty-1.1.1-py3-none-any.whl (27 kB)
+2026-11-12T20:58:07.4902541Z Downloading fsspec-2026.9.0-py3-none-any.whl (221 kB)
+2026-11-12T20:58:07.4959036Z Downloading huggingface_hub-2.4.0-py3-none-any.whl (857 kB)
+2026-11-12T20:58:07.5015495Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 857.0/857.0 kB 191.9 MB/s eta 0:00:00
+2026-11-12T20:58:07.5051024Z Downloading filelock-4.2.10-py3-none-any.whl (218 kB)
+2026-11-12T20:58:07.5110737Z Downloading joblib-1.6.0-py3-none-any.whl (306 kB)
+2026-11-12T20:58:07.5181278Z Downloading markupsafe-3.0.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (22 kB)
+2026-11-12T20:58:07.5232588Z Downloading mbstrdecoder-1.1.5-py3-none-any.whl (8.0 kB)
+2026-11-12T20:58:07.5285785Z Downloading multiprocess-0.70.19-py312-none-any.whl (150 kB)
+2026-11-12T20:58:07.5343605Z Downloading narwhals-2.28.0-py3-none-any.whl (490 kB)
+2026-11-12T20:58:07.5409212Z Downloading pathvalidate-3.3.1-py3-none-any.whl (24 kB)
+2026-11-12T20:58:07.5470596Z Downloading pyarrow-26.0.1-cp312-cp312-manylinux_2_28_x86_64.whl (55.0 MB)
+2026-11-12T20:58:07.7038136Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 55.0/55.0 MB 358.3 MB/s eta 0:00:00
+2026-11-12T20:58:07.7075447Z Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+2026-11-12T20:58:07.7132685Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 172.7 MB/s eta 0:00:00
+2026-11-12T20:58:07.7168352Z Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+2026-11-12T20:58:07.7225155Z Downloading scipy-1.18.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (35.3 MB)
+2026-11-12T20:58:07.8190757Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 35.3/35.3 MB 373.7 MB/s eta 0:00:00
+2026-11-12T20:58:07.8203645Z Using cached setuptools-84.2.1-py3-none-any.whl (876 kB)
+2026-11-12T20:58:07.8244353Z Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+2026-11-12T20:58:07.8296321Z Downloading tabledata-1.3.5-py3-none-any.whl (11 kB)
+2026-11-12T20:58:07.8347996Z Downloading tabulate-0.10.0-py3-none-any.whl (39 kB)
+2026-11-12T20:58:07.8400272Z Downloading tcolorpy-0.1.7-py3-none-any.whl (8.1 kB)
+2026-11-12T20:58:07.8451442Z Downloading threadpoolctl-3.8.0-py3-none-any.whl (32 kB)
+2026-11-12T20:58:07.8503013Z Downloading typepy-1.3.5-py3-none-any.whl (31 kB)
+2026-11-12T20:58:07.8555559Z Downloading absl_py-2.5.1-py3-none-any.whl (137 kB)
+2026-11-12T20:58:07.8612067Z Downloading colorama-0.4.6-py2.py3-none-any.whl (25 kB)
+2026-11-12T20:58:07.8666477Z Downloading lxml-6.1.3-cp312-cp312-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl (5.2 MB)
+2026-11-12T20:58:07.8832300Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.2/5.2 MB 355.8 MB/s eta 0:00:00
+2026-11-12T20:58:07.8876358Z Downloading nltk-3.10.4-py3-none-any.whl (1.7 MB)
+2026-11-12T20:58:07.8952962Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.7/1.7 MB 283.2 MB/s eta 0:00:00
+2026-11-12T20:58:07.8992647Z Downloading regex-2026.11.9-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (808 kB)
+2026-11-12T20:58:07.9051326Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 808.8/808.8 kB 171.3 MB/s eta 0:00:00
+2026-11-12T20:58:07.9091951Z Downloading pandas-3.1.1-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (12.0 MB)
+2026-11-12T20:58:07.9441409Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.0/12.0 MB 364.6 MB/s eta 0:00:00
+2026-11-12T20:58:07.9480546Z Downloading portalocker-4.4.2-py3-none-any.whl (129 kB)
+2026-11-12T20:58:07.9539859Z Downloading xxhash-4.1.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (472 kB)
+2026-11-12T20:58:07.9604332Z Downloading aiohttp-3.14.5-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (1.9 MB)
+2026-11-12T20:58:07.9683745Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.9/1.9 MB 308.3 MB/s eta 0:00:00
+2026-11-12T20:58:07.9722718Z Downloading certifi-2026.10.23-py3-none-any.whl (135 kB)
+2026-11-12T20:58:07.9781559Z Downloading chardet-6.0.0.post1-py3-none-any.whl (627 kB)
+2026-11-12T20:58:07.9832436Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 627.2/627.2 kB 139.0 MB/s eta 0:00:00
+2026-11-12T20:58:07.9878227Z Downloading charset_normalizer-3.5.2-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (257 kB)
+2026-11-12T20:58:07.9950302Z Downloading click-8.5.1-py3-none-any.whl (126 kB)
+2026-11-12T20:58:08.0006830Z Downloading cloudpickle-3.1.2-py3-none-any.whl (22 kB)
+2026-11-12T20:58:08.0064527Z Downloading hf_xet-1.8.0-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (4.3 MB)
+2026-11-12T20:58:08.0199935Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.3/4.3 MB 366.4 MB/s eta 0:00:00
+2026-11-12T20:58:08.0239168Z Downloading httpx2-2.16.0-py3-none-any.whl (97 kB)
+2026-11-12T20:58:08.0297247Z Downloading httpcore2-2.16.0-py3-none-any.whl (85 kB)
+2026-11-12T20:58:08.0357737Z Downloading idna-3.20-py3-none-any.whl (69 kB)
+2026-11-12T20:58:08.0418040Z Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+2026-11-12T20:58:08.0477824Z Downloading pytz-2026.6-py2.py3-none-any.whl (506 kB)
+2026-11-12T20:58:08.0556752Z Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+2026-11-12T20:58:08.0630223Z Downloading defusedxml-0.7.1-py2.py3-none-any.whl (25 kB)
+2026-11-12T20:58:08.0691260Z Downloading aiohappyeyeballs-2.7.1-py3-none-any.whl (15 kB)
+2026-11-12T20:58:08.0747568Z Downloading aiosignal-1.4.0-py3-none-any.whl (7.5 kB)
+2026-11-12T20:58:08.0801909Z Downloading anyio-4.16.0-py3-none-any.whl (134 kB)
+2026-11-12T20:58:08.0858404Z Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+2026-11-12T20:58:08.0914652Z Downloading frozenlist-1.8.0-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (242 kB)
+2026-11-12T20:58:08.0974969Z Downloading multidict-7.2.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (516 kB)
+2026-11-12T20:58:08.1040970Z Downloading propcache-0.5.4-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (250 kB)
+2026-11-12T20:58:08.1099105Z Downloading truststore-0.10.5-py3-none-any.whl (19 kB)
+2026-11-12T20:58:08.1150548Z Downloading yarl-1.25.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (117 kB)
+2026-11-12T20:58:08.1206511Z Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+2026-11-12T20:58:08.3455526Z Building wheels for collected packages: lm_eval, rouge-score, sqlitedict, word2number
+2026-11-12T20:58:08.3465536Z   Building editable for lm_eval (pyproject.toml): started
+2026-11-12T20:58:11.0655788Z   Building editable for lm_eval (pyproject.toml): finished with status 'done'
+2026-11-12T20:58:11.0662653Z   Created wheel for lm_eval: filename=lm_eval-0.4.14.dev0-0.editable-py3-none-any.whl size=32448 sha256=97bd2aa752a73102fa2ff64fd27f5f46fd78e8144c0a269063073cf8840ac93f
+2026-11-12T20:58:11.0691713Z   Stored in directory: /tmp/pip-ephem-wheel-cache-qwik5j1_/wheels/bf/9d/07/258f6f6b8fd081213448f09425b42464128e74900e171734bc
+2026-11-12T20:58:11.0731975Z   Building wheel for rouge-score (pyproject.toml): started
+2026-11-12T20:58:11.2792648Z   Building wheel for rouge-score (pyproject.toml): finished with status 'done'
+2026-11-12T20:58:11.2798857Z   Created wheel for rouge-score: filename=rouge_score-0.1.2-py3-none-any.whl size=24985 sha256=e203a1f690fe061c3d171a2471572186f194cf34e1257d22453bdd53a442a911
+2026-11-12T20:58:11.2800794Z   Stored in directory: /home/runner/.cache/pip/wheels/85/9d/af/01feefbe7d55ef5468796f0c68225b6788e85d9d0a281e7a70
+2026-11-12T20:58:11.2826906Z   Building wheel for sqlitedict (pyproject.toml): started
+2026-11-12T20:58:11.4835934Z   Building wheel for sqlitedict (pyproject.toml): finished with status 'done'
+2026-11-12T20:58:11.4841276Z   Created wheel for sqlitedict: filename=sqlitedict-2.1.0-py3-none-any.whl size=16957 sha256=d6c501e864fdff49ffb79221248e8fc6e7715b37d5de7a901906ae29edbd54cd
+2026-11-12T20:58:11.4843668Z   Stored in directory: /home/runner/.cache/pip/wheels/7a/6f/21/fc016aef45ffcabe27129a2252f061387cbf278d2086225a64
+2026-11-12T20:58:11.4874026Z   Building wheel for word2number (pyproject.toml): started
+2026-11-12T20:58:11.6911634Z   Building wheel for word2number (pyproject.toml): finished with status 'done'
+2026-11-12T20:58:11.6918492Z   Created wheel for word2number: filename=word2number-1.1-py3-none-any.whl size=5659 sha256=8853584975feee5061de6d4ab979cb88eb5ba4d2d3b06d43c26977be2cc8a610
+2026-11-12T20:58:11.6920102Z   Stored in directory: /home/runner/.cache/pip/wheels/5b/79/fb/d25928e599c7e11fe4e00d32048cd74933f34a74c633d2aea6
+2026-11-12T20:58:11.6942862Z Successfully built lm_eval rouge-score sqlitedict word2number
+2026-11-12T20:58:11.8803176Z Installing collected packages: word2number, sqlitedict, pytz, xxhash, urllib3, typing_extensions, truststore, tqdm, threadpoolctl, tcolorpy, tabulate, six, setuptools, ruff, regex, pyyaml, pygments, pyarrow, propcache, portalocker, pluggy, pathvalidate, packaging, numpy, narwhals, multidict, more_itertools, MarkupSafe, lxml, iniconfig, idna, hf-xet, h11, fsspec, frozenlist, filelock, dill, defusedxml, colorama, cloudpickle, click, charset_normalizer, chardet, certifi, attrs, aiohappyeyeballs, absl-py, yarl, scipy, sacrebleu, requests, python-dateutil, pytest, multiprocess, mbstrdecoder, joblib, jinja2, httpcore2, anyio, aiosignal, typepy, scikit-learn, pandas, nltk, httpx2, aiohttp, rouge-score, huggingface-hub, datasets, DataProperty, tabledata, evaluate, pytablewriter, lm_eval
+2026-11-12T20:58:35.9128981Z Successfully installed DataProperty-1.1.1 MarkupSafe-3.0.4 absl-py-2.5.1 aiohappyeyeballs-2.7.1 aiohttp-3.14.5 aiosignal-1.4.0 anyio-4.16.0 attrs-26.1.0 certifi-2026.10.23 chardet-6.0.0.post1 charset_normalizer-3.5.2 click-8.5.1 cloudpickle-3.1.2 colorama-0.4.6 datasets-5.2.0 defusedxml-0.7.1 dill-0.4.1 evaluate-0.4.6 filelock-4.2.10 frozenlist-1.8.0 fsspec-2026.9.0 h11-0.16.0 hf-xet-1.8.0 httpcore2-2.16.0 httpx2-2.16.0 huggingface-hub-2.4.0 idna-3.20 iniconfig-2.3.1 jinja2-3.1.6 joblib-1.6.0 lm_eval-0.4.14.dev0 lxml-6.1.3 mbstrdecoder-1.1.5 more_itertools-11.2.1 multidict-7.2.1 multiprocess-0.70.19 narwhals-2.28.0 nltk-3.10.4 numpy-2.5.4 packaging-26.3 pandas-3.1.1 pathvalidate-3.3.1 pluggy-1.7.0 portalocker-4.4.2 propcache-0.5.4 pyarrow-26.0.1 pygments-2.21.0 pytablewriter-1.2.1 pytest-9.2.0 python-dateutil-2.9.0.post0 pytz-2026.6 pyyaml-6.0.3 regex-2026.11.9 requests-2.34.2 rouge-score-0.1.2 ruff-0.16.3 sacrebleu-2.6.0 scikit-learn-1.9.1 scipy-1.18.1 setuptools-84.2.1 six-1.17.0 sqlitedict-2.1.0 tabledata-1.3.5 tabulate-0.10.0 tcolorpy-0.1.7 threadpoolctl-3.8.0 tqdm-4.70.1 truststore-0.10.5 typepy-1.3.5 typing_extensions-4.16.0 urllib3-2.8.0 word2number-1.1 xxhash-4.1.0 yarl-1.25.1
+2026-11-12T20:58:35.9996317Z 
+2026-11-12T20:58:35.9996923Z [notice] A new release of pip is available: 25.0.1 -> 26.3
+2026-11-12T20:58:35.9997407Z [notice] To update, run: pip install --upgrade pip
+2026-11-12T20:58:36.5503118Z ##[group]Run set -o pipefail
+2026-11-12T20:58:36.5503470Z [36;1mset -o pipefail[0m
+2026-11-12T20:58:36.5504079Z [36;1mpython -m pytest -q --junitxml=regex-patched.xml tests/test_regex_stream_selection.py tests/test_filters.py 2>&1 | tee regex-patched.log[0m
+2026-11-12T20:58:36.5529533Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-12T20:58:36.5529880Z env:
+2026-11-12T20:58:36.5530078Z   HF_HUB_OFFLINE: 1
+2026-11-12T20:58:36.5530303Z   HF_DATASETS_OFFLINE: 1
+2026-11-12T20:58:36.5530535Z   OPENBLAS_NUM_THREADS: 1
+2026-11-12T20:58:36.5530777Z   PYTEST_DISABLE_PLUGIN_AUTOLOAD: 1
+2026-11-12T20:58:36.5531096Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:36.5531524Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-12T20:58:36.5531974Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:36.5532349Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:36.5532762Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:36.5533138Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-12T20:58:36.5533472Z ##[endgroup]
+2026-11-12T20:58:38.2377636Z ........................................................................ [ 49%]
+2026-11-12T20:58:41.7655373Z ........................................................................ [ 98%]
+2026-11-12T20:58:42.2438477Z ..                                                                       [100%]
+2026-11-12T20:58:42.2439034Z 146 passed in 4.01s
+2026-11-12T20:58:42.4682526Z ##[group]Run set -o pipefail
+2026-11-12T20:58:42.4682893Z [36;1mset -o pipefail[0m
+2026-11-12T20:58:42.4683180Z [36;1mcat > "$RUNNER_TEMP/benchmark_regex.py" <<'PY'[0m
+2026-11-12T20:58:42.4683496Z [36;1mimport gc[0m
+2026-11-12T20:58:42.4683747Z [36;1mimport importlib.util[0m
+2026-11-12T20:58:42.4683998Z [36;1mimport json[0m
+2026-11-12T20:58:42.4684544Z [36;1mimport statistics[0m
+2026-11-12T20:58:42.4684786Z [36;1mimport subprocess[0m
+2026-11-12T20:58:42.4685019Z [36;1mimport tempfile[0m
+2026-11-12T20:58:42.4685248Z [36;1mimport time[0m
+2026-11-12T20:58:42.4685464Z [36;1mimport tracemalloc[0m
+2026-11-12T20:58:42.4685716Z [36;1mfrom pathlib import Path[0m
+2026-11-12T20:58:42.4685964Z [36;1m[0m
+2026-11-12T20:58:42.4686200Z [36;1mimport lm_eval.api.registry as registry[0m
+2026-11-12T20:58:42.4686563Z [36;1mfrom lm_eval.filters.extraction import RegexFilter[0m
+2026-11-12T20:58:42.4686893Z [36;1m[0m
+2026-11-12T20:58:42.4687180Z [36;1mwith tempfile.TemporaryDirectory() as directory:[0m
+2026-11-12T20:58:42.4687614Z [36;1m    baseline_path = Path(directory) / "original_extraction.py"[0m
+2026-11-12T20:58:42.4688046Z [36;1m    baseline_path.write_bytes(subprocess.check_output([[0m
+2026-11-12T20:58:42.4688387Z [36;1m        "git", "show",[0m
+2026-11-12T20:58:42.4689002Z [36;1m        "d6de81643928d653435c431bae19945d41d32520:lm_eval/filters/extraction.py",[0m
+2026-11-12T20:58:42.4689413Z [36;1m    ]))[0m
+2026-11-12T20:58:42.4689788Z [36;1m    spec = importlib.util.spec_from_file_location("original_extraction", baseline_path)[0m
+2026-11-12T20:58:42.4690276Z [36;1m    baseline = importlib.util.module_from_spec(spec)[0m
+2026-11-12T20:58:42.4690764Z [36;1m    # Keep the original implementation's decorators in an independent native registry.[0m
+2026-11-12T20:58:42.4691257Z [36;1m    patched_registry = registry.filter_registry[0m
+2026-11-12T20:58:42.4691718Z [36;1m    registry.filter_registry = registry.Registry("benchmark-original-filters")[0m
+2026-11-12T20:58:42.4692132Z [36;1m    try:[0m
+2026-11-12T20:58:42.4692377Z [36;1m        spec.loader.exec_module(baseline)[0m
+2026-11-12T20:58:42.4692664Z [36;1m    finally:[0m
+2026-11-12T20:58:42.4692935Z [36;1m        registry.filter_registry = patched_registry[0m
+2026-11-12T20:58:42.4693248Z [36;1m    rows = [][0m
+2026-11-12T20:58:42.4693484Z [36;1m    for count in (32, 100000):[0m
+2026-11-12T20:58:42.4693857Z [36;1m        response = " ".join(str(100000 + number) for number in range(count))[0m
+2026-11-12T20:58:42.4694499Z [36;1m        for index in (0, 1, -1, -2):[0m
+2026-11-12T20:58:42.4694847Z [36;1m            metrics = {}[0m
+2026-11-12T20:58:42.4695096Z [36;1m            outputs = [][0m
+2026-11-12T20:58:42.4695500Z [36;1m            for label, cls in (("baseline", baseline.RegexFilter), ("patched", RegexFilter)):[0m
+2026-11-12T20:58:42.4695980Z [36;1m                extractor = cls(r"(\d+)", group_select=index)[0m
+2026-11-12T20:58:42.4696298Z [36;1m                def run():[0m
+2026-11-12T20:58:42.4696609Z [36;1m                    return extractor.apply([[response]], [{}])[0m
+2026-11-12T20:58:42.4696935Z [36;1m                run()[0m
+2026-11-12T20:58:42.4697173Z [36;1m                times = [][0m
+2026-11-12T20:58:42.4697430Z [36;1m                for _ in range(9):[0m
+2026-11-12T20:58:42.4697735Z [36;1m                    start = time.perf_counter()[0m
+2026-11-12T20:58:42.4698039Z [36;1m                    result = run()[0m
+2026-11-12T20:58:42.4698386Z [36;1m                    times.append((time.perf_counter() - start) * 1000)[0m
+2026-11-12T20:58:42.4698743Z [36;1m                gc.collect()[0m
+2026-11-12T20:58:42.4699021Z [36;1m                tracemalloc.start()[0m
+2026-11-12T20:58:42.4699303Z [36;1m                try:[0m
+2026-11-12T20:58:42.4699544Z [36;1m                    result = run()[0m
+2026-11-12T20:58:42.4699858Z [36;1m                    _, peak = tracemalloc.get_traced_memory()[0m
+2026-11-12T20:58:42.4700361Z [36;1m                finally:[0m
+2026-11-12T20:58:42.4700629Z [36;1m                    tracemalloc.stop()[0m
+2026-11-12T20:58:42.4700924Z [36;1m                outputs.append(result)[0m
+2026-11-12T20:58:42.4701343Z [36;1m                metrics[label] = {"median_ms": statistics.median(times), "peak_bytes": peak}[0m
+2026-11-12T20:58:42.4701785Z [36;1m            assert outputs[0] == outputs[1][0m
+2026-11-12T20:58:42.4702247Z [36;1m            rows.append({"matches": count, "group_select": index, "input_bytes": len(response),[0m
+2026-11-12T20:58:42.4702724Z [36;1m                         "output": outputs[0], **metrics})[0m
+2026-11-12T20:58:42.4703258Z [36;1m    result = {"source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),[0m
+2026-11-12T20:58:42.4703888Z [36;1m              "warmups": 1, "timed_repetitions": 9, "memory_measured_separately": True,[0m
+2026-11-12T20:58:42.4704630Z [36;1m              "scope": "Native RegexFilter.apply only; no model inference.", "rows": rows}[0m
+2026-11-12T20:58:42.4705245Z [36;1m    Path("regex-selection-benchmark.json").write_text(json.dumps(result, indent=2) + "\n")[0m
+2026-11-12T20:58:42.4705719Z [36;1m    print(json.dumps(result, indent=2))[0m
+2026-11-12T20:58:42.4706016Z [36;1mPY[0m
+2026-11-12T20:58:42.4706500Z [36;1mpython "$RUNNER_TEMP/benchmark_regex.py" | tee regex-benchmark.log[0m
+2026-11-12T20:58:42.4707008Z [36;1mtest -s regex-selection-benchmark.json[0m
+2026-11-12T20:58:42.4707549Z [36;1mpython -c 'import json; data=json.load(open("regex-selection-benchmark.json")); assert len(data["rows"]) == 8'[0m
+2026-11-12T20:58:42.4731136Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-12T20:58:42.4731485Z env:
+2026-11-12T20:58:42.4731686Z   HF_HUB_OFFLINE: 1
+2026-11-12T20:58:42.4731909Z   HF_DATASETS_OFFLINE: 1
+2026-11-12T20:58:42.4732145Z   OPENBLAS_NUM_THREADS: 1
+2026-11-12T20:58:42.4732400Z   PYTEST_DISABLE_PLUGIN_AUTOLOAD: 1
+2026-11-12T20:58:42.4732734Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:42.4733175Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-12T20:58:42.4733624Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:42.4734008Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:42.4734590Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:42.4735003Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-12T20:58:42.4735351Z ##[endgroup]
+2026-11-12T20:58:44.2652103Z {
+2026-11-12T20:58:44.2652620Z   "source_commit": "a4e9cf6d62b3c0da4f12393920fa975b8a19ffaa",
+2026-11-12T20:58:44.2653155Z   "warmups": 1,
+2026-11-12T20:58:44.2653391Z   "timed_repetitions": 9,
+2026-11-12T20:58:44.2653751Z   "memory_measured_separately": true,
+2026-11-12T20:58:44.2654423Z   "scope": "Native RegexFilter.apply only; no model inference.",
+2026-11-12T20:58:44.2654922Z   "rows": [
+2026-11-12T20:58:44.2655200Z     {
+2026-11-12T20:58:44.2655456Z       "matches": 32,
+2026-11-12T20:58:44.2655833Z       "group_select": 0,
+2026-11-12T20:58:44.2656179Z       "input_bytes": 223,
+2026-11-12T20:58:44.2656505Z       "output": [
+2026-11-12T20:58:44.2656788Z         [
+2026-11-12T20:58:44.2657050Z           "100000"
+2026-11-12T20:58:44.2657383Z         ]
+2026-11-12T20:58:44.2657651Z       ],
+2026-11-12T20:58:44.2657914Z       "baseline": {
+2026-11-12T20:58:44.2658229Z         "median_ms": 0.006198999997764076,
+2026-11-12T20:58:44.2658634Z         "peak_bytes": 3638
+2026-11-12T20:58:44.2658955Z       },
+2026-11-12T20:58:44.2659224Z       "patched": {
+2026-11-12T20:58:44.2659513Z         "median_ms": 0.0024139999936778622,
+2026-11-12T20:58:44.2659781Z         "peak_bytes": 2500
+2026-11-12T20:58:44.2659991Z       }
+2026-11-12T20:58:44.2660199Z     },
+2026-11-12T20:58:44.2660376Z     {
+2026-11-12T20:58:44.2660566Z       "matches": 32,
+2026-11-12T20:58:44.2660790Z       "group_select": 1,
+2026-11-12T20:58:44.2661023Z       "input_bytes": 223,
+2026-11-12T20:58:44.2661246Z       "output": [
+2026-11-12T20:58:44.2661721Z         [
+2026-11-12T20:58:44.2661910Z           "100001"
+2026-11-12T20:58:44.2662109Z         ]
+2026-11-12T20:58:44.2662282Z       ],
+2026-11-12T20:58:44.2662468Z       "baseline": {
+2026-11-12T20:58:44.2662687Z         "median_ms": 0.006128999999077678,
+2026-11-12T20:58:44.2662968Z         "peak_bytes": 3638
+2026-11-12T20:58:44.2663184Z       },
+2026-11-12T20:58:44.2663373Z       "patched": {
+2026-11-12T20:58:44.2663591Z         "median_ms": 0.002544000011539538,
+2026-11-12T20:58:44.2663866Z         "peak_bytes": 2581
+2026-11-12T20:58:44.2664276Z       }
+2026-11-12T20:58:44.2664540Z     },
+2026-11-12T20:58:44.2664771Z     {
+2026-11-12T20:58:44.2665004Z       "matches": 32,
+2026-11-12T20:58:44.2665320Z       "group_select": -1,
+2026-11-12T20:58:44.2665629Z       "input_bytes": 223,
+2026-11-12T20:58:44.2665948Z       "output": [
+2026-11-12T20:58:44.2666200Z         [
+2026-11-12T20:58:44.2666435Z           "100031"
+2026-11-12T20:58:44.2666681Z         ]
+2026-11-12T20:58:44.2666920Z       ],
+2026-11-12T20:58:44.2667169Z       "baseline": {
+2026-11-12T20:58:44.2667453Z         "median_ms": 0.010665000004905778,
+2026-11-12T20:58:44.2667786Z         "peak_bytes": 3638
+2026-11-12T20:58:44.2668062Z       },
+2026-11-12T20:58:44.2668321Z       "patched": {
+2026-11-12T20:58:44.2668774Z         "median_ms": 0.009022999989838354,
+2026-11-12T20:58:44.2669029Z         "peak_bytes": 3589
+2026-11-12T20:58:44.2669250Z       }
+2026-11-12T20:58:44.2669428Z     },
+2026-11-12T20:58:44.2669604Z     {
+2026-11-12T20:58:44.2669783Z       "matches": 32,
+2026-11-12T20:58:44.2669995Z       "group_select": -2,
+2026-11-12T20:58:44.2670220Z       "input_bytes": 223,
+2026-11-12T20:58:44.2670429Z       "output": [
+2026-11-12T20:58:44.2670615Z         [
+2026-11-12T20:58:44.2670791Z           "100030"
+2026-11-12T20:58:44.2670977Z         ]
+2026-11-12T20:58:44.2671160Z       ],
+2026-11-12T20:58:44.2671340Z       "baseline": {
+2026-11-12T20:58:44.2671551Z         "median_ms": 0.005958999992117242,
+2026-11-12T20:58:44.2671805Z         "peak_bytes": 3638
+2026-11-12T20:58:44.2672013Z       },
+2026-11-12T20:58:44.2672189Z       "patched": {
+2026-11-12T20:58:44.2672392Z         "median_ms": 0.009052999999425992,
+2026-11-12T20:58:44.2672638Z         "peak_bytes": 3725
+2026-11-12T20:58:44.2672848Z       }
+2026-11-12T20:58:44.2673026Z     },
+2026-11-12T20:58:44.2673200Z     {
+2026-11-12T20:58:44.2673382Z       "matches": 100000,
+2026-11-12T20:58:44.2673599Z       "group_select": 0,
+2026-11-12T20:58:44.2673831Z       "input_bytes": 699999,
+2026-11-12T20:58:44.2674057Z       "output": [
+2026-11-12T20:58:44.2674506Z         [
+2026-11-12T20:58:44.2674685Z           "100000"
+2026-11-12T20:58:44.2674868Z         ]
+2026-11-12T20:58:44.2675039Z       ],
+2026-11-12T20:58:44.2675214Z       "baseline": {
+2026-11-12T20:58:44.2675419Z         "median_ms": 15.992324999999141,
+2026-11-12T20:58:44.2675677Z         "peak_bytes": 5502806
+2026-11-12T20:58:44.2675902Z       },
+2026-11-12T20:58:44.2676075Z       "patched": {
+2026-11-12T20:58:44.2676473Z         "median_ms": 0.0026040000022931054,
+2026-11-12T20:58:44.2676833Z         "peak_bytes": 2500
+2026-11-12T20:58:44.2677115Z       }
+2026-11-12T20:58:44.2677340Z     },
+2026-11-12T20:58:44.2677517Z     {
+2026-11-12T20:58:44.2677705Z       "matches": 100000,
+2026-11-12T20:58:44.2677942Z       "group_select": 1,
+2026-11-12T20:58:44.2678162Z       "input_bytes": 699999,
+2026-11-12T20:58:44.2678386Z       "output": [
+2026-11-12T20:58:44.2678575Z         [
+2026-11-12T20:58:44.2678757Z           "100001"
+2026-11-12T20:58:44.2678945Z         ]
+2026-11-12T20:58:44.2679128Z       ],
+2026-11-12T20:58:44.2679305Z       "baseline": {
+2026-11-12T20:58:44.2679513Z         "median_ms": 15.78602300000398,
+2026-11-12T20:58:44.2679771Z         "peak_bytes": 5502806
+2026-11-12T20:58:44.2679989Z       },
+2026-11-12T20:58:44.2680168Z       "patched": {
+2026-11-12T20:58:44.2680374Z         "median_ms": 0.002543999997328683,
+2026-11-12T20:58:44.2680626Z         "peak_bytes": 2581
+2026-11-12T20:58:44.2680837Z       }
+2026-11-12T20:58:44.2681173Z     },
+2026-11-12T20:58:44.2681355Z     {
+2026-11-12T20:58:44.2681542Z       "matches": 100000,
+2026-11-12T20:58:44.2681769Z       "group_select": -1,
+2026-11-12T20:58:44.2681992Z       "input_bytes": 699999,
+2026-11-12T20:58:44.2682211Z       "output": [
+2026-11-12T20:58:44.2682407Z         [
+2026-11-12T20:58:44.2682586Z           "199999"
+2026-11-12T20:58:44.2682779Z         ]
+2026-11-12T20:58:44.2682954Z       ],
+2026-11-12T20:58:44.2683133Z       "baseline": {
+2026-11-12T20:58:44.2683338Z         "median_ms": 15.674640000000295,
+2026-11-12T20:58:44.2683597Z         "peak_bytes": 5502806
+2026-11-12T20:58:44.2683820Z       },
+2026-11-12T20:58:44.2684012Z       "patched": {
+2026-11-12T20:58:44.2684480Z         "median_ms": 18.210827000004315,
+2026-11-12T20:58:44.2684738Z         "peak_bytes": 4117
+2026-11-12T20:58:44.2684956Z       }
+2026-11-12T20:58:44.2685137Z     },
+2026-11-12T20:58:44.2685324Z     {
+2026-11-12T20:58:44.2685510Z       "matches": 100000,
+2026-11-12T20:58:44.2685742Z       "group_select": -2,
+2026-11-12T20:58:44.2685966Z       "input_bytes": 699999,
+2026-11-12T20:58:44.2686190Z       "output": [
+2026-11-12T20:58:44.2686384Z         [
+2026-11-12T20:58:44.2686566Z           "199998"
+2026-11-12T20:58:44.2686761Z         ]
+2026-11-12T20:58:44.2687094Z       ],
+2026-11-12T20:58:44.2687279Z       "baseline": {
+2026-11-12T20:58:44.2687489Z         "median_ms": 15.157961999989311,
+2026-11-12T20:58:44.2687745Z         "peak_bytes": 5502806
+2026-11-12T20:58:44.2687971Z       },
+2026-11-12T20:58:44.2688149Z       "patched": {
+2026-11-12T20:58:44.2688351Z         "median_ms": 18.18913500000008,
+2026-11-12T20:58:44.2688602Z         "peak_bytes": 4253
+2026-11-12T20:58:44.2688817Z       }
+2026-11-12T20:58:44.2688994Z     }
+2026-11-12T20:58:44.2689171Z   ]
+2026-11-12T20:58:44.2689351Z }
+2026-11-12T20:58:44.3177089Z ##[group]Run git show d6de81643928d653435c431bae19945d41d32520:lm_eval/filters/extraction.py > lm_eval/filters/extraction.py
+2026-11-12T20:58:44.3177977Z [36;1mgit show d6de81643928d653435c431bae19945d41d32520:lm_eval/filters/extraction.py > lm_eval/filters/extraction.py[0m
+2026-11-12T20:58:44.3178534Z [36;1mpython - <<'PY'[0m
+2026-11-12T20:58:44.3178794Z [36;1mfrom pathlib import Path[0m
+2026-11-12T20:58:44.3179195Z [36;1mfor cached in Path("lm_eval/filters/__pycache__").glob("extraction.*.pyc"):[0m
+2026-11-12T20:58:44.3179634Z [36;1m    cached.unlink()[0m
+2026-11-12T20:58:44.3179872Z [36;1mPY[0m
+2026-11-12T20:58:44.3202250Z shell: /usr/bin/bash -e {0}
+2026-11-12T20:58:44.3202523Z env:
+2026-11-12T20:58:44.3202721Z   HF_HUB_OFFLINE: 1
+2026-11-12T20:58:44.3202955Z   HF_DATASETS_OFFLINE: 1
+2026-11-12T20:58:44.3203198Z   OPENBLAS_NUM_THREADS: 1
+2026-11-12T20:58:44.3203463Z   PYTEST_DISABLE_PLUGIN_AUTOLOAD: 1
+2026-11-12T20:58:44.3203837Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:44.3204448Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-12T20:58:44.3204871Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:44.3205252Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:44.3205629Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:44.3206004Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-12T20:58:44.3206360Z ##[endgroup]
+2026-11-12T20:58:44.3616350Z ##[group]Run set +e
+2026-11-12T20:58:44.3616627Z [36;1mset +e[0m
+2026-11-12T20:58:44.3617136Z [36;1mpython -m pytest -q --junitxml=regex-baseline.xml tests/test_regex_stream_selection.py > regex-baseline.log 2>&1[0m
+2026-11-12T20:58:44.3617704Z [36;1mresult=$?[0m
+2026-11-12T20:58:44.3617918Z [36;1mset -e[0m
+2026-11-12T20:58:44.3618145Z [36;1mcat regex-baseline.log[0m
+2026-11-12T20:58:44.3618408Z [36;1mtest "$result" -eq 1[0m
+2026-11-12T20:58:44.3618656Z [36;1mpython - <<'PY'[0m
+2026-11-12T20:58:44.3618919Z [36;1mimport xml.etree.ElementTree as ET[0m
+2026-11-12T20:58:44.3619269Z [36;1mroot = ET.parse("regex-baseline.xml").getroot()[0m
+2026-11-12T20:58:44.3619617Z [36;1massert not root.findall(".//error")[0m
+2026-11-12T20:58:44.3620136Z [36;1mfailed = [case.attrib["name"] for case in root.findall(".//testcase") if case.find("failure") is not None][0m
+2026-11-12T20:58:44.3620626Z [36;1massert len(failed) == 4, failed[0m
+2026-11-12T20:58:44.3621180Z [36;1massert all(name.startswith("test_match_storage_is_bounded_for_long_responses") for name in failed), failed[0m
+2026-11-12T20:58:44.3621829Z [36;1mprint("Only the four actual peak-memory limits fail on baseline:", failed)[0m
+2026-11-12T20:58:44.3622223Z [36;1mPY[0m
+2026-11-12T20:58:44.3644457Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-12T20:58:44.3644794Z env:
+2026-11-12T20:58:44.3644995Z   HF_HUB_OFFLINE: 1
+2026-11-12T20:58:44.3645214Z   HF_DATASETS_OFFLINE: 1
+2026-11-12T20:58:44.3645449Z   OPENBLAS_NUM_THREADS: 1
+2026-11-12T20:58:44.3645712Z   PYTEST_DISABLE_PLUGIN_AUTOLOAD: 1
+2026-11-12T20:58:44.3646037Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:44.3646468Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-12T20:58:44.3646890Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:44.3647271Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:44.3647884Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:44.3648270Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-12T20:58:44.3648595Z ##[endgroup]
+2026-11-12T20:58:48.6637983Z ........................................................................ [ 51%]
+2026-11-12T20:58:48.6638793Z ...............................................................FFFF      [100%]
+2026-11-12T20:58:48.6639347Z =================================== FAILURES ===================================
+2026-11-12T20:58:48.6639906Z _____________ test_match_storage_is_bounded_for_long_responses[0] ______________
+2026-11-12T20:58:48.6640409Z 
+2026-11-12T20:58:48.6640541Z index = 0
+2026-11-12T20:58:48.6640755Z 
+2026-11-12T20:58:48.6641006Z     @pytest.mark.parametrize("index", [0, 1, -1, -2])
+2026-11-12T20:58:48.6641603Z     def test_match_storage_is_bounded_for_long_responses(index):
+2026-11-12T20:58:48.6642172Z         response = " ".join(str(100000 + number) for number in range(100000))
+2026-11-12T20:58:48.6703839Z         extractor = RegexFilter(r"(\d+)", group_select=index)
+2026-11-12T20:58:48.6704619Z         expected = str(100000 + (index if index >= 0 else 100000 + index))
+2026-11-12T20:58:48.6705168Z         gc.collect()
+2026-11-12T20:58:48.6705517Z         tracemalloc.start()
+2026-11-12T20:58:48.6705808Z         try:
+2026-11-12T20:58:48.6706147Z             result = extractor.apply([[response]], [{}])
+2026-11-12T20:58:48.6706625Z             _, peak = tracemalloc.get_traced_memory()
+2026-11-12T20:58:48.6707021Z         finally:
+2026-11-12T20:58:48.6707320Z             tracemalloc.stop()
+2026-11-12T20:58:48.6707672Z         assert result == [[expected]]
+2026-11-12T20:58:48.6708220Z         # The response already exists. Selecting the first/last two matches need not
+2026-11-12T20:58:48.6708876Z         # allocate the roughly 6 MiB list of all 100,000 captured strings.
+2026-11-12T20:58:48.6709392Z >       assert peak < 256 * 1024
+2026-11-12T20:58:48.6709750Z E       assert 5502806 < (256 * 1024)
+2026-11-12T20:58:48.6710472Z 
+2026-11-12T20:58:48.6710639Z tests/test_regex_stream_selection.py:158: AssertionError
+2026-11-12T20:58:48.6711070Z _____________ test_match_storage_is_bounded_for_long_responses[1] ______________
+2026-11-12T20:58:48.6711362Z 
+2026-11-12T20:58:48.6711447Z index = 1
+2026-11-12T20:58:48.6711551Z 
+2026-11-12T20:58:48.6711706Z     @pytest.mark.parametrize("index", [0, 1, -1, -2])
+2026-11-12T20:58:48.6712083Z     def test_match_storage_is_bounded_for_long_responses(index):
+2026-11-12T20:58:48.6712505Z         response = " ".join(str(100000 + number) for number in range(100000))
+2026-11-12T20:58:48.6712912Z         extractor = RegexFilter(r"(\d+)", group_select=index)
+2026-11-12T20:58:48.6713302Z         expected = str(100000 + (index if index >= 0 else 100000 + index))
+2026-11-12T20:58:48.6713644Z         gc.collect()
+2026-11-12T20:58:48.6713863Z         tracemalloc.start()
+2026-11-12T20:58:48.6714303Z         try:
+2026-11-12T20:58:48.6714646Z             result = extractor.apply([[response]], [{}])
+2026-11-12T20:58:48.6715003Z             _, peak = tracemalloc.get_traced_memory()
+2026-11-12T20:58:48.6715289Z         finally:
+2026-11-12T20:58:48.6715504Z             tracemalloc.stop()
+2026-11-12T20:58:48.6715756Z         assert result == [[expected]]
+2026-11-12T20:58:48.6716137Z         # The response already exists. Selecting the first/last two matches need not
+2026-11-12T20:58:48.6716604Z         # allocate the roughly 6 MiB list of all 100,000 captured strings.
+2026-11-12T20:58:48.6716961Z >       assert peak < 256 * 1024
+2026-11-12T20:58:48.6717200Z E       assert 5502806 < (256 * 1024)
+2026-11-12T20:58:48.6717359Z 
+2026-11-12T20:58:48.6717511Z tests/test_regex_stream_selection.py:158: AssertionError
+2026-11-12T20:58:48.6717951Z _____________ test_match_storage_is_bounded_for_long_responses[-1] _____________
+2026-11-12T20:58:48.6718231Z 
+2026-11-12T20:58:48.6718311Z index = -1
+2026-11-12T20:58:48.6718423Z 
+2026-11-12T20:58:48.6718552Z     @pytest.mark.parametrize("index", [0, 1, -1, -2])
+2026-11-12T20:58:48.6719089Z     def test_match_storage_is_bounded_for_long_responses(index):
+2026-11-12T20:58:48.6719503Z         response = " ".join(str(100000 + number) for number in range(100000))
+2026-11-12T20:58:48.6719907Z         extractor = RegexFilter(r"(\d+)", group_select=index)
+2026-11-12T20:58:48.6720282Z         expected = str(100000 + (index if index >= 0 else 100000 + index))
+2026-11-12T20:58:48.6720611Z         gc.collect()
+2026-11-12T20:58:48.6720819Z         tracemalloc.start()
+2026-11-12T20:58:48.6721041Z         try:
+2026-11-12T20:58:48.6721272Z             result = extractor.apply([[response]], [{}])
+2026-11-12T20:58:48.6721587Z             _, peak = tracemalloc.get_traced_memory()
+2026-11-12T20:58:48.6721852Z         finally:
+2026-11-12T20:58:48.6722052Z             tracemalloc.stop()
+2026-11-12T20:58:48.6722299Z         assert result == [[expected]]
+2026-11-12T20:58:48.6722664Z         # The response already exists. Selecting the first/last two matches need not
+2026-11-12T20:58:48.6723118Z         # allocate the roughly 6 MiB list of all 100,000 captured strings.
+2026-11-12T20:58:48.6723454Z >       assert peak < 256 * 1024
+2026-11-12T20:58:48.6723683Z E       assert 5502806 < (256 * 1024)
+2026-11-12T20:58:48.6723843Z 
+2026-11-12T20:58:48.6723980Z tests/test_regex_stream_selection.py:158: AssertionError
+2026-11-12T20:58:48.6724574Z _____________ test_match_storage_is_bounded_for_long_responses[-2] _____________
+2026-11-12T20:58:48.6724855Z 
+2026-11-12T20:58:48.6724937Z index = -2
+2026-11-12T20:58:48.6725047Z 
+2026-11-12T20:58:48.6725177Z     @pytest.mark.parametrize("index", [0, 1, -1, -2])
+2026-11-12T20:58:48.6725532Z     def test_match_storage_is_bounded_for_long_responses(index):
+2026-11-12T20:58:48.6725944Z         response = " ".join(str(100000 + number) for number in range(100000))
+2026-11-12T20:58:48.6726335Z         extractor = RegexFilter(r"(\d+)", group_select=index)
+2026-11-12T20:58:48.6726709Z         expected = str(100000 + (index if index >= 0 else 100000 + index))
+2026-11-12T20:58:48.6727196Z         gc.collect()
+2026-11-12T20:58:48.6727414Z         tracemalloc.start()
+2026-11-12T20:58:48.6727636Z         try:
+2026-11-12T20:58:48.6727865Z             result = extractor.apply([[response]], [{}])
+2026-11-12T20:58:48.6728185Z             _, peak = tracemalloc.get_traced_memory()
+2026-11-12T20:58:48.6728452Z         finally:
+2026-11-12T20:58:48.6728657Z             tracemalloc.stop()
+2026-11-12T20:58:48.6728901Z         assert result == [[expected]]
+2026-11-12T20:58:48.6729269Z         # The response already exists. Selecting the first/last two matches need not
+2026-11-12T20:58:48.6729733Z         # allocate the roughly 6 MiB list of all 100,000 captured strings.
+2026-11-12T20:58:48.6730089Z >       assert peak < 256 * 1024
+2026-11-12T20:58:48.6730337Z E       assert 5502806 < (256 * 1024)
+2026-11-12T20:58:48.6730504Z 
+2026-11-12T20:58:48.6730649Z tests/test_regex_stream_selection.py:158: AssertionError
+2026-11-12T20:58:48.6731042Z =========================== short test summary info ============================
+2026-11-12T20:58:48.6731769Z FAILED tests/test_regex_stream_selection.py::test_match_storage_is_bounded_for_long_responses[0] - assert 5502806 < (256 * 1024)
+2026-11-12T20:58:48.6732562Z FAILED tests/test_regex_stream_selection.py::test_match_storage_is_bounded_for_long_responses[1] - assert 5502806 < (256 * 1024)
+2026-11-12T20:58:48.6733335Z FAILED tests/test_regex_stream_selection.py::test_match_storage_is_bounded_for_long_responses[-1] - assert 5502806 < (256 * 1024)
+2026-11-12T20:58:48.6734297Z FAILED tests/test_regex_stream_selection.py::test_match_storage_is_bounded_for_long_responses[-2] - assert 5502806 < (256 * 1024)
+2026-11-12T20:58:48.6734943Z 4 failed, 135 passed in 2.94s
+2026-11-12T20:58:48.6967336Z Only the four actual peak-memory limits fail on baseline: ['test_match_storage_is_bounded_for_long_responses[0]', 'test_match_storage_is_bounded_for_long_responses[1]', 'test_match_storage_is_bounded_for_long_responses[-1]', 'test_match_storage_is_bounded_for_long_responses[-2]']
+2026-11-12T20:58:48.7049365Z ##[group]Run git restore --source=HEAD -- lm_eval/filters/extraction.py
+2026-11-12T20:58:48.7049902Z [36;1mgit restore --source=HEAD -- lm_eval/filters/extraction.py[0m
+2026-11-12T20:58:48.7050454Z [36;1mpython -m ruff check lm_eval/filters/extraction.py tests/test_regex_stream_selection.py[0m
+2026-11-12T20:58:48.7051136Z [36;1mpython -m ruff format --diff lm_eval/filters/extraction.py tests/test_regex_stream_selection.py[0m
+2026-11-12T20:58:48.7051857Z [36;1mpython -m ruff format --check lm_eval/filters/extraction.py tests/test_regex_stream_selection.py[0m
+2026-11-12T20:58:48.7052361Z [36;1mgit diff --check[0m
+2026-11-12T20:58:48.7075338Z shell: /usr/bin/bash -e {0}
+2026-11-12T20:58:48.7075597Z env:
+2026-11-12T20:58:48.7075792Z   HF_HUB_OFFLINE: 1
+2026-11-12T20:58:48.7076026Z   HF_DATASETS_OFFLINE: 1
+2026-11-12T20:58:48.7076262Z   OPENBLAS_NUM_THREADS: 1
+2026-11-12T20:58:48.7076503Z   PYTEST_DISABLE_PLUGIN_AUTOLOAD: 1
+2026-11-12T20:58:48.7076891Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:48.7077337Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-12T20:58:48.7077759Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:48.7078135Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:48.7078511Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:48.7078885Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-12T20:58:48.7079214Z ##[endgroup]
+2026-11-12T20:58:48.7572976Z All checks passed!
+2026-11-12T20:58:48.7944599Z 2 files already formatted
+2026-11-12T20:58:48.8316597Z 2 files already formatted
+2026-11-12T20:58:49.2365178Z ##[group]Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+2026-11-12T20:58:49.2365609Z with:
+2026-11-12T20:58:49.2365838Z   name: native-regex-selection-evidence
+2026-11-12T20:58:49.2366449Z   path: regex-patched.log
+regex-patched.xml
+regex-baseline.log
+regex-baseline.xml
+regex-benchmark.log
+regex-selection-benchmark.json
+
+2026-11-12T20:58:49.2367058Z   if-no-files-found: warn
+2026-11-12T20:58:49.2367295Z   compression-level: 6
+2026-11-12T20:58:49.2367518Z   overwrite: false
+2026-11-12T20:58:49.2367743Z   include-hidden-files: false
+2026-11-12T20:58:49.2367988Z   archive: true
+2026-11-12T20:58:49.2368187Z env:
+2026-11-12T20:58:49.2368375Z   HF_HUB_OFFLINE: 1
+2026-11-12T20:58:49.2368592Z   HF_DATASETS_OFFLINE: 1
+2026-11-12T20:58:49.2368822Z   OPENBLAS_NUM_THREADS: 1
+2026-11-12T20:58:49.2369066Z   PYTEST_DISABLE_PLUGIN_AUTOLOAD: 1
+2026-11-12T20:58:49.2369390Z   pythonLocation: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:49.2369856Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib/pkgconfig
+2026-11-12T20:58:49.2370278Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:49.2370651Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:49.2371025Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.12.16/x64
+2026-11-12T20:58:49.2371403Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.12.16/x64/lib
+2026-11-12T20:58:49.2371730Z ##[endgroup]
+2026-11-12T20:58:49.3995664Z Multiple search paths detected. Calculating the least common ancestor of all paths
+2026-11-12T20:58:49.3999000Z The least common ancestor is /home/runner/work/lm-evaluation-harness/lm-evaluation-harness. This will be the root directory of the artifact
+2026-11-12T20:58:49.4000058Z With the provided path, there will be 6 files uploaded
+2026-11-12T20:58:49.4033395Z Artifact name is valid!
+2026-11-12T20:58:49.4034523Z Root directory input is valid!
+2026-11-12T20:58:49.6470211Z Uploading artifact: native-regex-selection-evidence.zip
+2026-11-12T20:58:49.6508652Z Beginning upload of artifact content to blob storage
+2026-11-12T20:58:49.8423844Z Uploaded bytes 5676
+2026-11-12T20:58:49.8818064Z Finished uploading artifact content to blob storage!
+2026-11-12T20:58:49.8818864Z SHA256 digest of uploaded artifact is 58703e88eeec5423ac28f42cbd7052583ede370902ad215fa81a28fb0f780da6
+2026-11-12T20:58:49.8820493Z Finalizing artifact upload
+2026-11-12T20:58:50.4081646Z Artifact native-regex-selection-evidence successfully finalized. Artifact ID 13984201110
+2026-11-12T20:58:50.4082880Z Artifact native-regex-selection-evidence has been successfully uploaded! Final size is 5676 bytes. Artifact ID is 13984201110
+2026-11-12T20:58:50.4087225Z Artifact download URL: https://github.com/Afloat16/lm-evaluation-harness/actions/runs/43305454239/artifacts/13984201110
+2026-11-12T20:58:50.4296618Z Post job cleanup.
+2026-11-12T20:58:50.5573383Z (node:2763) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-12T20:58:50.5574342Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-12T20:58:50.5769230Z Post job cleanup.
+2026-11-12T20:58:50.6703092Z [command]/usr/bin/git version
+2026-11-12T20:58:50.6781932Z git version 2.56.0
+2026-11-12T20:58:50.6818136Z Temporarily overriding HOME='/home/runner/work/_temp/e36fa26e-9b28-419c-a027-d878bcbc841f' before making global git config changes
+2026-11-12T20:58:50.6819439Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-12T20:58:50.6823528Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/lm-evaluation-harness/lm-evaluation-harness
+2026-11-12T20:58:50.6865312Z Removing SSH command configuration
+2026-11-12T20:58:50.6872448Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-12T20:58:50.6913747Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-12T20:58:50.7221486Z Removing HTTP extra header
+2026-11-12T20:58:50.7226398Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-12T20:58:50.7273254Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-12T20:58:50.7597965Z Removing includeIf entries pointing to credentials config files
+2026-11-12T20:58:50.7615562Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-12T20:58:50.7674592Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-12T20:58:50.8159360Z Cleaning up orphan processes
+2026-11-12T20:58:50.8573974Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

@@ -1,0 +1,219 @@
+{
+  "repository": "EleutherAI/lm-evaluation-harness",
+  "fork": "Afloat16/lm-evaluation-harness",
+  "base": "d6de81643928d653435c431bae19945d41d32520",
+  "base_tree": "b4b7c5d7c16a287b1025906d61720c77fb70fb8b",
+  "branch": "perf/stream-regex-answer-selection-20261112",
+  "commit": "a4e9cf6d62b3c0da4f12393920fa975b8a19ffaa",
+  "files": [
+    "lm_eval/filters/extraction.py",
+    "tests/test_regex_stream_selection.py"
+  ],
+  "status": "ready_permission_blocked",
+  "validation": {
+    "run": "https://github.com/Afloat16/lm-evaluation-harness/actions/runs/43305454239",
+    "job_id": 131487428488,
+    "conclusion": "success",
+    "source_commit": "a4e9cf6d62b3c0da4f12393920fa975b8a19ffaa",
+    "new_tests": 139,
+    "existing_tests": 7,
+    "patched_passed": 146,
+    "baseline_failed": 4,
+    "baseline_passed": 135,
+    "baseline_failures": "Only the four bounded peak-memory assertions fail; all semantics pass.",
+    "format": "Ruff0.16.3 lint/format and git diff --check passed",
+    "benchmark": {
+      "source_commit": "a4e9cf6d62b3c0da4f12393920fa975b8a19ffaa",
+      "warmups": 1,
+      "timed_repetitions": 9,
+      "memory_measured_separately": true,
+      "scope": "Native RegexFilter.apply only; no model inference.",
+      "rows": [
+        {
+          "matches": 32,
+          "group_select": 0,
+          "input_bytes": 223,
+          "output": [
+            [
+              "100000"
+            ]
+          ],
+          "baseline": {
+            "median_ms": 0.006198999997764076,
+            "peak_bytes": 3638
+          },
+          "patched": {
+            "median_ms": 0.0024139999936778622,
+            "peak_bytes": 2500
+          }
+        },
+        {
+          "matches": 32,
+          "group_select": 1,
+          "input_bytes": 223,
+          "output": [
+            [
+              "100001"
+            ]
+          ],
+          "baseline": {
+            "median_ms": 0.006128999999077678,
+            "peak_bytes": 3638
+          },
+          "patched": {
+            "median_ms": 0.002544000011539538,
+            "peak_bytes": 2581
+          }
+        },
+        {
+          "matches": 32,
+          "group_select": -1,
+          "input_bytes": 223,
+          "output": [
+            [
+              "100031"
+            ]
+          ],
+          "baseline": {
+            "median_ms": 0.010665000004905778,
+            "peak_bytes": 3638
+          },
+          "patched": {
+            "median_ms": 0.009022999989838354,
+            "peak_bytes": 3589
+          }
+        },
+        {
+          "matches": 32,
+          "group_select": -2,
+          "input_bytes": 223,
+          "output": [
+            [
+              "100030"
+            ]
+          ],
+          "baseline": {
+            "median_ms": 0.005958999992117242,
+            "peak_bytes": 3638
+          },
+          "patched": {
+            "median_ms": 0.009052999999425992,
+            "peak_bytes": 3725
+          }
+        },
+        {
+          "matches": 100000,
+          "group_select": 0,
+          "input_bytes": 699999,
+          "output": [
+            [
+              "100000"
+            ]
+          ],
+          "baseline": {
+            "median_ms": 15.992324999999141,
+            "peak_bytes": 5502806
+          },
+          "patched": {
+            "median_ms": 0.0026040000022931054,
+            "peak_bytes": 2500
+          }
+        },
+        {
+          "matches": 100000,
+          "group_select": 1,
+          "input_bytes": 699999,
+          "output": [
+            [
+              "100001"
+            ]
+          ],
+          "baseline": {
+            "median_ms": 15.78602300000398,
+            "peak_bytes": 5502806
+          },
+          "patched": {
+            "median_ms": 0.002543999997328683,
+            "peak_bytes": 2581
+          }
+        },
+        {
+          "matches": 100000,
+          "group_select": -1,
+          "input_bytes": 699999,
+          "output": [
+            [
+              "199999"
+            ]
+          ],
+          "baseline": {
+            "median_ms": 15.674640000000295,
+            "peak_bytes": 5502806
+          },
+          "patched": {
+            "median_ms": 18.210827000004315,
+            "peak_bytes": 4117
+          }
+        },
+        {
+          "matches": 100000,
+          "group_select": -2,
+          "input_bytes": 699999,
+          "output": [
+            [
+              "199998"
+            ]
+          ],
+          "baseline": {
+            "median_ms": 15.157961999989311,
+            "peak_bytes": 5502806
+          },
+          "patched": {
+            "median_ms": 18.18913500000008,
+            "peak_bytes": 4253
+          }
+        }
+      ]
+    }
+  },
+  "dedup": {
+    "history_entries": 26,
+    "fork_heads": 145,
+    "fork_sources": 130,
+    "missing_legacy_file": 15,
+    "unique_regex_versions": 16,
+    "excluded_related_prs": [
+      4033,
+      3884,
+      3708,
+      3395,
+      1356,
+      4358,
+      4324,
+      4449
+    ]
+  },
+  "stars": 14458,
+  "default_branch": "main",
+  "base_commit": "d6de81643928d653435c431bae19945d41d32520",
+  "title": "perf: bound memory when selecting regex answer matches",
+  "body": "## Summary\n\nRegex answer extraction currently materializes every `findall` result before selecting `group_select`. A long response can therefore allocate a large list of captures even when only the first or last answer is needed.\n\nUse `finditer` to stop at a nonnegative selected index, or retain only the required suffix in a bounded deque for negative indices. A shared helper reconstructs the existing zero-, one-, and multiple-capture `findall` return forms, including unmatched optional captures as empty strings. Both the primary regex filter and multiple-choice fallback use the same selection semantics.\n\nNo-match fallbacks, out-of-range index errors, zero-width advancement, capture stripping, and multiple-choice conversion retain their existing behavior.\n\n## Validation\n\n[Native CPU validation on the exact source commit](https://github.com/Afloat16/lm-evaluation-harness/actions/runs/43305454239) passes **146 tests**: 139 new cases plus the existing filter module. The new coverage includes independent `re.findall` comparisons, optional and empty groups, Unicode, zero-width matches, large positive/negative indices, multiple-choice fallbacks, and real `ConfigurableTask` request/filter/scoring integration.\n\nRestoring the original extraction implementation produces **4 memory-limit failures and 135 passing semantic/control cases**. Ruff lint, formatting, and `git diff --check` pass.\n\n## Allocation and timing measurements\n\nThe same-process benchmark runs the native original and patched `RegexFilter.apply`, with one warmup and nine measured calls per case. Allocation peaks are measured separately with `tracemalloc`; input-string construction is outside the measured region. Outputs are equal in every case.\n\nFor 100,000 six-digit matches in a 699,999-byte response:\n\n| Selected match | Original median | Patched median | Original peak allocation | Patched peak allocation |\n| --- | ---: | ---: | ---: | ---: |\n| First (0) | 15.992 ms | 0.002604 ms | 5,502,806 B | 2,500 B |\n| Second (1) | 15.786 ms | 0.002544 ms | 5,502,806 B | 2,581 B |\n| Last (-1) | 15.675 ms | 18.211 ms | 5,502,806 B | 4,117 B |\n| Penultimate (-2) | 15.158 ms | 18.189 ms | 5,502,806 B | 4,253 B |\n\nNegative indices still scan the whole response and are slower in this large-input benchmark; their benefit is bounded match storage. With only 32 matches, the penultimate case also has a small allocation increase (3,638 to 3,725 B) and a timing regression (0.005959 to 0.009053 ms). This change does not promise a speedup for every response or index.\n\nThese measurements cover extraction only, not model inference or overall evaluation throughput.",
+  "prefilled_url": "https://github.com/EleutherAI/lm-evaluation-harness/compare/main...Afloat16:perf/stream-regex-answer-selection-20261112?expand=1&title=perf%3A%20bound%20memory%20when%20selecting%20regex%20answer%20matches&body=%23%23%20Summary%0A%0ARegex%20answer%20extraction%20currently%20materializes%20every%20%60findall%60%20result%20before%20selecting%20%60group_select%60.%20A%20long%20response%20can%20therefore%20allocate%20a%20large%20list%20of%20captures%20even%20when%20only%20the%20first%20or%20last%20answer%20is%20needed.%0A%0AUse%20%60finditer%60%20to%20stop%20at%20a%20nonnegative%20selected%20index%2C%20or%20retain%20only%20the%20required%20suffix%20in%20a%20bounded%20deque%20for%20negative%20indices.%20A%20shared%20helper%20reconstructs%20the%20existing%20zero-%2C%20one-%2C%20and%20multiple-capture%20%60findall%60%20return%20forms%2C%20including%20unmatched%20optional%20captures%20as%20empty%20strings.%20Both%20the%20primary%20regex%20filter%20and%20multiple-choice%20fallback%20use%20the%20same%20selection%20semantics.%0A%0ANo-match%20fallbacks%2C%20out-of-range%20index%20errors%2C%20zero-width%20advancement%2C%20capture%20stripping%2C%20and%20multiple-choice%20conversion%20retain%20their%20existing%20behavior.%0A%0A%23%23%20Validation%0A%0A%5BNative%20CPU%20validation%20on%20the%20exact%20source%20commit%5D(https%3A%2F%2Fgithub.com%2FAfloat16%2Flm-evaluation-harness%2Factions%2Fruns%2F43305454239)%20passes%20**146%20tests**%3A%20139%20new%20cases%20plus%20the%20existing%20filter%20module.%20The%20new%20coverage%20includes%20independent%20%60re.findall%60%20comparisons%2C%20optional%20and%20empty%20groups%2C%20Unicode%2C%20zero-width%20matches%2C%20large%20positive%2Fnegative%20indices%2C%20multiple-choice%20fallbacks%2C%20and%20real%20%60ConfigurableTask%60%20request%2Ffilter%2Fscoring%20integration.%0A%0ARestoring%20the%20original%20extraction%20implementation%20produces%20**4%20memory-limit%20failures%20and%20135%20passing%20semantic%2Fcontrol%20cases**.%20Ruff%20lint%2C%20formatting%2C%20and%20%60git%20diff%20--check%60%20pass.%0A%0A%23%23%20Allocation%20and%20timing%20measurements%0A%0AThe%20same-process%20benchmark%20runs%20the%20native%20original%20and%20patched%20%60RegexFilter.apply%60%2C%20with%20one%20warmup%20and%20nine%20measured%20calls%20per%20case.%20Allocation%20peaks%20are%20measured%20separately%20with%20%60tracemalloc%60%3B%20input-string%20construction%20is%20outside%20the%20measured%20region.%20Outputs%20are%20equal%20in%20every%20case.%0A%0AFor%20100%2C000%20six-digit%20matches%20in%20a%20699%2C999-byte%20response%3A%0A%0A%7C%20Selected%20match%20%7C%20Original%20median%20%7C%20Patched%20median%20%7C%20Original%20peak%20allocation%20%7C%20Patched%20peak%20allocation%20%7C%0A%7C%20---%20%7C%20---%3A%20%7C%20---%3A%20%7C%20---%3A%20%7C%20---%3A%20%7C%0A%7C%20First%20(0)%20%7C%2015.992%20ms%20%7C%200.002604%20ms%20%7C%205%2C502%2C806%20B%20%7C%202%2C500%20B%20%7C%0A%7C%20Second%20(1)%20%7C%2015.786%20ms%20%7C%200.002544%20ms%20%7C%205%2C502%2C806%20B%20%7C%202%2C581%20B%20%7C%0A%7C%20Last%20(-1)%20%7C%2015.675%20ms%20%7C%2018.211%20ms%20%7C%205%2C502%2C806%20B%20%7C%204%2C117%20B%20%7C%0A%7C%20Penultimate%20(-2)%20%7C%2015.158%20ms%20%7C%2018.189%20ms%20%7C%205%2C502%2C806%20B%20%7C%204%2C253%20B%20%7C%0A%0ANegative%20indices%20still%20scan%20the%20whole%20response%20and%20are%20slower%20in%20this%20large-input%20benchmark%3B%20their%20benefit%20is%20bounded%20match%20storage.%20With%20only%2032%20matches%2C%20the%20penultimate%20case%20also%20has%20a%20small%20allocation%20increase%20(3%2C638%20to%203%2C725%20B)%20and%20a%20timing%20regression%20(0.005959%20to%200.009053%20ms).%20This%20change%20does%20not%20promise%20a%20speedup%20for%20every%20response%20or%20index.%0A%0AThese%20measurements%20cover%20extraction%20only%2C%20not%20model%20inference%20or%20overall%20evaluation%20throughput.",
+  "pr_status": "ready_permission_blocked",
+  "pr_url": null,
+  "merged_at": null,
+  "counts_as_upstream_merged": false,
+  "novelty": "genuinely-new",
+  "publication_error": "This upstream repository previously returned create_pull_request HTTP403 Resource not accessible by integration; CUA is currently unavailable.",
+  "limitations": [
+    "CPU filter and task integration, no model inference.",
+    "Negative indices trade extra match-object traversal time for bounded storage; short responses can also allocate slightly more.",
+    "Local filesystem unavailable; remote receipt supersedes any older local snapshot."
+  ],
+  "evidence_files": [
+    ".validation/regex_selection_upstream_history.json",
+    ".validation/regex_selection_fork_audit.json"
+  ],
+  "validation_branch": "validation/regex-answer-selection-20261112",
+  "validation_commit": "f2c49f9cd0437a83601cd1c0fef61077caec8f28"
+}
