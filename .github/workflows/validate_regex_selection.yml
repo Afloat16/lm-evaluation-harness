@@ -100,8 +100,10 @@ jobs:
                         "scope": "Native RegexFilter.apply only; no model inference.", "rows": rows}
               Path("regex-selection-benchmark.json").write_text(json.dumps(result, indent=2) + "\n")
               print(json.dumps(result, indent=2))
-                    PY
+          PY
           python "$RUNNER_TEMP/benchmark_regex.py" | tee regex-benchmark.log
+          test -s regex-selection-benchmark.json
+          python -c 'import json; data=json.load(open("regex-selection-benchmark.json")); assert len(data["rows"]) == 8'
       - name: Restore the original extraction implementation
         run: |
           git show d6de81643928d653435c431bae19945d41d32520:lm_eval/filters/extraction.py > lm_eval/filters/extraction.py
