@@ -4,13 +4,13 @@
   "base": "d6de81643928d653435c431bae19945d41d32520",
   "base_tree": "b4b7c5d7c16a287b1025906d61720c77fb70fb8b",
   "branch": "perf/stream-regex-answer-selection-20261112",
-  "commit": "6012a41d17786da4b3dbf9b89bde06df8f20f79b",
+  "commit": "a4e9cf6d62b3c0da4f12393920fa975b8a19ffaa",
   "files": [
     "lm_eval/filters/extraction.py",
     "tests/test_regex_stream_selection.py"
   ],
   "status": "pending_native_validation",
-  "validation": "No passing results claimed yet; hosted native tests and benchmark next.",
+  "validation": "Initial exact source native new and existing tests: 146 passed. Benchmark registration and test formatting corrected; exact final SHA rerun pending.",
   "dedup": {
     "history_entries": 26,
     "fork_heads": 145,

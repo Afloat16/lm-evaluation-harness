@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
-          ref: 6012a41d17786da4b3dbf9b89bde06df8f20f79b
+          ref: a4e9cf6d62b3c0da4f12393920fa975b8a19ffaa
           fetch-depth: 2
           persist-credentials: false
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
@@ -49,6 +49,7 @@ jobs:
           import tracemalloc
           from pathlib import Path
           
+          import lm_eval.api.registry as registry
           from lm_eval.filters.extraction import RegexFilter
           
           with tempfile.TemporaryDirectory() as directory:
@@ -59,7 +60,13 @@ jobs:
               ]))
               spec = importlib.util.spec_from_file_location("original_extraction", baseline_path)
               baseline = importlib.util.module_from_spec(spec)
-              spec.loader.exec_module(baseline)
+              # Keep the original implementation's decorators in an independent native registry.
+              patched_registry = registry.filter_registry
+              registry.filter_registry = registry.Registry("benchmark-original-filters")
+              try:
+                  spec.loader.exec_module(baseline)
+              finally:
+                  registry.filter_registry = patched_registry
               rows = []
               for count in (32, 100000):
                   response = " ".join(str(100000 + number) for number in range(count))
@@ -93,7 +100,7 @@ jobs:
                         "scope": "Native RegexFilter.apply only; no model inference.", "rows": rows}
               Path("regex-selection-benchmark.json").write_text(json.dumps(result, indent=2) + "\n")
               print(json.dumps(result, indent=2))
-          PY
+                    PY
           python "$RUNNER_TEMP/benchmark_regex.py" | tee regex-benchmark.log
       - name: Restore the original extraction implementation
         run: |
