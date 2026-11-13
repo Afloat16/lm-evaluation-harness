@@ -34,7 +34,7 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
         with:
           repository: Afloat16/lm-evaluation-harness
-          ref: c09418d65e9748f91dfa9a80535fe19df5009335
+          ref: dc9e5355367efa3f0f8650781f49b6308b7f5d3a
           path: source
           persist-credentials: false
           fetch-depth: 3
@@ -58,7 +58,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: lm-eval4591-round7-c09418d6-attempt-${{ github.run_attempt }}
+          name: lm-eval4591-round7-dc9e5355-attempt-${{ github.run_attempt }}
           path: ${{ runner.temp }}/lm-eval4591-round7/
           if-no-files-found: error
           retention-days: 14

@@ -10,8 +10,8 @@ root = Path.cwd()
 evidence = Path(os.environ["RUNNER_TEMP"]) / "lm-eval4591-round7"
 evidence.mkdir(parents=True, exist_ok=True)
 head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
-assert head == "c09418d65e9748f91dfa9a80535fe19df5009335", head
-assert subprocess.check_output(["git", "rev-parse", "HEAD^{tree}"], text=True).strip() == "1231b82735bfdee595b1b8f4371c718afa4f6fda"
+assert head == "dc9e5355367efa3f0f8650781f49b6308b7f5d3a", head
+assert subprocess.check_output(["git", "rev-parse", "HEAD^{tree}"], text=True).strip() == "b9a51c7f76b9843de46f6a714c0207a54d8d9983"
 paths = {
     "lm_eval/tasks/ifeval/ifeval.yaml": 5.0,
     "lm_eval/tasks/leaderboard/ifeval/ifeval.yaml": 4.0,
@@ -19,7 +19,7 @@ paths = {
     "lm_eval/tasks/ifeval/multilingual/ifeval_ca.yaml": 2.0,
 }
 changed = subprocess.check_output(["git", "diff", "--name-only", "HEAD^", "HEAD"], text=True).splitlines()
-assert set(changed) == set(paths) | {"lm_eval/tasks/ifeval/README.md"}, changed
+assert set(changed) == set(paths) | {"lm_eval/tasks/ifeval/README.md", "tests/test_ifeval_zero_arguments.py"}, changed
 versions = {}
 for path, expected in paths.items():
     actual = load_yaml(root / path, resolve_func=False)["metadata"]["version"]
@@ -28,7 +28,7 @@ for path, expected in paths.items():
 assert (root / "lm_eval/tasks/ifeval/../../../docs/new_task_guide.md").resolve().is_file()
 subprocess.run(["git", "diff", "--check", "HEAD^", "HEAD"], check=True)
 (evidence / "source-and-versions.json").write_text(json.dumps({
-    "sha": head, "tree": "1231b82735bfdee595b1b8f4371c718afa4f6fda",
+    "sha": head, "tree": "b9a51c7f76b9843de46f6a714c0207a54d8d9983",
     "changed_files": changed, "versions": versions,
 }, indent=2))
 command = [
