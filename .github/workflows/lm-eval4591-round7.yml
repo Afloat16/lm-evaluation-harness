@@ -1,0 +1,63 @@
+name: IFEval 4591 compatibility documentation validation
+
+on:
+  push:
+    branches:
+      - validation/lm-eval4591-readme-round7-20261113
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Exact candidate versions and all four IFEval variants
+    if: github.repository == 'Afloat16/lm-evaluation-harness'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+        working-directory: source
+    env:
+      PIP_DISABLE_PIP_VERSION_CHECK: '1'
+      HF_HUB_DISABLE_PROGRESS_BARS: '1'
+      TQDM_DISABLE: '1'
+      SKIP: no-commit-to-branch,mypy
+    steps:
+      - name: Check out validation script
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+        with:
+          path: verification
+          persist-credentials: false
+          sparse-checkout: .github/validation
+      - name: Check out exact candidate
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+        with:
+          repository: Afloat16/lm-evaluation-harness
+          ref: c09418d65e9748f91dfa9a80535fe19df5009335
+          path: source
+          persist-credentials: false
+          fetch-depth: 3
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - name: Install evaluator and language test requirements
+        run: |
+          mkdir -p "$RUNNER_TEMP/lm-eval4591-round7"
+          python -m pip install -e '.[ifeval]' 'pytest>=9,<10' 'spacy>=3.8,<3.9' iso639-lang pre-commit
+          python -m spacy download es_core_news_sm
+          python -m spacy download ca_core_news_sm
+          python -m nltk.downloader -q punkt punkt_tab
+          python -m pip freeze > "$RUNNER_TEMP/lm-eval4591-round7/dependencies.txt"
+          python --version
+      - name: Validate versions, regressions, and touched-file checks
+        run: python ../verification/.github/validation/lm-eval4591-round7.py
+      - name: Preserve verification evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: lm-eval4591-round7-c09418d6-attempt-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/lm-eval4591-round7/
+          if-no-files-found: error
+          retention-days: 14
