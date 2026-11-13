@@ -1,0 +1,102 @@
+{
+  "repository": "sgl-project/sglang",
+  "stars": 38809,
+  "archived": false,
+  "default_branch": "main",
+  "fork": "Afloat16/sglang",
+  "base_commit": "bd4c1afc37b3919869ec88a1987649fa5ad0f870",
+  "commit": "ea71bf744ee5b7902dbbe24639f008fd9bba68cb",
+  "branch": "fix/layernorm-converted-parameter-dtype-20261112",
+  "title": "Follow live parameter dtype in LayerNorm",
+  "body": "## Motivation\n\n`LayerNorm` caches its constructor dtype, but normal module conversion (`.half()`, `.bfloat16()`, `.double()`, `.float()`, `.to()`) and `load_state_dict(assign=True)` can change its parameter dtype. The stale value then casts inputs to an incompatible dtype and can incorrectly enable a fused backend, causing valid converted modules to fail.\n\n## Modifications\n\nUse the current `weight.dtype` for the native input cast and CUDA/HIP eligibility checks. The output still returns to the input dtype. An unconverted float32 norm retains its existing mixed precision behavior.\n\nAdd eight test methods covering public module conversions, mixed input dtype, biasless modules, checkpoint assignment, native SGD updates, and backend fallback eligibility.\n\n## Accuracy Tests\n\nExact-source native validation: https://github.com/Afloat16/sglang/actions/runs/43401517260\n\n- Linux CPU, with normal repository imports and its actual PyTorch LayerNorm implementation.\n- New tests plus existing CPU LayerNorm controls: **12 tests passed, 25 subtests passed**.\n- Restoring the original source produces **3 failing methods and 13 failing subtests** (pytest reports 16 failures), with 5 completed methods and 4 passing subtests. These are dtype/dispatch failures after valid module conversion.\n- Three native training updates match `torch.nn.LayerNorm` forward values, gradients and parameters.\n- Repository pre-commit hooks and `git diff --check` passed.\n\nThe tests check CUDA/HIP fallback eligibility on CPU; they do not execute fused GPU kernels or benchmark model generation.\n\n## Speed Tests and Profiling\n\nNo throughput or model-quality improvement is claimed. This fixes correctness after parameter dtype conversion.\n\n## Checklist\n\n- [x] Format code with repository pre-commit hooks.\n- [x] Add registered CPU regression tests.\n- [x] Follow the SGLang code style guidance.\n- Documentation: no public API change.\n- Accuracy: native LayerNorm and training checks described above.\n",
+  "prefilled_url": "https://github.com/sgl-project/sglang/compare/main...Afloat16:fix/layernorm-converted-parameter-dtype-20261112?expand=1&title=Follow%20live%20parameter%20dtype%20in%20LayerNorm&body=%23%23%20Motivation%0A%0A%60LayerNorm%60%20caches%20its%20constructor%20dtype%2C%20but%20normal%20module%20conversion%20(%60.half()%60%2C%20%60.bfloat16()%60%2C%20%60.double()%60%2C%20%60.float()%60%2C%20%60.to()%60)%20and%20%60load_state_dict(assign%3DTrue)%60%20can%20change%20its%20parameter%20dtype.%20The%20stale%20value%20then%20casts%20inputs%20to%20an%20incompatible%20dtype%20and%20can%20incorrectly%20enable%20a%20fused%20backend%2C%20causing%20valid%20converted%20modules%20to%20fail.%0A%0A%23%23%20Modifications%0A%0AUse%20the%20current%20%60weight.dtype%60%20for%20the%20native%20input%20cast%20and%20CUDA%2FHIP%20eligibility%20checks.%20The%20output%20still%20returns%20to%20the%20input%20dtype.%20An%20unconverted%20float32%20norm%20retains%20its%20existing%20mixed%20precision%20behavior.%0A%0AAdd%20eight%20test%20methods%20covering%20public%20module%20conversions%2C%20mixed%20input%20dtype%2C%20biasless%20modules%2C%20checkpoint%20assignment%2C%20native%20SGD%20updates%2C%20and%20backend%20fallback%20eligibility.%0A%0A%23%23%20Accuracy%20Tests%0A%0AExact-source%20native%20validation%3A%20https%3A%2F%2Fgithub.com%2FAfloat16%2Fsglang%2Factions%2Fruns%2F43401517260%0A%0A-%20Linux%20CPU%2C%20with%20normal%20repository%20imports%20and%20its%20actual%20PyTorch%20LayerNorm%20implementation.%0A-%20New%20tests%20plus%20existing%20CPU%20LayerNorm%20controls%3A%20**12%20tests%20passed%2C%2025%20subtests%20passed**.%0A-%20Restoring%20the%20original%20source%20produces%20**3%20failing%20methods%20and%2013%20failing%20subtests**%20(pytest%20reports%2016%20failures)%2C%20with%205%20completed%20methods%20and%204%20passing%20subtests.%20These%20are%20dtype%2Fdispatch%20failures%20after%20valid%20module%20conversion.%0A-%20Three%20native%20training%20updates%20match%20%60torch.nn.LayerNorm%60%20forward%20values%2C%20gradients%20and%20parameters.%0A-%20Repository%20pre-commit%20hooks%20and%20%60git%20diff%20--check%60%20passed.%0A%0AThe%20tests%20check%20CUDA%2FHIP%20fallback%20eligibility%20on%20CPU%3B%20they%20do%20not%20execute%20fused%20GPU%20kernels%20or%20benchmark%20model%20generation.%0A%0A%23%23%20Speed%20Tests%20and%20Profiling%0A%0ANo%20throughput%20or%20model-quality%20improvement%20is%20claimed.%20This%20fixes%20correctness%20after%20parameter%20dtype%20conversion.%0A%0A%23%23%20Checklist%0A%0A-%20%5Bx%5D%20Format%20code%20with%20repository%20pre-commit%20hooks.%0A-%20%5Bx%5D%20Add%20registered%20CPU%20regression%20tests.%0A-%20%5Bx%5D%20Follow%20the%20SGLang%20code%20style%20guidance.%0A-%20Documentation%3A%20no%20public%20API%20change.%0A-%20Accuracy%3A%20native%20LayerNorm%20and%20training%20checks%20described%20above.%0A",
+  "pr_url": "https://github.com/sgl-project/sglang/pull/50288",
+  "pr_status": "open",
+  "merged_at": null,
+  "counts_as_upstream_merged": false,
+  "novelty": {
+    "classification": "genuinely-new",
+    "upstream_history_entries": 132,
+    "actual_related_patches": [
+      12044,
+      14074,
+      15075,
+      13814,
+      22424
+    ],
+    "all_state_searches": "LayerNorm self.dtype / mixed dtype / dtype conversion / half / double",
+    "personal_prs": [
+      50152,
+      50164,
+      50179
+    ],
+    "fork_branches": [
+      {
+        "name": "fix/bounded-atomic-stop-regex-20261112",
+        "sha": "3e2b9ff667f11c0a4c3eb56fd857389b3d57c102"
+      },
+      {
+        "name": "fix/pooler-half-normalization-20261112",
+        "sha": "6cfa1c2b244d2a7b9816ade3d58927e5fb9914bd"
+      },
+      {
+        "name": "fix/schema-identifier-field-names-20261112",
+        "sha": "1093b07ba3410e4c963a17965e846e5e5662aac9"
+      },
+      {
+        "name": "main",
+        "sha": "721ef92c4c764bb3c2307378bf13609fc7be7e72"
+      },
+      {
+        "name": "validation/cpu-pooler-normalization-20261112",
+        "sha": "749c51ee2698245b14aed1e2c1edd3187b71c23f"
+      }
+    ]
+  },
+  "validation": {
+    "source_commit": "ea71bf744ee5b7902dbbe24639f008fd9bba68cb",
+    "workflow_commit": "6a9752b21dc8f8842ac9bd3c162d334d69ddaa8c",
+    "run_url": "https://github.com/Afloat16/sglang/actions/runs/43401517260",
+    "job_id": 131805242445,
+    "artifact_id": 14025932145,
+    "environment": "Linux hosted CPU; native PyTorch and repository imports; no GPU fused-kernel execution",
+    "patched": {
+      "methods_passed": 12,
+      "subtests_passed": 25
+    },
+    "baseline": {
+      "methods_failed": 3,
+      "subtests_failed": 13,
+      "methods_completed": 5,
+      "subtests_passed": 4
+    },
+    "checks": [
+      "repository pre-commit",
+      "git diff --check"
+    ]
+  },
+  "limitations": [
+    "CUDA/HIP checks exercise CPU fallback eligibility, not fused GPU kernels",
+    "No model generation benchmark or model quality claim"
+  ],
+  "source_files": [
+    "python/sglang/srt/layers/layernorm.py",
+    "test/registered/unit/layers/test_layernorm_dtype_conversion.py"
+  ],
+  "pr_number": 50288,
+  "draft": false,
+  "publication": {
+    "method": "GitHub connector",
+    "head_verified": "ea71bf744ee5b7902dbbe24639f008fd9bba68cb",
+    "title_verified": true,
+    "submitted_body_verified": true,
+    "maintainer_can_modify": false
+  },
+  "current_upstream_snapshot": {
+    "head": "ea71bf744ee5b7902dbbe24639f008fd9bba68cb",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "repository": "mlflow/mlflow",
+  "pr_number": 27736,
+  "pr_url": "https://github.com/mlflow/mlflow/pull/27736",
+  "title": "Deduplicate identical parameters in `MlflowAutologgingQueueingClient`",
+  "body": "### Related Issues/PRs\n\nRelates to #4416, which introduced the queueing client.\n\n### What changes are proposed in this pull request?\n\nRepeatedly logging the same parameter value is valid through `MlflowClient`, but `MlflowAutologgingQueueingClient` currently forwards identical queued records into the same `log_batch` call. The store rejects the duplicate keys, and the metrics and tags sharing that batch are not logged.\n\nDeduplicate queued parameters by their already-normalized `(key, value)` pair before constructing batches. This retains insertion order, keeps different keys with equal values, and preserves conflicting values for the existing store validation. The change restores idempotent logging of the same parameter value; it does not introduce transactionality across batches.\n\n### How is this PR tested?\n\n- [x] Existing unit/integration tests\n- [x] New unit/integration tests\n- [x] Manual tests\n\nNative SQLite reproduction: two direct `MlflowClient.log_param` calls with the same key/value succeed, while two queued `log_params` calls fail before the fix with `Duplicate parameter keys`.\n\nThe nine new regression/control cases produce **7 failures and 2 passes** on the base revision. After the fix, the complete `tests/autologging/test_autologging_client.py` module has **20 passing tests**.\n\nCoverage includes synchronous/asynchronous/context-manager flushing, existing and pending runs, value stringification, accompanying metrics/tags/run termination, more than one parameter batch, equal values under different keys, and conflicting parameter values. These tests use the real queue client and SQLite store without mocked logging operations.\n\nRuff 0.16.8, Clint, character normalization, and `git diff --check` pass. Validation is limited to this native local-store path; remote stores and the full MLflow test suite were not exercised.\n\n### Does this PR require documentation update?\n\n- [x] No.\n\n### Does this PR require updating the [MLflow Skills](https://github.com/mlflow/skills) repository?\n\n- [x] No.\n\n### Release Notes\n\n#### Is this a user-facing change?\n\n- [x] Yes. Fix autologging batches failing when the same parameter value is queued more than once.\n\n#### What component(s), interfaces, languages, and integrations does this PR affect?\n\nComponents\n\n- [x] `area/tracking`: Tracking Service, tracking client APIs, autologging\n\n<a name=\"release-note-category\"></a>\n\n#### How should the PR be classified in the release notes? Choose one:\n\n- [x] `rn/bug-fix` - A user-facing bug fix worth mentioning in the release notes\n\n#### Is this PR a critical bugfix or security fix that should go into the next patch release?\n\n<details>\n<summary>What is a minor/patch release?</summary>\n\n- Minor release: a release that increments the second part of the version number (e.g., 1.2.0 -> 1.3.0).\n  Minor releases are expected to contain larger changes, such as new features and improvements. Non-critical bug fixes and doc updates can be included as well. By default, your PR should target the next minor release.\n- Patch release: a release that increments the third part of the version number (e.g., 1.2.0 -> 1.2.1).\n  Patch releases are typically only performed when there has been a major regression or bug in the latest release. For the sake of stability, your PR should not be included in a patch release unless it is a critical fix, or if the risk level of your PR is exceedingly low.\n\n</details>\n\n- [ ] This PR is critical and needs to be in the next patch release\n- [x] This PR can wait for the next minor release\n",
+  "commit": "dfef96be40bffb37020347f1c934489a03318dda",
+  "branch": "fix/autologging-repeated-parameters-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "dfef96be40bffb37020347f1c934489a03318dda",
+    "state": "open",
+    "draft": true,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  },
+  "counts_as_upstream_merged": false
+}

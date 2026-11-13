@@ -1,0 +1,90 @@
+{
+  "repository": "sgl-project/sglang",
+  "stars": 38809,
+  "archived": false,
+  "default_branch": "main",
+  "fork": "Afloat16/sglang",
+  "base_commit": "5792cf6e5e11aebc62d41cf19828f615a8fa7e0a",
+  "commit": "0828b0d8d3d097f50e15e7b27d6cca75bc955bb1",
+  "branch": "fix/cpu-rope-offset-delegation-20261113",
+  "title": "[Fix] Apply CPU rotary offsets once in the native fallback",
+  "body": "## Motivation\n\nThe CPU RoPE entry points add offsets before choosing their backend. Their native fallback then receives both the shifted positions and the same offsets, so it adds the offsets a second time. This changes rotation angles and can index beyond the cache even when the requested position is valid.\n\n## Modifications\n\nApply the eager position shift only inside the AMX branch. The existing native implementation receives the original positions and offsets and performs its own single shift. This fixes the shared delegation error in the base/linear and DeepSeek rotary implementations.\n\n## Accuracy Tests\n\nExact-source native validation: https://github.com/Afloat16/sglang/actions/runs/43408946377\n\n- Seven new native CPU test methods passed with **18 subtests**.\n- Restoring the original implementation produces **2 failing methods and 14 failing subtests** (pytest reports 16 failures), with 5 completed methods and 4 passing subtests.\n- Independent cache-row references cover Neox/GPT-J layouts, FP16/BF16/FP32, linear scaling, DeepSeek layouts, scalar cache-boundary offsets, and zero/absent offsets.\n- Real CPU scaled-dot-product attention and input gradients match an independently positioned reference.\n- Full repository pre-commit hooks and `git diff --check` passed.\n\nThe tests select the actual native CPU fallback; they do not replace the RoPE operators. AMX and GPU fused kernels are outside the executed scope.\n\n## Speed Tests and Profiling\n\nThis is a correctness fix. No throughput or model-quality improvement is claimed.\n",
+  "prefilled_url": "https://github.com/sgl-project/sglang/compare/main...Afloat16:fix/cpu-rope-offset-delegation-20261113?expand=1&title=%5BFix%5D%20Apply%20CPU%20rotary%20offsets%20once%20in%20the%20native%20fallback&body=%23%23%20Motivation%0A%0AThe%20CPU%20RoPE%20entry%20points%20add%20offsets%20before%20choosing%20their%20backend.%20Their%20native%20fallback%20then%20receives%20both%20the%20shifted%20positions%20and%20the%20same%20offsets%2C%20so%20it%20adds%20the%20offsets%20a%20second%20time.%20This%20changes%20rotation%20angles%20and%20can%20index%20beyond%20the%20cache%20even%20when%20the%20requested%20position%20is%20valid.%0A%0A%23%23%20Modifications%0A%0AApply%20the%20eager%20position%20shift%20only%20inside%20the%20AMX%20branch.%20The%20existing%20native%20implementation%20receives%20the%20original%20positions%20and%20offsets%20and%20performs%20its%20own%20single%20shift.%20This%20fixes%20the%20shared%20delegation%20error%20in%20the%20base%2Flinear%20and%20DeepSeek%20rotary%20implementations.%0A%0A%23%23%20Accuracy%20Tests%0A%0AExact-source%20native%20validation%3A%20https%3A%2F%2Fgithub.com%2FAfloat16%2Fsglang%2Factions%2Fruns%2F43408946377%0A%0A-%20Seven%20new%20native%20CPU%20test%20methods%20passed%20with%20**18%20subtests**.%0A-%20Restoring%20the%20original%20implementation%20produces%20**2%20failing%20methods%20and%2014%20failing%20subtests**%20(pytest%20reports%2016%20failures)%2C%20with%205%20completed%20methods%20and%204%20passing%20subtests.%0A-%20Independent%20cache-row%20references%20cover%20Neox%2FGPT-J%20layouts%2C%20FP16%2FBF16%2FFP32%2C%20linear%20scaling%2C%20DeepSeek%20layouts%2C%20scalar%20cache-boundary%20offsets%2C%20and%20zero%2Fabsent%20offsets.%0A-%20Real%20CPU%20scaled-dot-product%20attention%20and%20input%20gradients%20match%20an%20independently%20positioned%20reference.%0A-%20Full%20repository%20pre-commit%20hooks%20and%20%60git%20diff%20--check%60%20passed.%0A%0AThe%20tests%20select%20the%20actual%20native%20CPU%20fallback%3B%20they%20do%20not%20replace%20the%20RoPE%20operators.%20AMX%20and%20GPU%20fused%20kernels%20are%20outside%20the%20executed%20scope.%0A%0A%23%23%20Speed%20Tests%20and%20Profiling%0A%0AThis%20is%20a%20correctness%20fix.%20No%20throughput%20or%20model-quality%20improvement%20is%20claimed.%0A",
+  "pr_url": "https://github.com/sgl-project/sglang/pull/50303",
+  "pr_status": "open",
+  "merged_at": null,
+  "counts_as_upstream_merged": false,
+  "novelty": {
+    "classification": "genuinely-new",
+    "modern_base_history_entries": 41,
+    "variant_history_entries": 8,
+    "legacy_history_entries": 122,
+    "actual_patches_read": [
+      2806,
+      2975,
+      19144,
+      9493,
+      11003,
+      11009,
+      44394,
+      31897,
+      48154
+    ],
+    "queries": [
+      "DeepseekScalingRotaryEmbedding offsets",
+      "forward_cpu offsets",
+      "rotary double offset",
+      "rope offsets twice",
+      "rotary offset CPU"
+    ],
+    "personal_fork": "All current task fork heads and seven actual PRs inspected; no CPU offset delegation repair."
+  },
+  "validation": {
+    "source_commit": "0828b0d8d3d097f50e15e7b27d6cca75bc955bb1",
+    "workflow_commit": "b2217e36665dd33569f31364b473903263bfdeea",
+    "run_url": "https://github.com/Afloat16/sglang/actions/runs/43408946377",
+    "job_id": 131830205348,
+    "artifact_id": 14028932764,
+    "patched": {
+      "methods_passed": 7,
+      "subtests_passed": 18
+    },
+    "baseline": {
+      "methods_failed": 2,
+      "subtests_failed": 14,
+      "methods_completed": 5,
+      "subtests_passed": 4
+    },
+    "checks": [
+      "full repository pre-commit",
+      "git diff --check"
+    ],
+    "scope": "Native CPU RoPE and scaled-dot-product attention"
+  },
+  "limitations": [
+    "AMX and GPU fused kernels were not executed",
+    "DeepSeek uses supported positional layouts; unrelated shape conventions are unchanged",
+    "No throughput or model-quality measurements"
+  ],
+  "source_files": [
+    "python/sglang/srt/layers/rotary_embedding/base.py",
+    "python/sglang/srt/layers/rotary_embedding/rope_variant.py",
+    "test/registered/unit/layers/test_cpu_rope_offsets.py"
+  ],
+  "pr_number": 50303,
+  "draft": false,
+  "publication": {
+    "method": "GitHub connector",
+    "head_verified": "0828b0d8d3d097f50e15e7b27d6cca75bc955bb1",
+    "title_verified": true,
+    "body_verified": true,
+    "maintainer_can_modify": false
+  },
+  "current_upstream_snapshot": {
+    "head": "0828b0d8d3d097f50e15e7b27d6cca75bc955bb1",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  }
+}

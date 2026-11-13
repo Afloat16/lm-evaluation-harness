@@ -1,0 +1,23 @@
+{
+  "repository": "hyperopt/hyperopt",
+  "pr_number": 968,
+  "pr_url": "https://github.com/hyperopt/hyperopt/pull/968",
+  "title": "Ignore unsuccessful trial losses when constructing sampler history",
+  "body": "## Problem\n\nTPE and annealing both state that new, running, or failed evaluations receive infinite loss. In practice, both paths read any numeric `loss` without checking the result status. A failed evaluation that retains a low loss can therefore become a preferred point for subsequent suggestions. This also contradicts the expected behavior described in #609.\n\n## Changes\n\nRead an observed loss only for `STATUS_OK` results. Other statuses use the existing infinite-loss path. Trials remain in the history with their existing ordering, and their result dictionaries are not modified. Annealing uses the domain's status accessor consistently with its loss accessor.\n\n## Validation\n\n- Added deterministic tests using native `Trials` and actual TPE/annealing suggestions. For fail/new/running/suspended results, supplying a low loss must produce the same next suggestion as omitting that invalid loss.\n- Added successful-result controls confirming that valid losses still affect the next suggestion.\n- Before the change: 8 new failures and 2 passing controls. After the change: all 10 new tests pass; together with the existing annealing smoke cases, 18 tests pass.\n- Ruff checks, formatting, and `git diff --check` pass.\n\nThis corrects how result status affects sampling. It does not claim improved convergence on a benchmark or change early stopping and loss-threshold handling.",
+  "commit": "4b339129a45349c0bfa899f36c5c42105d7731ff",
+  "branch": "fix/sampler-trial-result-status-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "4b339129a45349c0bfa899f36c5c42105d7731ff",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

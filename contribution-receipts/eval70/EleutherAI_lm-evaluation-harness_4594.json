@@ -1,0 +1,23 @@
+{
+  "repository": "EleutherAI/lm-evaluation-harness",
+  "pr_number": 4594,
+  "pr_url": "https://github.com/EleutherAI/lm-evaluation-harness/pull/4594",
+  "title": "Keep prescription task choices consistent between prompts and scoring",
+  "body": "## Problem\n\nThe prescription tasks call `doc_to_choice_easy` / `doc_to_choice_hard` while rendering the prompt and again while constructing log-likelihood requests. Each call samples new distractors. As a result, the scored negative continuations can differ from the options displayed to the model.\n\n## Change\n\nSample both sets of choices once during `process_docs`, after selecting the gold answer and its position, and store them in the processed record. Rendering and request construction then read copies of those saved lists. The existing sampling rules and record-filtering logic are retained.\n\nBoth task configurations now resolve to version **1.2**. The README explains the corrected prompt/request consistency and the changed random-number consumption order. Version 1.2 scores should not be compared directly with version 1.1 results.\n\n## Validation\n\nThe 13 new tests give **12 failures and 1 pass** on the base revision and **13 passes** with the fix:\n\n- Native Dataset preprocessing for both difficulties and one to four source prescriptions.\n- Exact agreement between displayed options and repeated choice callbacks, even after unrelated random draws.\n- Both real YAML configurations loaded into `ConfigurableTask`; every constructed request is compared with the corresponding displayed option.\n- Saving and reloading processed datasets preserves prompts and choices.\n- Existing record filtering, gold membership, and gold position remain covered.\n\nThe tests use native dataset/task implementations and local synthetic records. No model inference or full-dataset benchmark was run, and no model accuracy improvement is claimed.\n\nRuff checks on the new test, formatting checks, YAML resolution, and `git diff --check` pass. The existing utility file still has the same nine Ruff diagnostics as the base revision (five `BLE001`, two `S110`, and two `UP032`); their codes and messages were compared against the base, with no new diagnostic introduced.\n\n## Related work\n\nThe original task was added in #2714. The actual changes in #3589 (removing a prompt print) and #4041 (diagnosis-key validation) were checked; neither addresses repeated choice sampling.\n",
+  "commit": "b87c7d6f4bfd95189964f72db49e9942b6f10ad9",
+  "branch": "fix/prescription-choice-consistency-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "b87c7d6f4bfd95189964f72db49e9942b6f10ad9",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.328Z"
+  },
+  "counts_as_upstream_merged": false
+}

@@ -1,0 +1,23 @@
+{
+  "repository": "rasbt/mlxtend",
+  "pr_number": 1292,
+  "pr_url": "https://github.com/rasbt/mlxtend/pull/1292",
+  "title": "Align prefit voting probabilities with classifier labels",
+  "body": "### Description\n\nWhen `fit_base_estimators=False`, `EnsembleVoteClassifier` averages probability columns by position. Prefit classifiers can have different class subsets or class orders, so equal-width arrays silently mix unrelated classes; differing widths raise a ragged-array error.\n\nAlign each prefit classifier's probability columns with the ensemble's labels using `classes_`. Classes missing from an individual classifier receive zero probability before the existing weighted average. The same alignment is used by soft `transform`; hard voting and the path that fits base estimators retain their behavior.\n\n### Validation\n\nBase: `1aee767ef57b84a8191511a08955c583b65de382`.\n\n- Eight new regression/control cases: **5 failed, 3 passed** before the change; **8 passed** afterward.\n- Tests use fitted native GaussianNB models with overlapping and unequal class subsets, numeric and string labels, and a different learned class order. They check the explicit weighted probability reference, normalization, predicted labels, transform shape, and preservation of fitted parameters. Ordinary full-class ensembles and hard voting are controls.\n- `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 OPENBLAS_NUM_THREADS=1 python -m pytest mlxtend/classifier/tests/test_prefit_vote_classes.py mlxtend/classifier/tests/test_ensemble_vote_classifier.py -q`: **24 passed**.\n- Changed-file Black, isort, Flake8 and `git diff --check` passed.\n\nPython 3.12.14, NumPy 2.3.5, scikit-learn 1.8.0. The existing prefit test emits its expected use-clones warning. The full repository suite was not run.\n\n### Pull Request Checklist\n\n- [x] Added a changelog entry.\n- [x] Added regression/control tests.\n- [x] Documented prefit probability-column alignment.\n- [x] Relevant tests and changed-file style checks pass.\n",
+  "commit": "cf80c72190f17e49bd230779ee261eb254b9a6c4",
+  "branch": "fix/prefit-vote-probability-columns-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "cf80c72190f17e49bd230779ee261eb254b9a6c4",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  },
+  "counts_as_upstream_merged": false
+}

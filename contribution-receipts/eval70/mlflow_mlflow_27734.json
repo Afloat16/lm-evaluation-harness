@@ -1,0 +1,23 @@
+{
+  "repository": "mlflow/mlflow",
+  "pr_number": 27734,
+  "pr_url": "https://github.com/mlflow/mlflow/pull/27734",
+  "title": "Prevent numeric overflow in regression `sum_on_target`",
+  "body": "### Related Issues/PRs\n\nRelates to #27729. That change corrects weight normalization for `mean_on_target`; this change fixes arithmetic precision in target accumulation.\n\n### What changes are proposed in this pull request?\n\nPromote targets and sample weights to float64 before multiplication and summation in `_get_regressor_metrics`. NumPy can otherwise retain a narrow input dtype during arithmetic: summing uint8 targets `[200, 210]` reports 154, and applying uint8 weights `[2, 3]` reports 262 instead of 1030. Small signed integers can wrap negative, float16 accumulation can become infinite, and float32 can discard small contributions.\n\nThe promoted calculation preserves the intended weighted sum and does not modify caller inputs. It also supplies the correct sum to the existing unweighted mean calculation. Values remain subject to float64 precision; this is not arbitrary-precision arithmetic.\n\n### How is this PR tested?\n\n- [x] New unit/integration tests\n\n18 new tests: 14 failed and 4 passed on the upstream base; all 18 pass with this change. They use independently calculated Python-float sums, cover integer/float dtypes, list and Series inputs, input immutability, and native `mlflow.models.evaluate` runs whose corrected sums are verified after persistence.\n\nRuff 0.16.8, Clint, character normalization, and `git diff --check` pass. The broad legacy evaluator test module requires unavailable PySpark, so the full evaluator suite was not run. The complete pre-commit hook set could not be installed because npm rejected a Prettier dependency under its Git-install safety policy; the listed direct Python checks were executed.\n\n### Does this PR require documentation update?\n\n- [x] No.\n\n### Does this PR require updating the [MLflow Skills](https://github.com/mlflow/skills) repository?\n\n- [x] No.\n\n### Release Notes\n\n#### Is this a user-facing change?\n\n- [x] Yes. Regression evaluation now accumulates `sum_on_target` in float64 to prevent overflow and lost contributions from narrow integer and floating-point inputs.\n\n#### What component(s), interfaces, languages, and integrations does this PR affect?\n\nComponents\n\n- [x] `area/evaluation`: MLflow model evaluation features, evaluation metrics, and evaluation workflows\n\n<a name=\"release-note-category\"></a>\n\n#### How should the PR be classified in the release notes? Choose one:\n\n- [x] `rn/bug-fix` - A user-facing bug fix worth mentioning in the release notes\n\n#### Is this PR a critical bugfix or security fix that should go into the next patch release?\n\n- [ ] This PR is critical and needs to be in the next patch release\n- [x] This PR can wait for the next minor release",
+  "commit": "6d1ec610ae49ed6517332fafd446b6c5dc719509",
+  "branch": "fix/regression-target-accumulation-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "6d1ec610ae49ed6517332fafd446b6c5dc719509",
+    "state": "open",
+    "draft": true,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  },
+  "counts_as_upstream_merged": false
+}

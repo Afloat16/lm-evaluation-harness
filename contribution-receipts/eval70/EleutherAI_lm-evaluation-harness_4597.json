@@ -1,0 +1,23 @@
+{
+  "repository": "EleutherAI/lm-evaluation-harness",
+  "pr_number": 4597,
+  "pr_url": "https://github.com/EleutherAI/lm-evaluation-harness/pull/4597",
+  "title": "Count SCORE answer agreement without enumerating every pair",
+  "body": "## Problem\n\nSCORE's exact-string consistency rate enumerates every pair of answers to a question. That performs quadratic Python work even though only the number of equal-answer pairs is needed. The same loop is used in prompt/option consistency and in the non-greedy log summarizer.\n\n## Change\n\nFor each question, count how many times each answer has already appeared. An answer seen `k` times contributes exactly `k` additional matching pairs. This takes expected linear work in the number of responses and stores one count per distinct answer.\n\nKeep the existing pair-count denominator, weighting between differently sized response groups, empty/singleton behavior, case/Unicode-sensitive equality, and the separate pairwise mathematical-equivalence scoring path. Scores do not change, so task versions stay unchanged.\n\n## Validation\n\n- **Original and patched source: 26 passed** in the new semantic tests. This is a performance change; the original implementation passes these correctness controls.\n- Independent enumeration of all answer pairs covers empty/singleton groups, identical/distinct answers, uneven group sizes, randomized groups, response ordering, case, whitespace, Unicode, and a 900-response group. Inputs remain unchanged.\n- The real MMLU-Pro SCORE YAML, `ConfigurableTask`, prompt expansion, result processing, and evaluator aggregation preserve consistency and per-prompt accuracy.\n- The real non-greedy summarizer reads five seed-specific JSONL files and persists the expected consistency and per-seed accuracy.\n- Existing numeric-equivalence scoring is exercised separately and unchanged.\n- New tests, formatting of all changed Python files, and `git diff --check` pass Ruff 0.16.3. The two production modules retain their 16 and 7 pre-existing Ruff findings, with no new diagnostics.\n\n### Local timing\n\nOne warmup followed by seven measured runs per case, reporting the median on a shared CPU environment, Python 3.12.14. Each question's answers cycle through four distinct strings. These measurements cover only consistency aggregation, excluding generation and file I/O.\n\n| Questions | Responses per question | Original prompt CR | Patched prompt CR |\n| --- | --- | --- | --- |\n| 10,000 | 5 | 5.512 ms | 2.458 ms |\n| 10,000 | 10 | 20.462 ms | 4.389 ms |\n| 1,000 | 100 | 205.332 ms | 4.019 ms |\n| 100 | 1,000 | 2242.578 ms | 4.894 ms |\n\nThe non-greedy entry point was also timed and returned the same consistency value in every run. The change trades the pair iterator's constant auxiliary storage for a dictionary proportional to the number of distinct answers per question. It does not claim faster model inference or improved model quality; the full harness suite and model benchmarks were not run.\n\n## Related work\n\nChecked all-state consistency/counting/performance searches, the complete histories of both affected files, personal PR history, and all 143 current fork branches against the existing actual-commit audit. Read the actual patch of #4336: that fixes option-label remapping and does not change pair counting. This change preserves the current remapping behavior and is independent of that fix.\n",
+  "commit": "1817b30352a92a73ce7520e1934c7d4219d5ff8f",
+  "branch": "perf/score-consistency-counts-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "1817b30352a92a73ce7520e1934c7d4219d5ff8f",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.328Z"
+  },
+  "counts_as_upstream_merged": false
+}

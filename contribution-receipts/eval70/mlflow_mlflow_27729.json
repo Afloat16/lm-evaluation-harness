@@ -1,0 +1,23 @@
+{
+  "repository": "mlflow/mlflow",
+  "pr_number": 27729,
+  "pr_url": "https://github.com/mlflow/mlflow/pull/27729",
+  "title": "Normalize `mean_on_target` by sample weights in regression evaluation",
+  "body": "### Related Issues/PRs\n\nNone.\n\n### What changes are proposed in this pull request?\n\nThe regression evaluator divides its weighted target sum by the row count. Multiplying all sample weights therefore changes `mean_on_target`: targets `[2, 4, 8]` with weights `[10, 30, 0]` produce `46.6667` instead of `3.5`.\n\nUse the weighted average for `mean_on_target`. Keep `sum_on_target` as the weighted total and `example_count` as the row count. Correct the existing weighted golden from `-5.2 / 3` to `-5.2 / 6`.\n\n### How is this PR tested?\n\n- [x] New unit/integration tests\n\nBase: `e8a158349ec5ce27f715b8b1dd4a92dd7d409b8a`.\n\nSeven new cases produce **5 failed, 2 passed** on unchanged master and **7 passed** with the fix. They cover unweighted/uniform-weight controls, fractional and rescaled weights, zero-weight observations, frequency weights versus repeated observations, and a real `mlflow.models.evaluate` call followed by reading persisted run metrics.\n\n`PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 OPENBLAS_NUM_THREADS=1 python -m pytest tests/evaluate/test_regressor_target_statistics.py -q -p pytest_mock -p pytest_timeout`: **7 passed**. Pinned Ruff 0.16.8, formatting, Clint, character normalization and `git diff --check` pass. Python 3.12.14, NumPy 2.5.4 and scikit-learn 1.7.2 were used.\n\nThe existing `test_default_evaluator.py` module was attempted with `-k test_get_regressor_metrics`, but collection is blocked by its unconditional `pyspark` import; the corrected legacy golden is not counted as a passing test. The new integration test runs without Spark. Full-repository tests were not run. Full pre-commit is blocked while initializing the unrelated Prettier environment by npm `EALLOWGIT`; the Python checks were run separately with pinned tools.\n\n### Does this PR require documentation update?\n\n- [x] No.\n\n### Does this PR require updating the [MLflow Skills](https://github.com/mlflow/skills) repository?\n\n- [x] No.\n\n### Release Notes\n\n#### Is this a user-facing change?\n\n- [x] Yes. Regression evaluation correctly normalizes `mean_on_target` when sample weights are supplied.\n\n#### What component(s), interfaces, languages, and integrations does this PR affect?\n\nComponents\n\n- [x] `area/evaluation`: MLflow model evaluation features, evaluation metrics, and evaluation workflows\n\n<a name=\"release-note-category\"></a>\n\n#### How should the PR be classified in the release notes? Choose one:\n\n- [x] `rn/bug-fix` - A user-facing bug fix worth mentioning in the release notes\n\n#### Is this PR a critical bugfix or security fix that should go into the next patch release?\n\n- [ ] This PR is critical and needs to be in the next patch release\n- [x] This PR can wait for the next minor release\n",
+  "commit": "bf84e533123259c36e3341e4ccdab5c4e2941ef7",
+  "branch": "fix/regressor-weighted-target-mean-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "bf84e533123259c36e3341e4ccdab5c4e2941ef7",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

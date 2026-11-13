@@ -1,0 +1,23 @@
+{
+  "repository": "evidentlyai/evidently",
+  "pr_number": 1988,
+  "pr_url": "https://github.com/evidentlyai/evidently/pull/1988",
+  "title": "Keep embedding data separate from model drift labels",
+  "body": "## Problem\n\n`ModelDriftMethod` writes a `target` column directly into each embedding DataFrame and then removes it from the classifier features. This mutates the caller's data and silently discards an existing embedding dimension named `target`. If the same DataFrame is supplied for both samples, the second assignment overwrites both sets of labels, so fitting fails with a single-class error.\n\n## Change\n\nConstruct the domain-classification target as a separate array in the same reference/current order as the concatenated embeddings. Preserve all input dimensions and leave the original DataFrames unchanged. PCA, train/test splitting, classifier configuration, and drift threshold logic stay the same.\n\n## Validation\n\nSeven new tests cover input preservation with and without bootstrap/PCA, invariance under renaming an embedding dimension, and comparing a DataFrame with itself. On a fixture whose only separating dimension is named `target`, the old implementation reports ROC AUC 0.4125 and no drift; renaming that dimension yields AUC 1.0. The fix makes the result independent of that column name. This is a correctness example, not a general accuracy or performance claim.\n\n- Baseline: 4 failures and 3 passing controls with the final regression tests.\n- Fixed: all 7 new tests plus the existing native embedding-drift report test pass (8 total).\n- Ruff 0.3.7 checks and formatting, plus `git diff --check`, pass.\n- Tested on Python 3.12 with CPU dependencies. The complete repository suite and mypy were not run.",
+  "commit": "ebe4db657b68ac817411efb4b11a7e545fa4dbfb",
+  "branch": "fix/embedding-model-drift-inputs-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "ebe4db657b68ac817411efb4b11a7e545fa4dbfb",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.328Z"
+  },
+  "counts_as_upstream_merged": false
+}

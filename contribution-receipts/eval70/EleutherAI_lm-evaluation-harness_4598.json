@@ -1,0 +1,23 @@
+{
+  "repository": "EleutherAI/lm-evaluation-harness",
+  "pr_number": 4598,
+  "pr_url": "https://github.com/EleutherAI/lm-evaluation-harness/pull/4598",
+  "title": "Stream request-cache serialization to reduce peak memory",
+  "body": "## Problem\n\nRequest-cache writes first materialize the entire pickle with `dill.dumps`, and reads first retain the complete file with `file.read()`. Large cached request collections therefore need an additional serialized-data-sized allocation alongside their actual objects.\n\n## Change\n\nUse dill's file interfaces (`dump` and `load`) to serialize and deserialize through the already-open binary file. Cache keys, file names, protocol defaults, directory creation, disabled-cache behavior, and exception-to-cache-miss handling stay the same. Existing cache files remain readable, and new cache bytes match the previous serializer.\n\n## Validation\n\n- Original implementation: **2 memory-regression failures, 10 semantic tests passed**.\n- Patched implementation: **18 passed**, covering all 12 new tests and the complete existing `tests/test_cache.py` module.\n- Existing dill protocols 3, 4, and 5, exact serialized bytes, `Instance` metadata and shared references, recursive/callable payloads, corrupt/missing/disabled caches are covered.\n- A real `ConfigurableTask` builds requests, writes the cache, restores a limited request set in a fresh task, and processes a result successfully.\n- Ruff 0.16.3 checks, formatting, and `git diff --check` pass.\n\n### Local memory and timing\n\nMeasured on a shared CPU environment using one warmup and seven timed calls per case. Peak Python allocation was measured separately with `tracemalloc`. Every original/patched cache file has the same SHA-256, and every restored object equals its input.\n\n| Payload | Original write peak | Patched write peak | Original read peak | Patched read peak |\n| --- | ---: | ---: | ---: | ---: |\n| 100 requests, roughly 1 KiB context each | 309,993 B | 201,400 B | 383,939 B | 272,020 B |\n| 1,000 requests, roughly 8 KiB context each | 10,548,001 B | 1,446,916 B | 17,795,904 B | 9,507,308 B |\n| Single 8 MiB byte payload | 9,445,476 B | 8,093 B | 16,784,941 B | 8,404,107 B |\n\nFor the 1,000-request fixture, median write time was 26.279 → 25.504 ms and read time was 2.312 → 2.021 ms. For the small 100-request fixture, write time was 2.322 → 2.366 ms and read time was 0.116 → 0.115 ms. The benefit is reduced serialization memory; small-cache latency is effectively unchanged in this measurement and is not claimed to improve universally.\n\nThese measurements cover cache I/O and serialization only. The full harness suite and model inference were not run. Request objects and dill's memo still occupy memory proportional to the cached data; the cache is not made lazy, and this change does not add atomic writes or change cache-key semantics.\n\n## Related work\n\nChecked all-state request-cache/serialization/dill/stream searches, all six actual source-history patches, personal PR history, and the actual pre-existing fork commits. The current 144 fork heads differ from the prior audit only by the already-published SCORE counting change. Existing file-name work (#4446 and #4547) and response-cache coalescing (#4588) address different paths and are not included here.\n",
+  "commit": "0ec73a7605fd361dc03e32f1f5163253a009fddd",
+  "branch": "perf/stream-request-cache-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "0ec73a7605fd361dc03e32f1f5163253a009fddd",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.328Z"
+  },
+  "counts_as_upstream_merged": false
+}

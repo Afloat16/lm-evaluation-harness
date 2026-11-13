@@ -1,0 +1,23 @@
+{
+  "repository": "hyperopt/hyperopt",
+  "pr_number": 967,
+  "pr_url": "https://github.com/hyperopt/hyperopt/pull/967",
+  "title": "Include uncertain competing trials in average best error",
+  "body": "## Problem\n\n`Trials.average_best_error` estimates each successful trial's chance of having the lowest loss, then weights its `true_loss` by that probability. Before sampling, however, it discards trials whose observed losses exceed the lowest observed loss by three standard deviations, using only that lowest-loss trial's variance.\n\nThis ignores other trials' uncertainty: a higher observed loss with large variance can still have a substantial chance of being best. When the lowest-loss trial has zero variance while another trial is uncertain, the strict cutoff selects an empty array and the probability calculation raises `ValueError`.\n\n## Changes\n\nApply the existing `pmin_sampled` calculation to all successful trials whenever any loss has nonzero variance. Keep the all-deterministic shortcut and failed-trial filtering.\n\nThis removes an invalid truncation assumption, at a cost: sampling now uses all successful trials. Its time and sample-array memory scale with **N successful trials times the existing 1,000 samples**. This change does not claim a speedup.\n\n## Validation\n\nBase: `9834314879c09c13e0b8e93eb678408ba46441a8`.\n\nEight new cases produce **4 failed, 4 passed** on unchanged master and **8 passed** with the fix. Two Gaussian losses with means 0 and 1 and variances `1e-6` and 100 have an analytically computable probability of being best. With true losses 4 and 10, the expected weighted result is about 6.761; the original cutoff returns 4. With a zero-variance best trial, the original code raises on the empty array. Tests compare to the independent Gaussian-difference CDF with a Monte Carlo tolerance, covering native `Domain` and default extraction, failed results and the all-deterministic control.\n\n`PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 OPENBLAS_NUM_THREADS=1 python -m pytest hyperopt/tests/unit/test_average_best_error.py -q`: **8 passed**. Repository-pinned Ruff 0.15.18 lint and changed-file formatting, and `git diff --check`, pass.\n\nPython 3.12.14, NumPy 2.3.5 and SciPy 1.17.0. The full repository suite and optimization-convergence benchmarks were not run.\n",
+  "commit": "76256d9d051daad940bb5a8701869e53279e2b96",
+  "branch": "fix/average-best-error-uncertainty-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "76256d9d051daad940bb5a8701869e53279e2b96",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

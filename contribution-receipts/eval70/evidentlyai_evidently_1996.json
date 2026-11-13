@@ -1,0 +1,23 @@
+{
+  "repository": "evidentlyai/evidently",
+  "pr_number": 1996,
+  "pr_url": "https://github.com/evidentlyai/evidently/pull/1996",
+  "title": "Apply an explicitly configured zero relevance threshold",
+  "body": "## Problem\n\nThe shared recommendation preprocessing uses a truthiness check for min_rel_score. An explicitly configured zero threshold is skipped, so items with a zero rating are treated as irrelevant. This can also exclude users who should have relevant feedback and changes the resulting recommendation metrics.\n\n## Change\n\nApply the threshold whenever min_rel_score is not None, including zero. Preserve the existing >= comparison, optional binary conversion, and no-feedback-user policy. Other threshold values and the unconfigured behavior remain unchanged.\n\n## Validation\n\n- 20 new cases on the upstream base: 8 failed, 12 passed.\n- All recommendation metric tests with the fix: 58 passed on CPU.\n- Direct preprocessing cases cover None, negative, zero and positive thresholds with both binary/graded data and both no-feedback policies; input frames are unchanged.\n- Native current/reference Report cases check Precision, Recall, Hit Rate, MRR and NDCG against hand-calculated values for three users, with both scores and explicit ranks.\n- Repository-pinned Ruff 0.3.7 lint/format and git diff --check pass.\n\nThis corrects the handling of an explicit zero threshold in the existing recommendation preprocessing. It does not change ranking, tie handling, metric formulas, or the meaning of a missing threshold. The full repository and notebook smoke suites were not run.",
+  "commit": "9973c22e8b8ea46cbbe8a7a2681cda1991dd3f1b",
+  "branch": "fix/zero-relevance-threshold-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "9973c22e8b8ea46cbbe8a7a2681cda1991dd3f1b",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

@@ -1,0 +1,23 @@
+{
+  "repository": "rasbt/mlxtend",
+  "pr_number": 1296,
+  "pr_url": "https://github.com/rasbt/mlxtend/pull/1296",
+  "title": "Apply the reported L1 penalty during MLP training",
+  "body": "### Description\n\n`MultiLayerPerceptron._compute_cost` includes an L1 penalty, but the weight updates omit its derivative. Changing `l1` therefore changes the reported cost without changing the trained weights.\n\nAdd the existing penalty's subgradient to both weight matrices. The existing cost convention is `0.5 * l1 * sum(abs(weights))`, so the update uses the corresponding factor of 0.5 and a zero subgradient at zero weights. Biases remain unpenalized. Document this cost convention; the default `l1=0` path is unchanged.\n\n### Validation\n\nBase: `1aee767ef57b84a8191511a08955c583b65de382`.\n\n- Seven regression/control cases: **4 failed, 3 passed** on unchanged master; **7 passed** with the fix.\n- Central finite differences of the existing reported cost independently check the observed one-step weight updates for two positive L1 strengths, with and without L2. Controls cover zero L1, zero-valued weights and unchanged biases.\n- `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 OPENBLAS_NUM_THREADS=1 python -m pytest mlxtend/classifier/tests/test_mlp_l1_updates.py mlxtend/classifier/tests/test_multilayerperceptron.py -q`: **21 passed**.\n- Changed-file Black, isort, Flake8 and `git diff --check` passed.\n\nPython 3.12.14, NumPy 2.3.5. Validation checks the training update against the existing objective; it is not a model-quality benchmark. The full repository suite was not run.\n\n### Pull Request Checklist\n\n- [x] Added a changelog entry.\n- [x] Added gradient and control regression tests.\n- [x] Documented the existing L1 cost convention.\n- [x] Relevant tests and changed-file style checks pass.\n",
+  "commit": "a951ff1bab7c5aa14f42604c998806bd96dc3c9a",
+  "branch": "fix/mlp-l1-regularization-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "a951ff1bab7c5aa14f42604c998806bd96dc3c9a",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  },
+  "counts_as_upstream_merged": false
+}

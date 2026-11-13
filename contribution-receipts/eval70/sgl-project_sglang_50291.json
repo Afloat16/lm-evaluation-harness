@@ -1,0 +1,83 @@
+{
+  "repository": "sgl-project/sglang",
+  "stars": 38809,
+  "archived": false,
+  "default_branch": "main",
+  "fork": "Afloat16/sglang",
+  "base_commit": "5792cf6e5e11aebc62d41cf19828f615a8fa7e0a",
+  "commit": "b157c3866c7c7313c87a6b1cc59052e78b3121e4",
+  "branch": "fix/msgpack-value-aware-pickle-fallback-20261113",
+  "title": "Preserve unsupported values through the MessagePack fallback",
+  "body": "## Motivation\n\nThe object-field IPC fallback currently decides MessagePack fidelity from the Python type alone. Arbitrarily large Python integers then reach an encoder that only supports signed/unsigned 64-bit integers. NumPy record, object, metadata-bearing and zero-itemsize arrays also reach the raw-buffer codec, whose dtype string cannot preserve their full representation. Requests can fail to encode or silently lose dtype information and shared-object identity.\n\n## Modifications\n\nMake fidelity checks depend on integer range and array dtype. Values outside the existing native codec's lossless domain use the existing shared pickle fallback. Ordinary integers, ordinary NumPy arrays, recursive containers, extension IDs and forwarding behavior retain their current format.\n\nThis applies to object-typed fields already supported by the fallback. It does not expand the direct typed ndarray codec or add a new serialization protocol.\n\n## Accuracy Tests\n\nExact-source native validation: https://github.com/Afloat16/sglang/actions/runs/43404011360\n\n- Eight new test methods cover integer limits, nested containers, record fields/titles/offsets, object arrays, dtype metadata, zero-itemsize arrays, ordinary strided/scalar/empty arrays and shared references.\n- A real `TokenizedGenerateReqInput` with `MultimodalProcessorOutput`, Torch features and NumPy metadata is wrapped, encoded, forwarded, re-encoded and decoded using the normal IPC implementation.\n- New tests plus existing request-IPC controls: **21 methods passed, 23 subtests passed, 2 existing tests skipped**.\n- Restoring the original implementation gives **3 failing methods and 18 failing subtests** (pytest reports 21 failures), with 5 completed methods and 5 passing subtests.\n- Full repository pre-commit hooks and `git diff --check` passed.\n\nLinux CPU execution validates actual serialization and request classes. No GPU inference or server load test is claimed.\n\n## Speed Tests and Profiling\n\nNo speed improvement is claimed. Flat integer sequences now check each value's bounds to avoid selecting an encoder that cannot represent them. Values requiring the fallback incur its existing pickle cost.\n\n## Checklist\n\n- [x] Format code with repository pre-commit hooks.\n- [x] Add registered CPU regression tests.\n- [x] Follow the SGLang code style guidance.\n- Documentation: existing IPC wire/fallback behavior is retained.\n- Accuracy: native serialization/request round trips described above.\n",
+  "prefilled_url": "https://github.com/sgl-project/sglang/compare/main...Afloat16:fix/msgpack-value-aware-pickle-fallback-20261113?expand=1&title=Preserve%20unsupported%20values%20through%20the%20MessagePack%20fallback&body=%23%23%20Motivation%0A%0AThe%20object-field%20IPC%20fallback%20currently%20decides%20MessagePack%20fidelity%20from%20the%20Python%20type%20alone.%20Arbitrarily%20large%20Python%20integers%20then%20reach%20an%20encoder%20that%20only%20supports%20signed%2Funsigned%2064-bit%20integers.%20NumPy%20record%2C%20object%2C%20metadata-bearing%20and%20zero-itemsize%20arrays%20also%20reach%20the%20raw-buffer%20codec%2C%20whose%20dtype%20string%20cannot%20preserve%20their%20full%20representation.%20Requests%20can%20fail%20to%20encode%20or%20silently%20lose%20dtype%20information%20and%20shared-object%20identity.%0A%0A%23%23%20Modifications%0A%0AMake%20fidelity%20checks%20depend%20on%20integer%20range%20and%20array%20dtype.%20Values%20outside%20the%20existing%20native%20codec's%20lossless%20domain%20use%20the%20existing%20shared%20pickle%20fallback.%20Ordinary%20integers%2C%20ordinary%20NumPy%20arrays%2C%20recursive%20containers%2C%20extension%20IDs%20and%20forwarding%20behavior%20retain%20their%20current%20format.%0A%0AThis%20applies%20to%20object-typed%20fields%20already%20supported%20by%20the%20fallback.%20It%20does%20not%20expand%20the%20direct%20typed%20ndarray%20codec%20or%20add%20a%20new%20serialization%20protocol.%0A%0A%23%23%20Accuracy%20Tests%0A%0AExact-source%20native%20validation%3A%20https%3A%2F%2Fgithub.com%2FAfloat16%2Fsglang%2Factions%2Fruns%2F43404011360%0A%0A-%20Eight%20new%20test%20methods%20cover%20integer%20limits%2C%20nested%20containers%2C%20record%20fields%2Ftitles%2Foffsets%2C%20object%20arrays%2C%20dtype%20metadata%2C%20zero-itemsize%20arrays%2C%20ordinary%20strided%2Fscalar%2Fempty%20arrays%20and%20shared%20references.%0A-%20A%20real%20%60TokenizedGenerateReqInput%60%20with%20%60MultimodalProcessorOutput%60%2C%20Torch%20features%20and%20NumPy%20metadata%20is%20wrapped%2C%20encoded%2C%20forwarded%2C%20re-encoded%20and%20decoded%20using%20the%20normal%20IPC%20implementation.%0A-%20New%20tests%20plus%20existing%20request-IPC%20controls%3A%20**21%20methods%20passed%2C%2023%20subtests%20passed%2C%202%20existing%20tests%20skipped**.%0A-%20Restoring%20the%20original%20implementation%20gives%20**3%20failing%20methods%20and%2018%20failing%20subtests**%20(pytest%20reports%2021%20failures)%2C%20with%205%20completed%20methods%20and%205%20passing%20subtests.%0A-%20Full%20repository%20pre-commit%20hooks%20and%20%60git%20diff%20--check%60%20passed.%0A%0ALinux%20CPU%20execution%20validates%20actual%20serialization%20and%20request%20classes.%20No%20GPU%20inference%20or%20server%20load%20test%20is%20claimed.%0A%0A%23%23%20Speed%20Tests%20and%20Profiling%0A%0ANo%20speed%20improvement%20is%20claimed.%20Flat%20integer%20sequences%20now%20check%20each%20value's%20bounds%20to%20avoid%20selecting%20an%20encoder%20that%20cannot%20represent%20them.%20Values%20requiring%20the%20fallback%20incur%20its%20existing%20pickle%20cost.%0A%0A%23%23%20Checklist%0A%0A-%20%5Bx%5D%20Format%20code%20with%20repository%20pre-commit%20hooks.%0A-%20%5Bx%5D%20Add%20registered%20CPU%20regression%20tests.%0A-%20%5Bx%5D%20Follow%20the%20SGLang%20code%20style%20guidance.%0A-%20Documentation%3A%20existing%20IPC%20wire%2Ffallback%20behavior%20is%20retained.%0A-%20Accuracy%3A%20native%20serialization%2Frequest%20round%20trips%20described%20above.%0A",
+  "pr_url": "https://github.com/sgl-project/sglang/pull/50291",
+  "pr_status": "open",
+  "merged_at": null,
+  "counts_as_upstream_merged": false,
+  "novelty": {
+    "classification": "genuinely_new",
+    "history_entries": 3,
+    "actual_patches_read": [
+      47445,
+      40107
+    ],
+    "queries": [
+      "msgpack structured",
+      "dtype.descr",
+      "msgpack large integer",
+      "msgpack object numpy",
+      "pickle_unfaithful_values",
+      "msgpack overflow"
+    ],
+    "difference": "47445 introduced the exact-type faithful whitelist and pickle fallback; 40107 preserves scalar ndarray shape. Neither validates MessagePack integer bounds or dtype metadata/object/record layout.",
+    "personal_history": "Current fork was created in this task; all previous branches inspected; no msgpack fidelity patch."
+  },
+  "validation": {
+    "source_commit": "b157c3866c7c7313c87a6b1cc59052e78b3121e4",
+    "workflow_commit": "2bead84aa683882c70c8302218db2a54381353e9",
+    "run_url": "https://github.com/Afloat16/sglang/actions/runs/43404011360",
+    "job_id": 131813692204,
+    "artifact_id": 14027721258,
+    "patched": {
+      "methods_passed": 21,
+      "subtests_passed": 23,
+      "skipped": 2
+    },
+    "baseline": {
+      "methods_failed": 3,
+      "subtests_failed": 18,
+      "methods_completed": 5,
+      "subtests_passed": 5
+    },
+    "checks": [
+      "full repository pre-commit",
+      "git diff --check"
+    ],
+    "scope": "Native Linux CPU serialization, no GPU inference"
+  },
+  "limitations": [
+    "Scope is object-typed fields using existing fallback, not directly typed ndarray codec",
+    "No throughput improvement; integer sequences now check bounds elementwise",
+    "No GPU inference or live server load test"
+  ],
+  "source_files": [
+    "python/sglang/srt/utils/msgpack_utils.py",
+    "test/registered/unit/utils/test_msgpack_value_faithfulness.py"
+  ],
+  "pr_number": 50291,
+  "draft": false,
+  "publication": {
+    "method": "GitHub connector",
+    "head_verified": "b157c3866c7c7313c87a6b1cc59052e78b3121e4",
+    "title_verified": true,
+    "submitted_body_verified": true,
+    "maintainer_can_modify": false
+  },
+  "current_upstream_snapshot": {
+    "head": "b157c3866c7c7313c87a6b1cc59052e78b3121e4",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  }
+}

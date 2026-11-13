@@ -1,0 +1,82 @@
+{
+  "repository": "sgl-project/sglang",
+  "stars": 38809,
+  "archived": false,
+  "default_branch": "main",
+  "fork": "Afloat16/sglang",
+  "base_commit": "5792cf6e5e11aebc62d41cf19828f615a8fa7e0a",
+  "commit": "b3d89f7039501223ecca64f402b986041952575c",
+  "branch": "fix/dynamic-image-patch-cap-20261113",
+  "title": "[Fix] Honor image patch limits for extreme aspect ratios",
+  "body": "## Motivation\n\nDynamic image sizing can exceed `max_num_patches` for long, narrow images. Uniform scaling eventually clamps the short side to one downsampling cell, so the remaining long side still exceeds the budget. The multi-image budget loop can then repeat without reducing the total enough.\n\n## Modifications\n\nAfter uniform scaling, if the patch product still exceeds the per-image maximum, cap the long side using the remaining capacity and align it to the downsampling grid. Ordinary feasible image sizes keep their existing results.\n\nFor example, a 16384×16 image with patch size 16, downsampling factor 2 and a 256-patch limit previously produced 4096×32 pixels (512 patches / 128 image tokens). It now produces 2048×32 pixels (256 patches / 64 image tokens).\n\n## Testing\n\n- Seven new native CPU unittest methods passed with **25 subtests**.\n- Restoring the upstream implementation produces **1 failing method and 22 failing subtests**, with 6 completed methods and 3 passing subtests.\n- Coverage includes landscape/portrait images, downsampling factors 1/2/4, non-grid limits, two-image prompt budgets, ordinary-size controls and empty/unconstrained budgets.\n- Real PIL RGB/grayscale resizing followed by Torch patch aggregation and pixel-unshuffle verifies the pixel allocation and downsampled grid fit the requested budget.\n- Full repository pre-commit hooks and `git diff --check` passed.\n\nExact-source validation: https://github.com/Afloat16/sglang/actions/runs/43408230323\n\nThis validates image geometry and preprocessing on CPU, without model inference or quality measurements. Existing behavior for infeasible budgets, such as a maximum smaller than one downsampling cell, is outside this change.\n",
+  "prefilled_url": "https://github.com/sgl-project/sglang/compare/main...Afloat16:fix/dynamic-image-patch-cap-20261113?expand=1&title=%5BFix%5D%20Honor%20image%20patch%20limits%20for%20extreme%20aspect%20ratios&body=%23%23%20Motivation%0A%0ADynamic%20image%20sizing%20can%20exceed%20%60max_num_patches%60%20for%20long%2C%20narrow%20images.%20Uniform%20scaling%20eventually%20clamps%20the%20short%20side%20to%20one%20downsampling%20cell%2C%20so%20the%20remaining%20long%20side%20still%20exceeds%20the%20budget.%20The%20multi-image%20budget%20loop%20can%20then%20repeat%20without%20reducing%20the%20total%20enough.%0A%0A%23%23%20Modifications%0A%0AAfter%20uniform%20scaling%2C%20if%20the%20patch%20product%20still%20exceeds%20the%20per-image%20maximum%2C%20cap%20the%20long%20side%20using%20the%20remaining%20capacity%20and%20align%20it%20to%20the%20downsampling%20grid.%20Ordinary%20feasible%20image%20sizes%20keep%20their%20existing%20results.%0A%0AFor%20example%2C%20a%2016384%C3%9716%20image%20with%20patch%20size%2016%2C%20downsampling%20factor%202%20and%20a%20256-patch%20limit%20previously%20produced%204096%C3%9732%20pixels%20(512%20patches%20%2F%20128%20image%20tokens).%20It%20now%20produces%202048%C3%9732%20pixels%20(256%20patches%20%2F%2064%20image%20tokens).%0A%0A%23%23%20Testing%0A%0A-%20Seven%20new%20native%20CPU%20unittest%20methods%20passed%20with%20**25%20subtests**.%0A-%20Restoring%20the%20upstream%20implementation%20produces%20**1%20failing%20method%20and%2022%20failing%20subtests**%2C%20with%206%20completed%20methods%20and%203%20passing%20subtests.%0A-%20Coverage%20includes%20landscape%2Fportrait%20images%2C%20downsampling%20factors%201%2F2%2F4%2C%20non-grid%20limits%2C%20two-image%20prompt%20budgets%2C%20ordinary-size%20controls%20and%20empty%2Funconstrained%20budgets.%0A-%20Real%20PIL%20RGB%2Fgrayscale%20resizing%20followed%20by%20Torch%20patch%20aggregation%20and%20pixel-unshuffle%20verifies%20the%20pixel%20allocation%20and%20downsampled%20grid%20fit%20the%20requested%20budget.%0A-%20Full%20repository%20pre-commit%20hooks%20and%20%60git%20diff%20--check%60%20passed.%0A%0AExact-source%20validation%3A%20https%3A%2F%2Fgithub.com%2FAfloat16%2Fsglang%2Factions%2Fruns%2F43408230323%0A%0AThis%20validates%20image%20geometry%20and%20preprocessing%20on%20CPU%2C%20without%20model%20inference%20or%20quality%20measurements.%20Existing%20behavior%20for%20infeasible%20budgets%2C%20such%20as%20a%20maximum%20smaller%20than%20one%20downsampling%20cell%2C%20is%20outside%20this%20change.%0A",
+  "pr_url": "https://github.com/sgl-project/sglang/pull/50302",
+  "pr_status": "open",
+  "merged_at": null,
+  "counts_as_upstream_merged": false,
+  "novelty": {
+    "classification": "genuinely-new",
+    "history_entries": 3,
+    "actual_patches_read": [
+      23568,
+      49189,
+      44184
+    ],
+    "all_state_queries": [
+      "compute_dynamic_image_size",
+      "compute_budgeted_image_sizes",
+      "max_num_patches aspect",
+      "dynamic resolution budget",
+      "Nemotron budget",
+      "InternVL aspect ratio"
+    ],
+    "personal_fork": "19 current fork branches audited; all contribution heads are independent current-task fixes, with no prior dynamic-image patch-cap work."
+  },
+  "validation": {
+    "source_commit": "b3d89f7039501223ecca64f402b986041952575c",
+    "workflow_commit": "718d62e863affcbcd550dabc1fb27e27f7af5af5",
+    "run_url": "https://github.com/Afloat16/sglang/actions/runs/43408230323",
+    "job_id": 131827797729,
+    "artifact_id": 14028404231,
+    "patched": {
+      "methods_passed": 7,
+      "subtests_passed": 25
+    },
+    "baseline": {
+      "methods_failed": 1,
+      "subtests_failed": 22,
+      "methods_completed": 6,
+      "subtests_passed": 3
+    },
+    "checks": [
+      "full repository pre-commit",
+      "git diff --check"
+    ],
+    "scope": "Native CPU PIL/Torch image geometry and preprocessing; no model inference"
+  },
+  "limitations": [
+    "Only excess caused by the short-axis downsampling minimum is corrected",
+    "Existing infeasible-budget behavior remains unchanged",
+    "No model quality, GPU inference, or throughput measurements"
+  ],
+  "source_files": [
+    "python/sglang/srt/multimodal/internvl_utils.py",
+    "test/registered/unit/multimodal/test_dynamic_image_patch_budget.py"
+  ],
+  "pr_number": 50302,
+  "draft": false,
+  "publication": {
+    "method": "GitHub connector",
+    "head_verified": "b3d89f7039501223ecca64f402b986041952575c",
+    "title_verified": true,
+    "body_verified": true,
+    "maintainer_can_modify": false
+  },
+  "current_upstream_snapshot": {
+    "head": "b3d89f7039501223ecca64f402b986041952575c",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  }
+}

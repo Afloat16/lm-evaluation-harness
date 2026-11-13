@@ -1,0 +1,23 @@
+{
+  "repository": "evidentlyai/evidently",
+  "pr_number": 1997,
+  "pr_url": "https://github.com/evidentlyai/evidently/pull/1997",
+  "title": "Reuse cumulative counts when building classification tables",
+  "body": "## Problem\n\ncalculate_pr_table and calculate_lift_table recompute true-positive counts from the start of the sorted population at every percentile. This repeatedly scans approximately 20 and 100 overlapping prefixes, respectively, even though each table advances monotonically through the same binary target sequence.\n\n## Change\n\nAccumulate TP counts only over the newly included interval. Keep sorting, stable tie order, percentile boundaries, thresholds, rounding and returned rows unchanged. The change uses only the current interval slice rather than allocating a full-length cumulative-count array.\n\n## Validation\n\n- 28 new numerical and integration cases pass on both the original and changed implementations; this is a performance change, not a numerical bug fix.\n- With the four existing classification calculation tests: 32 passed on CPU.\n- Coverage includes empty/singleton inputs, percentile boundary sizes, non-divisible tails, tied scores, and native binary/multiclass current/reference Reports. Expected rows independently sum their selected populations.\n- Repository-pinned Ruff 0.3.7 lint/format and git diff --check pass.\n\nLocal CPU benchmark, one warm-up and five timed calls per case, seeded shuffled binary targets and scores, including each function's sorting but excluding construction/copying of its input list:\n\n| Input rows | PR table before/after | Lift table before/after |\n| --- | --- | --- |\n| 10,000 | 2.729 / 1.576 ms | 8.585 / 2.758 ms |\n| 100,000 | 31.454 / 18.258 ms | 101.109 / 20.950 ms |\n| 500,000 | 642.536 / 138.943 ms | 1293.687 / 129.687 ms |\n\nThese are median local measurements, not end-to-end Report or training benchmarks. Every benchmark returned an identical table representation before and after. Sorting still determines the overall O(N log N) complexity; the change eliminates repeated target-prefix scans. The full repository and notebook smoke suites were not run.",
+  "commit": "937658c9f77003507a9a1f4d0c969fb3e835f7e0",
+  "branch": "perf/classification-table-cumulative-counts-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "937658c9f77003507a9a1f4d0c969fb3e835f7e0",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

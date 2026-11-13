@@ -1,0 +1,23 @@
+{
+  "repository": "evidentlyai/evidently",
+  "pr_number": 1992,
+  "pr_url": "https://github.com/evidentlyai/evidently/pull/1992",
+  "title": "Stratify the train/test split for model-based embedding drift",
+  "body": "## Problem\n\nModelDriftMethod creates a binary source label for reference/current embeddings, then uses an unstratified 50/50 split. Even when both populations contain at least two rows, the fixed random split can leave the training set with one class. For example, reference/current sizes 2/8 and 3/4 raise SGDClassifier's single-class error. Training the classifier and evaluating its ROC AUC both require the source classes to remain represented.\n\n## Change\n\nStratify train_test_split by the existing source labels, preserving the 50/50 ratio, shuffle setting, random seed, classifier, and thresholds. This change is independent of the separate fix for using an embedding dimension named target.\n\n## Validation\n\n- 10 new tests on the upstream base: 5 failed, 5 passed.\n- Fixed tests plus the existing embedding-drift Report test: 11 passed on CPU.\n- Cases cover small imbalanced samples in both directions, a balanced control, bootstrap and fixed-threshold decisions, an explicit stratified SGD/ROC reference, and a real Report integration control.\n- The tests restore the caller's NumPy random state so the existing bootstrap behavior cannot contaminate other tests.\n- Ruff 0.3.7 lint/format and git diff --check pass.\n\nStratification can change numeric scores on existing datasets because it changes which rows enter each split. This does not provide a statistically reliable drift estimate from arbitrarily small datasets: each population must have enough rows for both splits. The Report plotting layer's independent t-SNE/KDE sample requirements are unchanged; the Report control uses a sufficient sample size.",
+  "commit": "b5232cb5e7cf530e6a70e70df34abfe5d26dec9f",
+  "branch": "fix/stratified-embedding-drift-split-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "b5232cb5e7cf530e6a70e70df34abfe5d26dec9f",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

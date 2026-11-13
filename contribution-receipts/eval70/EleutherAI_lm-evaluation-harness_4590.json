@@ -1,0 +1,23 @@
+{
+  "repository": "EleutherAI/lm-evaluation-harness",
+  "pr_number": 4590,
+  "pr_url": "https://github.com/EleutherAI/lm-evaluation-harness/pull/4590",
+  "title": "fix(mutual): rank choices by loglikelihood for all retrieval metrics",
+  "body": "## Problem\n\nMuTual receives `(loglikelihood, is_greedy)` pairs from the multiple-choice task. Its current `np.argmax(results)` flattens both fields, so greedy flags can determine the reported top-1 choice. The other metrics sort entire tuples, allowing those flags to break likelihood ties. As a concrete example, results `[(-4, False), (-3, False), (-1, False), (-2, False)]` with gold answer C currently report `r@1=0`, `r@2=0`, and `mrr=1`.\n\n## Change\n\nRank choice indices using only the loglikelihood field, then derive all three metrics from the gold choice's single rank. Equal loglikelihoods retain choice order. Update the task version to 2.1 and document the scoring correction; `mutual_plus` inherits the same configuration and implementation.\n\n## Validation\n\n- Four gold positions with two greedy-flag patterns verify the actual ranking metrics.\n- Equal-likelihood cases verify that greedy flags cannot alter tie handling and that all metrics agree on one rank.\n- Both real task YAML files are loaded into a native `ConfigurableTask` using an in-memory dataset. The tests construct four loglikelihood requests and verify the callback's metrics without downloading data or models.\n- Baseline: 7 failures and 7 passing controls with the final regression cases.\n- Fixed: all 14 new cases and 8 existing metric tests pass (22 total).\n- Ruff 0.16.3 checks and formatting, plus `git diff --check`, pass.\n\nNo full-model benchmark or complete repository suite was run. This corrects metric computation and changes scores affected by the bug; it does not claim that model quality itself improved.",
+  "commit": "51442935faabf33ec15fc2cb8bb2020fb863fe48",
+  "branch": "fix/mutual-loglikelihood-ranking-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "51442935faabf33ec15fc2cb8bb2020fb863fe48",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.328Z"
+  },
+  "counts_as_upstream_merged": false
+}

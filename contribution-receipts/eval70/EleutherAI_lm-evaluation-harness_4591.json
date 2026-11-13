@@ -1,0 +1,23 @@
+{
+  "repository": "EleutherAI/lm-evaluation-harness",
+  "pr_number": 4591,
+  "pr_url": "https://github.com/EleutherAI/lm-evaluation-harness/pull/4591",
+  "title": "Fix IFEval filtering of zero-valued instruction arguments",
+  "body": "## Summary\n\nIFEval currently removes every falsy instruction argument before constructing a checker. Zero is a valid value for constraints such as the number of placeholders, bullet points, or highlighted sections. Removing it causes the checker to sample a new requirement, so a response satisfying the recorded zero constraint can be scored incorrectly.\n\nKeep all non-None arguments in strict and loose evaluation. Apply the same correction to the standard, leaderboard, and multilingual implementations, and advance their task metadata versions. The original Google evaluation code also passes the recorded argument values through to the instruction constructor.\n\n## Validation\n\n- New regression tests against the upstream base: 14 failed, 12 passed, 26 skipped.\n- With this change, the new tests plus the existing metrics tests: 34 passed, 26 skipped.\n- The executed tests use the real placeholder, bullet-point, and highlight checkers, nonzero and empty-response controls, and ConfigurableTask integration with the standard and leaderboard YAML configurations.\n- Ruff 0.16.3 lint and formatting checks, and git diff --check pass. Existing typing annotations in the two touched English utility files are updated to satisfy that Ruff configuration.\n\nThe 26 Spanish/Catalan cases are skipped because the required spaCy language models are not installed. NLTK's downloader rejected the proxied Punkt resource download in this environment; the executed regular-expression checkers do not need that corpus. A full benchmark run and tokenizer-dependent instruction tests were not run.\n\nThis corrects interpretation of recorded task constraints; it does not claim an improvement in model capability.",
+  "commit": "6df6cb37f4babcc3b68bb79d71a711ef2cc26e88",
+  "branch": "fix/ifeval-zero-valued-arguments-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "6df6cb37f4babcc3b68bb79d71a711ef2cc26e88",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.328Z"
+  },
+  "counts_as_upstream_merged": false
+}

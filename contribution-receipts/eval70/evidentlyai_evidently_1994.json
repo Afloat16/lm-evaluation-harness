@@ -1,0 +1,23 @@
+{
+  "repository": "evidentlyai/evidently",
+  "pr_number": 1994,
+  "pr_url": "https://github.com/evidentlyai/evidently/pull/1994",
+  "title": "Keep embedding bootstrap samples large enough for their statistics",
+  "body": "## Problem\n\nDistance and MMD embedding drift choose bootstrap sample sizes by truncating population-proportional counts. For small or imbalanced inputs, this can produce zero observations for a mean, or one observation for the unbiased MMD statistic whose denominator contains n*(n-1).\n\nThe empty mean makes Euclidean distance raise on NaN input; cityblock distance instead produces a NaN threshold and reports no drift. MMD raises ZeroDivisionError. This also affects substantial imbalanced datasets: native Reports fail for reference/current sizes 20/500 with distance and 20/200 with MMD.\n\n## Change\n\nApply the minimum sample count required by each statistic to both bootstrap subsamples: one for distance between means, and two for unbiased MMD. The bootstrap already samples with replacement. Preserve the proportional counts whenever they are large enough, the seeds, the statistic formulas, bandwidths, and quantile settings.\n\n## Validation\n\n- 24 new tests on the upstream base: 10 failed, 14 passed.\n- Fixed tests plus the existing embedding-drift Report test: 25 passed on CPU.\n- Independent mean-distance and pairwise RBF U-statistic references verify scores and seeded bootstrap decisions. Cases cover small/imbalanced inputs, sufficient-size and non-bootstrap controls, the cityblock NaN decision, and native Reports for both methods.\n- Tests restore the caller's global NumPy random state.\n- Ruff 0.3.7 lint/format and git diff --check pass.\n\nThis fixes the bootstrap subsample domain. It does not relax the original input requirements (MMD still needs at least two observations in each population), solve degenerate bandwidths, or establish reliable inference from arbitrarily small samples. The full repository suite was not run.",
+  "commit": "682dd1c7da2cbc57d122e9a60ab5e1899325f7df",
+  "branch": "fix/valid-embedding-bootstrap-sizes-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "682dd1c7da2cbc57d122e9a60ab5e1899325f7df",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

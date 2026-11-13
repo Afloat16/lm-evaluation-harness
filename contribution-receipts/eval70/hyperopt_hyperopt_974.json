@@ -1,0 +1,23 @@
+{
+  "repository": "hyperopt/hyperopt",
+  "pr_number": 974,
+  "pr_url": "https://github.com/hyperopt/hyperopt/pull/974",
+  "title": "Use the category axis when constructing annealing batch probabilities",
+  "body": "## Problem\n\nWhen annealing proposes a batch for a categorical parameter, its prior probabilities are a matrix with one row per active trial. hp_categorical currently uses p.size as the number of categories. For a batch of two with three categories this allocates six empirical counts, then tries to combine shape (6,) with probabilities of shape (2, 3). Native anneal.suggest_batch therefore fails with a broadcasting ValueError once categorical observations exist.\n\n## Change\n\nUse p.shape[-1] for the count vector and its empty-value fallback. Preserve the existing batch-shared empirical frequencies, prior shrinking formula, and sampling behavior. This concerns construction of the probability matrix; the stochastic sampler's separate one-dimensional-probability shape handling is unchanged.\n\n## Validation\n\n- 8 new tests on the upstream base: 5 failed, 3 passed.\n- Fixed tests plus the existing pchoice tests: 17 passed on CPU.\n- Hand-calculated prior/empirical mixtures after four observed configurations are checked against native NumPy draws, including the following RNG value, for uniform and nonuniform priors and several batch sizes.\n- A real conditional search space passes through anneal.suggest_batch and space_eval. Single-item and empty-history controls preserve the existing behavior.\n- Ruff lint/format and git diff --check pass.\n\nThis makes the existing batch proposal path usable. It does not change the annealing algorithm or demonstrate a convergence improvement. The full repository suite was not run.",
+  "commit": "5a0f2e9a4e63750b5f504f359e790d47c4b6a66c",
+  "branch": "fix/anneal-categorical-batches-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "5a0f2e9a4e63750b5f504f359e790d47c4b6a66c",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

@@ -1,0 +1,23 @@
+{
+  "repository": "hyperopt/hyperopt",
+  "pr_number": 969,
+  "pr_url": "https://github.com/hyperopt/hyperopt/pull/969",
+  "title": "Compute Gaussian mixture normalizers in log space",
+  "body": "## Problem\n\n`GMM1_lpdf` computes `sqrt(2 * pi * sigmas**2)` before taking the logarithm of its mixture coefficient. Squaring a finite standard deviation around `1e154` or above can overflow. Valid Gaussian log densities consequently become NaN, and TPE can no longer compare its mixture scores correctly for large finite uniform search ranges.\n\nFor example, a zero-mean normal with standard deviation `1e200` has a finite log density of approximately -461.436 at zero; the current implementation returns NaN.\n\n## Change\n\nCompute the same coefficient as `log(weights) - log(sigmas) - 0.5 * log(2*pi) - log(p_accept)`. This avoids the intermediate squared scale and division before taking logs. The Mahalanobis term, existing sigma floor, quantized branch, and truncation acceptance calculation are unchanged.\n\n## Validation\n\n- Fourteen new regression cases: base code has 10 failures and 4 passing ordinary-scale controls.\n- Fixed code: 16 tests pass including the existing `TestGMM1Math` cases.\n- Independent SciPy normal log-density/logsumexp references cover mixed components, bounded/unbounded densities, scalar/matrix outputs, and scales 1, 1e154 and 1e200.\n- Native `fmin`, `Trials`, and TPE tests compare the 12-step suggestion trajectory for an equivalent uniform search at scales 1, 1e155 and 1e200.\n- Ruff 0.15.18 lint/format and `git diff --check` pass.\n\nThis addresses overflow in the Gaussian mixture normalizer. It does not claim to resolve every extreme-tail or truncation-CDF cancellation case, nor demonstrate better objective values or general optimization speed. The full repository suite was not run.",
+  "commit": "0199f05f75082a1303d125b2a0cfa5047bad033d",
+  "branch": "fix/gaussian-mixture-log-normalizer-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "0199f05f75082a1303d125b2a0cfa5047bad033d",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

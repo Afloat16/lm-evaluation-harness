@@ -1,0 +1,23 @@
+{
+  "repository": "EleutherAI/lm-evaluation-harness",
+  "pr_number": 4595,
+  "pr_url": "https://github.com/EleutherAI/lm-evaluation-harness/pull/4595",
+  "title": "Return infinite perplexity when the exponential exceeds the float range",
+  "body": "## Problem\n\nBoth perplexity aggregations call `math.exp` on the mean negative log likelihood. A finite mean log loss above the representable exponential range raises `OverflowError`, interrupting evaluation aggregation. For example, normalized finite log probabilities from `log_softmax([0, -1000])` trigger this failure even though the scoring stage itself succeeds.\n\n## Change\n\nReturn positive infinity when exponentiating the mean log loss overflows. Keep `math.exp` for representable results, preserve existing NaN and negative-infinite log-likelihood behavior, and leave mean/weight validation errors outside the exception handler.\n\nThis applies to both `perplexity` and `weighted_perplexity`, so word and byte perplexity also retain a reportable result. Infinite bootstrap replicates still have an undefined standard error (NaN).\n\n## Validation\n\n- Final unchanged source: **8 failed, 19 passed** in the 27 new regression/control cases.\n- Patched source plus the complete existing `tests/test_metrics.py`: **35 passed**.\n- An 80-digit Decimal reference covers ordinary values, the largest finite exponential boundary, and its next floating-point neighbor.\n- Real `ConfigurableTask` processing and evaluator aggregation cover log-likelihood and rolling log-likelihood tasks, with bootstrap disabled and enabled. Input log probabilities come from native SciPy log-softmax; no model inference was run.\n- Zero total weight continues to raise its existing error.\n- New tests pass Ruff 0.16.3. Source/test formatting and `git diff --check` pass. The production metric module has the same 43 pre-existing Ruff diagnostics on the original and patched source, with identical codes and messages.\n\nThe full harness suite and model benchmarks were not run. This fixes aggregation completing at the floating-point range boundary; it does not change representable perplexities or improve model quality.\n\n## Related work\n\nChecked all-state perplexity/overflow PR and issue searches, the complete metric-file history, personal PR history, and all 141 current fork branches against the prior actual-commit audit. No matching implementation was found. The existing log-space bias-score change modifies separate demographic-bias tasks and does not handle perplexity aggregation.\n",
+  "commit": "207e825dc0490a6cc49148f47abb22dea33a07be",
+  "branch": "fix/perplexity-overflow-results-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "207e825dc0490a6cc49148f47abb22dea33a07be",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.328Z"
+  },
+  "counts_as_upstream_merged": false
+}

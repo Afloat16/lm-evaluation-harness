@@ -1,0 +1,95 @@
+{
+  "repository": "sgl-project/sglang",
+  "stars": 38809,
+  "archived": false,
+  "default_branch": "main",
+  "fork": "Afloat16/sglang",
+  "base_commit": "5792cf6e5e11aebc62d41cf19828f615a8fa7e0a",
+  "commit": "57a8862391bf234f58eb1ccd11d3a540c576d921",
+  "branch": "fix/preprocess-retained-buffer-budget-20261113",
+  "title": "[Fix] Account for retained buffers in preprocessing cache budgets",
+  "body": "## Motivation\n\nPreprocessing cache admission currently charges a NumPy view's visible elements and a memoryview's element count. A tiny or empty view can therefore retain a much larger CPU allocation while consuming almost none of the cache's byte budget. Multiple views of the same allocation can also be counted inconsistently.\n\n## Modifications\n\nFollow NumPy base chains and memoryview owners to the retained CPU buffer, including NumPy stride-trick wrappers. Count the measurable owner once through the existing identity set. If a custom array owner exposes no measurable backing buffer, decline automatic admission instead of treating its visible slice as the whole retained allocation.\n\nExisting Torch accounting, explicitly supplied byte sizes, and ordinary owning arrays keep their existing paths.\n\n## Accuracy Tests\n\nExact-source native validation: https://github.com/Afloat16/sglang/actions/runs/43411501586\n\n- Ten new native test methods plus the existing preprocessing-cache module: **36 passed, 1 existing GPU-dependent skip, and 27 passing subtests**.\n- Restoring the original implementation produces **4 failing methods and 18 failing subtests** (pytest reports 22 failures), with 6 completed methods.\n- Tests cover sliced, reversed, transposed, broadcast and empty NumPy views; stride-trick wrappers; typed, multidimensional and strided memoryviews; external buffers; shared-owner deduplication; and opaque owners.\n- Real cache admission, singleflight completion, and weak-reference eviction checks verify that a small view cannot retain an oversized allocation outside the budget.\n- Full repository pre-commit hooks and `git diff --check` passed.\n\n## Speed Tests and Profiling\n\nThis corrects retained-buffer byte accounting. GPU execution, total process RSS bounds, and throughput changes are outside the measured scope.\n",
+  "pr_url": "https://github.com/sgl-project/sglang/pull/50312",
+  "pr_status": "open",
+  "merged_at": null,
+  "counts_as_upstream_merged": false,
+  "novelty": {
+    "classification": "genuinely-new",
+    "history_entries": 2,
+    "actual_patches_read": [
+      34398,
+      34404,
+      50202,
+      47786,
+      39120,
+      45203
+    ],
+    "all_state_queries": [
+      "\"estimate_cache_size_bytes\" numpy",
+      "\"preprocess_cache\" nbytes",
+      "memoryview cache",
+      "numpy cache base",
+      "preprocess view memory"
+    ],
+    "related_exclusions": {
+      "39120": "Separate GPU embedding-cache tensor compaction",
+      "45203": "Inline tensor IPC compaction; no CPU NumPy cache budget changes",
+      "47786": "Separate shared disk/SQLite preprocessing cache",
+      "50202": "Strong-reference temporary-provider IDs and Torch shared-storage deduplication only; ndarray.nbytes and memoryview len are unchanged"
+    },
+    "personal_fork": "23 existing branches inspected; all source heads belong to independent current-task fixes. No preexisting retained NumPy owner accounting branch."
+  },
+  "validation": {
+    "source_commit": "57a8862391bf234f58eb1ccd11d3a540c576d921",
+    "workflow_commit": "112950a845cfcec91abef1a383b61ad66e26c0a2",
+    "run_id": 43411501586,
+    "run_url": "https://github.com/Afloat16/sglang/actions/runs/43411501586",
+    "job_id": 131838776671,
+    "artifact_id": 14029739037,
+    "conclusion": "success",
+    "new_methods": 10,
+    "patched": {
+      "methods_passed": 36,
+      "skipped": 1,
+      "subtests_passed": 27
+    },
+    "baseline": {
+      "methods_failed": 4,
+      "subtests_failed": 18,
+      "methods_completed": 6
+    },
+    "checks": [
+      "full repository pre-commit",
+      "git diff --check"
+    ],
+    "scope": "Native CPU preprocessing cache, NumPy/Torch buffers, actual admission and eviction"
+  },
+  "limitations": [
+    "Existing GPU-dependent test skipped on CPU",
+    "Automatic owner accounting conservatively declines opaque buffers whose retained allocation cannot be measured",
+    "Does not promise total process RSS bounds or change explicitly supplied size overrides",
+    "No throughput or model-quality measurement"
+  ],
+  "source_files": [
+    "python/sglang/srt/multimodal/cache/preprocess_cache.py",
+    "test/registered/unit/multimodal/test_preprocess_retained_buffers.py"
+  ],
+  "prefilled_url": "https://github.com/sgl-project/sglang/compare/main...Afloat16:fix/preprocess-retained-buffer-budget-20261113?expand=1&title=%5BFix%5D%20Account%20for%20retained%20buffers%20in%20preprocessing%20cache%20budgets&body=%23%23%20Motivation%0A%0APreprocessing%20cache%20admission%20currently%20charges%20a%20NumPy%20view's%20visible%20elements%20and%20a%20memoryview's%20element%20count.%20A%20tiny%20or%20empty%20view%20can%20therefore%20retain%20a%20much%20larger%20CPU%20allocation%20while%20consuming%20almost%20none%20of%20the%20cache's%20byte%20budget.%20Multiple%20views%20of%20the%20same%20allocation%20can%20also%20be%20counted%20inconsistently.%0A%0A%23%23%20Modifications%0A%0AFollow%20NumPy%20base%20chains%20and%20memoryview%20owners%20to%20the%20retained%20CPU%20buffer%2C%20including%20NumPy%20stride-trick%20wrappers.%20Count%20the%20measurable%20owner%20once%20through%20the%20existing%20identity%20set.%20If%20a%20custom%20array%20owner%20exposes%20no%20measurable%20backing%20buffer%2C%20decline%20automatic%20admission%20instead%20of%20treating%20its%20visible%20slice%20as%20the%20whole%20retained%20allocation.%0A%0AExisting%20Torch%20accounting%2C%20explicitly%20supplied%20byte%20sizes%2C%20and%20ordinary%20owning%20arrays%20keep%20their%20existing%20paths.%0A%0A%23%23%20Accuracy%20Tests%0A%0AExact-source%20native%20validation%3A%20https%3A%2F%2Fgithub.com%2FAfloat16%2Fsglang%2Factions%2Fruns%2F43411501586%0A%0A-%20Ten%20new%20native%20test%20methods%20plus%20the%20existing%20preprocessing-cache%20module%3A%20**36%20passed%2C%201%20existing%20GPU-dependent%20skip%2C%20and%2027%20passing%20subtests**.%0A-%20Restoring%20the%20original%20implementation%20produces%20**4%20failing%20methods%20and%2018%20failing%20subtests**%20(pytest%20reports%2022%20failures)%2C%20with%206%20completed%20methods.%0A-%20Tests%20cover%20sliced%2C%20reversed%2C%20transposed%2C%20broadcast%20and%20empty%20NumPy%20views%3B%20stride-trick%20wrappers%3B%20typed%2C%20multidimensional%20and%20strided%20memoryviews%3B%20external%20buffers%3B%20shared-owner%20deduplication%3B%20and%20opaque%20owners.%0A-%20Real%20cache%20admission%2C%20singleflight%20completion%2C%20and%20weak-reference%20eviction%20checks%20verify%20that%20a%20small%20view%20cannot%20retain%20an%20oversized%20allocation%20outside%20the%20budget.%0A-%20Full%20repository%20pre-commit%20hooks%20and%20%60git%20diff%20--check%60%20passed.%0A%0A%23%23%20Speed%20Tests%20and%20Profiling%0A%0AThis%20corrects%20retained-buffer%20byte%20accounting.%20GPU%20execution%2C%20total%20process%20RSS%20bounds%2C%20and%20throughput%20changes%20are%20outside%20the%20measured%20scope.%0A",
+  "pr_number": 50312,
+  "draft": false,
+  "publication": {
+    "method": "GitHub connector",
+    "head_verified": "57a8862391bf234f58eb1ccd11d3a540c576d921",
+    "title_verified": true,
+    "authored_body_verified": true,
+    "repository_automation_appended_status": true,
+    "maintainer_can_modify": false
+  },
+  "current_upstream_snapshot": {
+    "head": "57a8862391bf234f58eb1ccd11d3a540c576d921",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "repository": "mlflow/mlflow",
+  "pr_number": 27728,
+  "pr_url": "https://github.com/mlflow/mlflow/pull/27728",
+  "title": "Preserve score-scale invariance in `compare_evaluations`",
+  "body": "### Related Issues/PRs\n\nRelates to #26396 (the original paired-comparison API).\n\n### What changes are proposed in this pull request?\n\nThe constant-difference check uses an absolute tolerance of `1e-12`. A nonconstant set of paired scores becomes \"constant\" merely by expressing the same scores in smaller units. This collapses its bootstrap confidence interval to a point and replaces a finite paired t-test p-value and effect size with `NaN`.\n\nKeep the existing relative tolerance and set the absolute tolerance to zero. Genuine zero or constant differences retain their existing special handling. No test-selection thresholds or statistical formulas change.\n\n### How is this PR tested?\n\n- [x] Existing unit/integration tests\n- [x] New unit/integration tests\n\nOn base `e8a158349ec5ce27f715b8b1dd4a92dd7d409b8a`, the six new regression/control cases produce **2 failed, 4 passed**. With this change, the complete `tests/genai/evaluate/test_comparison.py` module passes: **55 passed**. It includes real evaluation runs, row pairing, logging, identical/constant differences, binary comparisons and statistical references.\n\nThe new cases use exact binary rescaling to isolate the tolerance from decimal-rounding effects, with both zero and nonzero first differences. They compare the paired t-test and effect size to independent SciPy/formula references and verify the interval remains nondegenerate and scales with the units.\n\nPython 3.12.14, NumPy 2.5.4, SciPy 1.18.1. Changed-file Ruff 0.16.8, formatting, Clint, character normalization and `git diff --check` pass. The full pre-commit invocation was attempted but stops while initializing the unrelated Prettier environment because npm rejects its local git package with `EALLOWGIT`; the Python checks were run separately with the repository's pinned tools. The full repository suite was not run.\n\n### Does this PR require documentation update?\n\n- [x] No.\n\n### Does this PR require updating the [MLflow Skills](https://github.com/mlflow/skills) repository?\n\n- [x] No.\n\n### Release Notes\n\n#### Is this a user-facing change?\n\n- [x] Yes. `compare_evaluations` preserves confidence intervals, paired t-test results and effect sizes for nonconstant scores expressed in small units.\n\n#### What component(s), interfaces, languages, and integrations does this PR affect?\n\nComponents\n\n- [x] `area/evaluation`: MLflow model evaluation features, evaluation metrics, and evaluation workflows\n\n<a name=\"release-note-category\"></a>\n\n#### How should the PR be classified in the release notes? Choose one:\n\n- [x] `rn/bug-fix` - A user-facing bug fix worth mentioning in the release notes\n\n#### Is this PR a critical bugfix or security fix that should go into the next patch release?\n\n- [ ] This PR is critical and needs to be in the next patch release\n- [x] This PR can wait for the next minor release\n",
+  "commit": "ce054f7076a9772e1e873e990f52372c704f342c",
+  "branch": "fix/paired-comparison-scale-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "ce054f7076a9772e1e873e990f52372c704f342c",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

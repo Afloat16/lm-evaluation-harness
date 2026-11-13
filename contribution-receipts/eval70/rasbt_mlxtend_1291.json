@@ -1,0 +1,23 @@
+{
+  "repository": "rasbt/mlxtend",
+  "pr_number": 1291,
+  "pr_url": "https://github.com/rasbt/mlxtend/pull/1291",
+  "title": "Preserve automatic class inference across refits and cloning",
+  "body": "### Description\n\n`SoftmaxRegression` and `MultiLayerPerceptron` overwrite the `n_classes=None` constructor parameter with the first dataset's inferred class count. Later calls to `fit` retain that old output width: adding a class raises `IndexError`, while fitting fewer classes leaves extra outputs. Cloning an already fitted model also carries the accidental fixed class count into the clone.\n\nKeep the constructor parameter unchanged and infer the output width when initializing parameters. One-hot encoding uses the fitted output layer's actual width, so `init_params=False` continues training the existing model and explicit `n_classes` settings retain their behavior. No additional fitted-state field is introduced.\n\n### Validation\n\nBase: `1aee767ef57b84a8191511a08955c583b65de382`.\n\n- Ten new regression/control cases: **6 failed, 4 passed** on unchanged master; **10 passed** after the fix.\n- Both estimators are checked for growing and shrinking class vocabularies, cloning after fitting, explicit class counts, and continued training. Refitted/cloned outputs and costs match a fresh estimator with the same seed; continued training matches an uninterrupted run.\n- `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 OPENBLAS_NUM_THREADS=1 python -m pytest mlxtend/classifier/tests/test_inferred_class_count.py mlxtend/classifier/tests/test_softmax_regression.py mlxtend/classifier/tests/test_multilayerperceptron.py -q`: **37 passed**.\n- Changed-file Black, isort, Flake8 and `git diff --check` passed.\n\nPython 3.12.14, NumPy 2.3.5, scikit-learn 1.8.0. The full repository suite was not run.\n\n### Pull Request Checklist\n\n- [x] Added a changelog entry.\n- [x] Added regression/control tests for both affected estimators.\n- [x] Documented when automatic class-count inference runs.\n- [x] Relevant tests and changed-file style checks pass.\n",
+  "commit": "41c53b0b097fae747c6686f37797a159e7f91cc6",
+  "branch": "fix/refit-inferred-class-count-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "41c53b0b097fae747c6686f37797a159e7f91cc6",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  },
+  "counts_as_upstream_merged": false
+}

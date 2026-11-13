@@ -1,0 +1,23 @@
+{
+  "repository": "mlflow/mlflow",
+  "pr_number": 27733,
+  "pr_url": "https://github.com/mlflow/mlflow/pull/27733",
+  "title": "Preserve every row when inferring a single prediction field from records",
+  "body": "### Related Issues/PRs\n\nRelated implementation history: #10160 introduced automatic single-output selection; #14680 moved the helper into the shared regression evaluation path. Neither extracts all rows in the record-oriented fallback.\n\n### What changes are proposed in this pull request?\n\nWhen a model returns one dictionary per input row and `predictions` is omitted, `_extract_output_and_other_columns` infers the sole field from the first record but builds the output Series from that record's value alone. Numeric/text predictions lose all later rows; a list-valued prediction is instead expanded into separate rows.\n\nInfer the field name from the first record, then extract that field from every record, matching the existing explicit-field path. This keeps one output value per input row and allows regression evaluation to compute and log metrics for the whole batch.\n\n### How is this PR tested?\n\n- [x] New unit/integration tests\n\nTen focused tests have 5 failures and 5 passing controls on the base code. All 10 pass with the fix (`pytest -p pytest_mock -p pytest_timeout tests/evaluate/test_record_predictions.py -q`).\n\nCoverage includes numeric/text/list-valued records, a single record containing a vector, explicit-field controls, and the existing column-oriented dictionary convention. Native `mlflow.models.evaluate` calls verify all four regression rows and the persisted mean absolute error; the baseline automatic-selection call fails with inconsistent sample lengths `[4, 1]`.\n\nPinned Ruff, Clint, character normalization and `git diff --check` pass. The large existing default-evaluator module could not be collected in this environment because its imports require PySpark; it is not claimed as tested. The full repository suite was not run. Full pre-commit initialization remains blocked by npm's `EALLOWGIT` restriction on the Prettier environment; Python checks were run directly.\n\n### Does this PR require documentation update?\n\n- [x] No.\n\n### Does this PR require updating the [MLflow Skills](https://github.com/mlflow/skills) repository?\n\n- [x] No.\n\n### Release Notes\n\n#### Is this a user-facing change?\n\n- [x] Yes. Preserve all record-oriented predictions during automatic output-field selection.\n\n#### What component(s), interfaces, languages, and integrations does this PR affect?\n\nComponents\n\n- [x] `area/evaluation`: MLflow model evaluation features, evaluation metrics, and evaluation workflows\n\n<a name=\"release-note-category\"></a>\n\n#### How should the PR be classified in the release notes? Choose one:\n\n- [x] `rn/bug-fix` - A user-facing bug fix worth mentioning in the release notes\n\n#### Is this PR a critical bugfix or security fix that should go into the next patch release?\n\n- [ ] This PR is critical and needs to be in the next patch release\n- [x] This PR can wait for the next minor release\n",
+  "commit": "27aa3248cf00fd22b0bf8e518f12573543133a1f",
+  "branch": "fix/list-record-prediction-rows-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "27aa3248cf00fd22b0bf8e518f12573543133a1f",
+    "state": "open",
+    "draft": true,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

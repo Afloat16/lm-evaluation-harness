@@ -1,0 +1,23 @@
+{
+  "repository": "hyperopt/hyperopt",
+  "pr_number": 973,
+  "pr_url": "https://github.com/hyperopt/hyperopt/pull/973",
+  "title": "Preserve multidimensional categorical sample shapes",
+  "body": "## Problem\n\nThe one-dimensional probability-vector branch of categorical accepts a tuple size, but flattens it to an integer before calling NumPy's multinomial sampler. It then asserts that the returned array has the original multidimensional shape. Requests such as size=(2, 3), size=(2, 1, 3), and multidimensional shapes containing zero fail with AssertionError, including through pyll.stochastic.sample.\n\n## Change\n\nPass the normalized size directly to multinomial, which already supports multidimensional sample shapes. The existing category-index conversion then produces the requested shape. Keep the scalar/default convention of returning shape (1,), the one-dimensional path, and the separate per-row probability branch.\n\n## Validation\n\n- 14 new tests on the upstream base: 9 failed, 5 passed.\n- Fixed tests plus the existing stochastic and pchoice tests: 28 passed on CPU.\n- An independent flattened multinomial draw, reshaped to the requested dimensions, verifies the sample values and the next RNG draw. Controls cover empty dimensions, scalar/integer/vector sizes, deterministic category indices, input immutability, a native stochastic expression graph, and per-row probabilities.\n- Ruff lint/format and git diff --check pass.\n\nThis restores categorical shape support. It does not change the category distribution or demonstrate an optimization-convergence improvement. The full repository suite was not run.",
+  "commit": "08c7259a47746f71372df3b14b0d286909a403ad",
+  "branch": "fix/categorical-sample-shapes-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "08c7259a47746f71372df3b14b0d286909a403ad",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

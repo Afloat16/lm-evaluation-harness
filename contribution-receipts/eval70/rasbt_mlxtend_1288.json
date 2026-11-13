@@ -1,0 +1,23 @@
+{
+  "repository": "rasbt/mlxtend",
+  "pr_number": 1288,
+  "pr_url": "https://github.com/rasbt/mlxtend/pull/1288",
+  "title": "Preserve statistic scale in permutation-test comparisons",
+  "body": "### Description\n\n`permutation_test` uses NumPy's default absolute tolerance when deciding which null statistics tie the observed statistic. Rescaling a statistic can therefore change a result even though it preserves every ordering:\n\n```python\nx, y = [1, 2, 3], [4, 5, 6]\nstat = lambda a, b: abs(np.mean(a) - np.mean(b))\npermutation_test(x, y, func=stat)                      # 0.1\npermutation_test(x, y, func=lambda a, b: 1e-12*stat(a,b)) # previously 1.0\n```\n\nThe paired exact result similarly changes from `0.25` to `1.0`. The default relative tolerance also merges distinct float64 statistics separated by `1e-7` around one.\n\nUse a relative tie tolerance of 100 times the observed floating-point statistic dtype's machine epsilon, with zero absolute tolerance. Integer statistics use exact comparisons instead of floating-point coercion. This follows the roundoff approach described in [SciPy's permutation-test notes](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.permutation_test.html#notes). Sampling, seeds, exact enumeration and the randomized-test correction remain unchanged.\n\n### Validation\n\nBase: `1aee767ef57b84a8191511a08955c583b65de382`.\n\n- Thirteen new native regression/control cases: **8 failed, 5 passed** on unchanged master; **13 passed** with the fix.\n- Exact results are checked against independent enumeration using integer sums. Cases cover paired/unpaired tests, scales `1e-12`, `1`, `1e12`, float32/float64 custom statistics, genuine floating-point ties, nearby distinct values, and integer statistics above `2**53`.\n- `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 OPENBLAS_NUM_THREADS=1 python -m pytest mlxtend/evaluate/tests/test_permutation_precision.py mlxtend/evaluate/tests/test_permutation.py -q`: **23 passed**.\n- Changed-file Black, isort, Flake8 and `git diff --check` passed.\n\nPython 3.12.14, NumPy 2.3.5. The full repository suite was not run.\n\n### Related issues or pull requests\n\nThe existing #1269 fixes integer observation storage in paired permutations. This changes only statistic comparison, so the two fixes are independent; no observation-buffer changes are included here.\n\n### Pull Request Checklist\n\n- [x] Added a changelog entry.\n- [x] Added regression/control tests under `mlxtend/evaluate/tests`.\n- [x] Documented numerical comparison behavior in the public docstring.\n- [x] Relevant tests and changed-file style checks pass.\n",
+  "commit": "0851fd270d460d8ce4cf582d19ba8cb1a6a1307a",
+  "branch": "fix/permutation-statistic-relative-tolerance-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "0851fd270d460d8ce4cf582d19ba8cb1a6a1307a",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  },
+  "counts_as_upstream_merged": false
+}

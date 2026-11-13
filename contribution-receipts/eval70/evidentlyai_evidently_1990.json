@@ -1,0 +1,23 @@
+{
+  "repository": "evidentlyai/evidently",
+  "pr_number": 1990,
+  "pr_url": "https://github.com/evidentlyai/evidently/pull/1990",
+  "title": "Select MAPE near-zero rows without expanding duplicate index labels",
+  "body": "## Problem\n\nMAPE zero handling selects near-zero targets, then uses their index labels to drop or replace rows. With duplicate labels, `drop` also removes unrelated observations sharing those labels. On pandas 2.3, `replace` raises `InvalidIndexError` instead of producing the report.\n\nFor targets `[0, 1, 2, 0, 4, 8]`, predictions `[2, 2, 1, 3, 6, 8]`, and index `[7, 7, 8, 8, 9, 9]`, dropping the two near-zero target rows should produce MAPE 50%. The current code drops four rows and reports 25%.\n\n## Change\n\nKeep the boolean near-zero mask and use it directly for both row filtering and replacement. This preserves the individual observations even when their index labels are repeated, including MultiIndex labels.\n\nThe zero threshold, replacement value, denominator formula, and `near_zero_values` counter are unchanged. In particular, this is separate from #1933 (the near-zero row counter) and #1986 (negative-target denominators).\n\n## Validation\n\n- Eleven new regression cases: base code has 8 failures and 3 passing controls.\n- Fixed code: 12 tests pass including the existing native regression-report smoke test.\n- Tests cover duplicate integer/string/MultiIndex labels, unique-label controls, hand-calculated mean and sample standard deviation, unchanged input frames, and `none` handling.\n- Native `Report([MAPE(...)])` calls verify that changing only row labels does not change the reported metric.\n- Pinned Ruff 0.3.7 lint/format checks and `git diff --check` pass.\n\nThe full repository test suite was not run. This change corrects selection of evaluation rows; it does not claim improved model prediction quality.",
+  "commit": "f56d36ee6a9061046c3abd2748c3a98ed375da47",
+  "branch": "fix/mape-duplicate-row-index-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "f56d36ee6a9061046c3abd2748c3a98ed375da47",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

@@ -1,0 +1,23 @@
+{
+  "repository": "evidentlyai/evidently",
+  "pr_number": 1989,
+  "pr_url": "https://github.com/evidentlyai/evidently/pull/1989",
+  "title": "Handle zero median bandwidth in embedding MMD drift",
+  "body": "## Problem\n\nConstant or heavily repeated embeddings can have a zero median pairwise distance. The embedding MMD method then passes `gamma=1/0` to its RBF kernel, producing NaN entries and a NaN drift score. The same failure occurs in the bootstrap reference kernel when the reference embeddings are constant, even when the current embeddings differ.\n\n## Change\n\nUse the zero-bandwidth limit of the RBF kernel when the estimated squared bandwidth is exactly zero: equal vectors have kernel value 1 and distinct vectors have value 0. Group equal vectors with `np.unique`, then compare their group labels, avoiding a samples-by-samples-by-features intermediate. Positive bandwidths keep the existing `pairwise_kernels` calculation.\n\nBoth the observed embedding kernel and its bootstrap reference kernel use this helper. This change is confined to `legacy/metrics/data_drift/embedding_drift_methods.py`; it does not change the separate univariate `mmd_stattest.py` distance calculation addressed in #1966.\n\n## Validation\n\n- Identical constant embeddings return a finite zero score with and without bootstrap, including nonzero constant values.\n- A changed constant embedding is still detected; its score matches `2 * (1 - exp(-1))`.\n- A repeated-vector example with zero median bandwidth matches a hand-counted unbiased MMD statistic, preserving distinct groups.\n- A positive-bandwidth control matches an independently constructed RBF statistic.\n- The final eight new tests fail 6/pass 2 before the change; all eight pass after it. The existing native embedding-drift report test also passes (9 total).\n- Ruff 0.3.7 checks and formatting, plus `git diff --check`, pass.\n\nThe full repository suite and mypy were not run. This resolves undefined kernel values for degenerate bandwidths; it does not establish a general detection-quality improvement or change bootstrap sample-size policy.",
+  "commit": "95778276ac6b18c6ce35e1b80d41b4bafca2f367",
+  "branch": "fix/mmd-zero-bandwidth-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "95778276ac6b18c6ce35e1b80d41b4bafca2f367",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

@@ -1,0 +1,23 @@
+{
+  "repository": "evidentlyai/evidently",
+  "pr_number": 1995,
+  "pr_url": "https://github.com/evidentlyai/evidently/pull/1995",
+  "title": "Preserve text class labels in classification lift tables",
+  "body": "## Problem\n\nClassificationLiftTable converts probability column labels to int in both the binary and multiclass paths. Valid text classes such as cat/dog or Unicode labels raise ValueError before the report can be produced. PredictionData, the result schema, and the renderer already support text labels, and ClassificationPRTable already preserves them.\n\n## Change\n\nUse the original class labels as lift-table keys. Leave target binarization, table calculations, rendering, and the existing numeric-key JSON deserialization behavior unchanged.\n\n## Validation\n\n- 15 new tests against the upstream base: 12 failed, 3 passed.\n- The fixed tests and the existing report JSON test: 16 passed on CPU.\n- Binary and multiclass English/Unicode labels match equivalent integer-encoded tables; independent assertions check the final TP/FP counts, precision, recall, and lift values.\n- Native legacy Report cases cover current/reference data, JSON round trips, renderer tabs, and unchanged input frames.\n- Integer-key JSON round trips remain covered.\n- Repository-pinned Ruff 0.3.7 lint/format and git diff --check pass.\n\nThis corrects text-label handling in the legacy classification lift-table metric. It does not change lift formulas or the existing normalization of numeric-looking dictionary keys. The full repository and notebook smoke suites were not run.",
+  "commit": "44d54049cb4603b95e8cbff4c626910268ff4e3f",
+  "branch": "fix/lift-table-text-labels-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "44d54049cb4603b95e8cbff4c626910268ff4e3f",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

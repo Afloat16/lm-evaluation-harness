@@ -1,0 +1,23 @@
+{
+  "repository": "EleutherAI/lm-evaluation-harness",
+  "pr_number": 4592,
+  "pr_url": "https://github.com/EleutherAI/lm-evaluation-harness/pull/4592",
+  "title": "fix(mmmu): prevent numeric fragments from receiving answer credit",
+  "body": "## Problem\n\nMMMU's numeric extractor independently scans comma-separated, scientific, and ordinary numbers, then concatenates the matches. The same numeric span can therefore contribute several different answer candidates. For example, `The answer is 1.25e3.` contributes 1250, 1, and 3 after normalization, so a question whose correct answer is 3 incorrectly receives acc=1. Likewise, `1,234.5` contributes false 1234 and 234.5 candidates. Leading-dot scientific notation can also be read without its decimal point.\n\n## Change\n\nRun the patterns together in one non-overlapping scan, prioritizing complete comma-separated and scientific forms. Keep the existing numeric rounding, string-answer handling, and multiple-choice logic. Two pre-existing whole-file Ruff findings are also resolved without changing behavior: explicit `zip(..., strict=False)` and an equivalent combined conditional.\n\nThe current [original MMMU parser](https://github.com/MMMU-Benchmark/MMMU/blob/main/mmmu/utils/eval_utils.py) has the same overlapping extraction. This is a correction to that behavior, not a claim of exact parser equivalence. Task and group metadata move from 0.0 to 0.1, and the README explicitly identifies the difference and keeps the historical model scores labeled as version 0.0. Results affected by these formats should not be directly compared across parser versions.\n\n## Validation\n\n- 27 new tests on the upstream base: 15 failed, 12 passed.\n- Fixed tests plus the existing core metrics tests: 35 passed.\n- Cases cover complete numeric extraction, false-fragment rejection in process_results, genuine numeric answers, multiple independently stated numbers, and multiple-choice controls.\n- Native ConfigurableTask instances loaded from the actual MMMU math YAML construct generation requests and score the responses using an in-memory Dataset.\n- All eight task/group metadata files parse at version 0.1.\n- Pinned Ruff 0.16.3 lint/format and git diff --check pass.\n\nNo model inference, images, external benchmark download, or full repository suite was run. This corrects answer scoring; it does not demonstrate any improvement in a model's capability.",
+  "commit": "cc1c96637d212286164bb287f2a135755d1d464f",
+  "branch": "fix/mmmu-complete-numeric-candidates-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "cc1c96637d212286164bb287f2a135755d1d464f",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.328Z"
+  },
+  "counts_as_upstream_merged": false
+}

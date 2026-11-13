@@ -1,0 +1,23 @@
+{
+  "repository": "hyperopt/hyperopt",
+  "pr_number": 972,
+  "pr_url": "https://github.com/hyperopt/hyperopt/pull/972",
+  "title": "Preserve zero-density tails in mixture log reductions",
+  "body": "## Problem\n\nThe manual max-shift in logsum_rows subtracts -inf from -inf when every component has zero representable density. This turns a valid log likelihood of -inf into NaN. Positive-infinity rows have the same invalid subtraction. With ordinary mixture sigmas of 1 or 2, a finite far-tail sample such as 1e155 already reaches the first case; the normalization coefficients themselves remain finite.\n\n## Change\n\nUse scipy.special.logsumexp along the existing row axis. SciPy is already a required dependency. Finite rows, sample shape, and the surrounding mixture/TPE formulas are preserved, while extended-real rows retain their correct results.\n\n## Validation\n\n- Seven new regressions: upstream base 6 failed, 1 passed.\n- Fixed regressions plus the existing Gaussian and lognormal mixture math tests: 11 passed.\n- Explicit row-sum references cover zero/infinite mass, finite values, and an empty sample batch.\n- Gaussian-mixture tails are checked against independent SciPy normal log densities reduced with NumPy logaddexp.\n- Native fmin/TPE/Trials runs continue from finite initial observations at +1e155 and -1e155 with invalid floating-point operations configured to raise.\n- Ruff 0.15.18 lint/format and git diff --check pass.\n\nThis addresses the row reduction, separately from #969's Gaussian normalization coefficients. Overflow of an unrepresentably large squared distance can still produce infinity, correctly corresponding to log density -inf. Arbitrary invalid inputs or an undefined -inf-minus--inf likelihood ratio are not repaired by this change. No optimization-speed or general convergence claim is made.",
+  "commit": "dd6208b10eb84d27349209e55a5da54d60c34981",
+  "branch": "fix/zero-density-mixture-tails-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "dd6208b10eb84d27349209e55a5da54d60c34981",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

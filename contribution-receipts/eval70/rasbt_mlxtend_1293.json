@@ -1,0 +1,23 @@
+{
+  "repository": "rasbt/mlxtend",
+  "pr_number": 1293,
+  "pr_url": "https://github.com/rasbt/mlxtend/pull/1293",
+  "title": "Resolve class labels in probability-based counterfactuals",
+  "body": "### Description\n\nProbability-based `create_counterfactual` currently uses `y_desired` directly as an array index. Valid class labels such as 10 or 20 raise `IndexError`; a label of -1 silently selects the last probability column, which can optimize the opposite class.\n\nResolve the desired label through `model.classes_` once before optimization. Reject unknown labels with a clear `ValueError`. Estimators exposing only `predict_proba` retain the existing positional-column convention, and prediction mode is unchanged.\n\n### Validation\n\nBase: `1aee767ef57b84a8191511a08955c583b65de382`.\n\n- Ten new regression/control cases: **6 failed, 4 passed** before the change; **10 passed** afterward.\n- Actual LogisticRegression models check that counterfactuals are invariant under numeric, signed and string class relabeling, and that the resulting prediction is the requested class.\n- In the signed-label example, the old result was **+2.148633** for the wrong class instead of the reference **-1.800684**.\n- Unknown-class and metadata-free estimator cases verify the error and positional-compatibility boundaries.\n- `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 OPENBLAS_NUM_THREADS=1 python -m pytest mlxtend/evaluate/tests/test_counterfactual_class_labels.py mlxtend/evaluate/tests/test_counterfactual.py -q`: **15 passed**.\n- Changed-file Black, isort, Flake8 and `git diff --check` passed.\n\nPython 3.12.14, NumPy 2.3.5, SciPy 1.17.0, scikit-learn 1.8.0. The existing medium-lambda case still emits its optimization-evaluation-limit warning. The full repository suite was not run.\n\n### Related issues or pull requests\n\nThe distance-scaling change in #1233 and the feature-freezing/optimizer options in #1148 address separate behavior. Their source diffs retain positional probability indexing; this change does not modify the distance objective or optimization method.\n\n### Pull Request Checklist\n\n- [x] Added a changelog entry.\n- [x] Added native regression/control tests.\n- [x] Documented class-label resolution and the positional fallback.\n- [x] Relevant tests and changed-file style checks pass.\n",
+  "commit": "3f20692e5c34088ae7a5362c20a36676923e1107",
+  "branch": "fix/counterfactual-probability-labels-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "3f20692e5c34088ae7a5362c20a36676923e1107",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  },
+  "counts_as_upstream_merged": false
+}

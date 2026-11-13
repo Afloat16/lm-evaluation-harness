@@ -1,0 +1,23 @@
+{
+  "repository": "mlflow/mlflow",
+  "pr_number": 27735,
+  "pr_url": "https://github.com/mlflow/mlflow/pull/27735",
+  "title": "Preserve `run_name` when flushing autologging run creation",
+  "body": "### Related Issues/PRs\n\nRelates to #6782, which added the `run_name` parameter and pending-operation field. The queued creation path still does not forward that field to the tracking client.\n\n### What changes are proposed in this pull request?\n\nForward the stored `run_name` to `MlflowClient.create_run` when flushing an autologging create-run operation. Currently an explicitly named queued run receives a generated name, unless a name is separately supplied as a tag. Forwarding the parameter also restores the ordinary client's validation when the argument conflicts with an `mlflow.runName` tag.\n\nThe existing defaults for absent or empty names remain delegated to the tracking client. No public parameter, queue scheduling, or subsequent logging behavior changes.\n\n### How is this PR tested?\n\n- [x] Existing unit/integration tests\n- [x] New unit/integration tests\n\nEight new tests on upstream commit `77ef074b3efe2c4d124b72212ce2b4b482fac178`: 4 failed and 4 passed before the fix. The full autologging-client module passes after the fix: 19 tests.\n\nTests use the native SQLite tracking store. They create two named runs through synchronous flushing, asynchronous flushing with completion, and the context manager, then verify persisted run names, name tags, parameters, metrics, additional tags, timestamps, and termination status. Controls cover absent/empty names, tag-supplied names, matching argument/tag values, and conflicting values.\n\nPinned Ruff 0.16.8 lint/format, Clint, character normalization, and `git diff --check` pass. The full repository suite was not run. The complete pre-commit hook environment was previously blocked by npm's Git-install safety policy; the listed direct Python checks were executed.\n\n### Does this PR require documentation update?\n\n- [x] No.\n\n### Does this PR require updating the [MLflow Skills](https://github.com/mlflow/skills) repository?\n\n- [x] No.\n\n### Release Notes\n\n#### Is this a user-facing change?\n\n- [x] Yes. Preserve explicitly supplied run names when the autologging queue creates runs, including synchronous and asynchronous flushing.\n\n#### What component(s), interfaces, languages, and integrations does this PR affect?\n\nComponents\n\n- [x] `area/tracking`: Tracking Service, tracking client APIs, autologging\n\n<a name=\"release-note-category\"></a>\n\n#### How should the PR be classified in the release notes? Choose one:\n\n- [x] `rn/bug-fix` - A user-facing bug fix worth mentioning in the release notes\n\n#### Is this PR a critical bugfix or security fix that should go into the next patch release?\n\n- [ ] This PR is critical and needs to be in the next patch release\n- [x] This PR can wait for the next minor release",
+  "commit": "52ce6c051302c37c238df020a0321f657464d560",
+  "branch": "fix/autologging-queued-run-name-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "52ce6c051302c37c238df020a0321f657464d560",
+    "state": "open",
+    "draft": true,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  },
+  "counts_as_upstream_merged": false
+}

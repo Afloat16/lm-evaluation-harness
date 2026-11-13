@@ -1,0 +1,23 @@
+{
+  "repository": "rasbt/mlxtend",
+  "pr_number": 1294,
+  "pr_url": "https://github.com/rasbt/mlxtend/pull/1294",
+  "title": "Preserve MLP momentum history when continuing training",
+  "body": "### Description\n\nContinuing a `MultiLayerPerceptron` fit with nonzero momentum raises `UnboundLocalError`: the previous-gradient arrays are local variables initialized only when `init_params=True`.\n\nStore those four history arrays on the fitted model. Each update retains the history for the next fit or a serialized-model round trip; reinitializing the parameters resets it. The existing momentum update equation is unchanged.\n\n### Validation\n\nBase: `1aee767ef57b84a8191511a08955c583b65de382`.\n\n- Seven new regression/control cases: **4 failed, 3 passed** on unchanged master; **7 passed** with the fix.\n- For two nonzero momentum values, continued fitting and a real pickle round trip match uninterrupted training in all weights, biases and epoch costs. Zero-momentum and parameter-reinitialization cases are controls.\n- `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 OPENBLAS_NUM_THREADS=1 python -m pytest mlxtend/classifier/tests/test_mlp_momentum_continuation.py mlxtend/classifier/tests/test_multilayerperceptron.py -q`: **21 passed**.\n- Changed-file Black, isort, Flake8 and `git diff --check` passed.\n\nPython 3.12.14, NumPy 2.3.5. Validation covers a fixed momentum configuration and checkpoints produced by the corrected model. Enabling momentum after a zero-momentum fit and migrating older pickles without this history are outside this change's validation. The full repository suite was not run.\n\n### Pull Request Checklist\n\n- [x] Added a changelog entry.\n- [x] Added continuation, serialization and reset regression/control tests.\n- [x] Documented momentum-history retention.\n- [x] Relevant tests and changed-file style checks pass.\n",
+  "commit": "8840df2926c26d7a2c98e907c03d76a9cb9fe1c7",
+  "branch": "fix/mlp-momentum-continuation-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "8840df2926c26d7a2c98e907c03d76a9cb9fe1c7",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  },
+  "counts_as_upstream_merged": false
+}

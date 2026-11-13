@@ -1,0 +1,23 @@
+{
+  "repository": "rasbt/mlxtend",
+  "pr_number": 1295,
+  "pr_url": "https://github.com/rasbt/mlxtend/pull/1295",
+  "title": "Apply MLP learning-rate decay once per epoch",
+  "body": "### Description\n\n`MultiLayerPerceptron` divides its current learning rate inside every minibatch. With nonzero `decrease_const`, this compounds the decay repeatedly within an epoch and across epochs, instead of using the documented `eta / (1 + epoch * decrease_const)` schedule.\n\nCompute that rate once at the start of each epoch and share it across all minibatches. The existing epoch-cost history supplies the completed-epoch count, so continued fitting retains the schedule and parameter reinitialization restarts it.\n\n### Validation\n\nBase: `1aee767ef57b84a8191511a08955c583b65de382`.\n\n- Nine new regression/control cases: **7 failed, 2 passed** on unchanged master; **9 passed** with the fix.\n- Training parameters and costs are compared with explicit constant-rate one-epoch updates for two decay strengths and three minibatch counts. Identical training rows isolate the schedule from shuffled minibatch ordering. Additional cases cover continuation, reinitialization and zero decay.\n- The existing deterministic decay fixture's expected training accuracy changes from **0.98 to 1.0** because the corrected rates change its training trajectory; its exact assertion is updated. This is not a general model-quality benchmark.\n- `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 OPENBLAS_NUM_THREADS=1 python -m pytest mlxtend/classifier/tests/test_mlp_learning_rate_schedule.py mlxtend/classifier/tests/test_multilayerperceptron.py -q`: **23 passed**.\n- Changed-file Black, isort, Flake8 and `git diff --check` passed.\n\nPython 3.12.14, NumPy 2.3.5. The full repository suite was not run.\n\n### Pull Request Checklist\n\n- [x] Added a changelog entry.\n- [x] Added explicit-schedule regression/control tests.\n- [x] Documented minibatch and continuation schedule behavior.\n- [x] Relevant tests and changed-file style checks pass.\n",
+  "commit": "5d2286368bd22a55dd1632ff70415135dc983a9c",
+  "branch": "fix/mlp-epoch-learning-rate-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "5d2286368bd22a55dd1632ff70415135dc983a9c",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  },
+  "counts_as_upstream_merged": false
+}

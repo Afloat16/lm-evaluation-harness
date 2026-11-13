@@ -1,0 +1,23 @@
+{
+  "repository": "hyperopt/hyperopt",
+  "pr_number": 971,
+  "pr_url": "https://github.com/hyperopt/hyperopt/pull/971",
+  "title": "Preserve small positive values in quantized loguniform TPE",
+  "body": "## Problem\n\nTwo absolute EPS floors distort quantized loguniform search spaces below 1e-12. The lognormal CDF replaces all such inputs, including zero, with 1e-12; for mu=-30 it consequently returns about 0.991 even at zero. Quantized mixture bins can then receive zero probability, producing -inf likelihoods and NaN candidate scores. The qloguniform posterior also raises all small observations to EPS instead of the distribution's lower bound.\n\n## Change\n\nCompute the CDF using the actual nonnegative input: log(0) naturally gives -inf and therefore CDF zero, within the existing divide-warning guard. Retain negative-input validation and the existing sigma floor. For qloguniform observations, keep the exp(low) floor but use the smallest positive representable float solely to protect against exp(low) underflow.\n\nBoth corrections belong to the same preservation of small search-space values. Fixing only the CDF does not restore the search trajectory because the posterior observation floor still changes the fitted mixture.\n\n## Validation\n\n- 15 new regressions: upstream base 9 failed, 6 passed.\n- Fixed tests plus all 8 existing TestQLGMM1Math cases: 23 passed.\n- SciPy references cover CDF values including zero and small positives, and bounded/unbounded quantized mixture bin probabilities.\n- Native fmin/TPE/Trials runs produce the same normalized 12-step trajectory for equivalent qloguniform spaces at scales 1, 1e-15, and 1e-100.\n- Zero-observation controls include an exp(low) that actually underflows, preserving a finite logarithm floor.\n- Ruff 0.15.18 lint/format and git diff --check pass.\n\nThe qlognormal posterior's separate observation-floor heuristic and extreme-tail CDF cancellation are unchanged. The trajectory check is a deterministic regression on equivalent spaces, not a general convergence or model-quality benchmark.",
+  "commit": "0b2be04d2c7a07a6e766aba348f832c3fbc42e4a",
+  "branch": "fix/lognormal-cdf-small-values-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "0b2be04d2c7a07a6e766aba348f832c3fbc42e4a",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

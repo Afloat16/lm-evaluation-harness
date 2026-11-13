@@ -1,0 +1,23 @@
+{
+  "repository": "rasbt/mlxtend",
+  "pr_number": 1287,
+  "pr_url": "https://github.com/rasbt/mlxtend/pull/1287",
+  "title": "Fix binary probability scoring in out-of-bag bootstrap",
+  "body": "### Description\n\n`bootstrap_point632_score(..., method=\"oob\", predict_proba=True)` raises `UnboundLocalError` for binary classifiers because it converts `predicted_train_val` even though out-of-bag scoring never creates or needs training predictions.\n\nOnly convert training predictions for `.632` and `.632+`, while continuing to select the positive-class column for the out-of-bag predictions. No extra model prediction is performed.\n\n### Validation\n\nBase: `1aee767ef57b84a8191511a08955c583b65de382`.\n\n- Eight new native regression/control cases: **6 failed, 2 passed** before the fix; **8 passed** afterward.\n- New tests compare all five AUC scores with an independent NumPy bootstrap and native scikit-learn fit/predict reference for three seeds and both cloning settings. Multiclass `oob` and `.632` controls verify the full probability matrix still reaches the scorer.\n- `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 OPENBLAS_NUM_THREADS=1 python -m pytest mlxtend/evaluate/tests/test_bootstrap_point632.py mlxtend/evaluate/tests/test_bootstrap_oob_proba.py mlxtend/evaluate/tests/test_bootstrap_outofbag.py -q -k 'not keras'`: **22 passed, 1 deselected**. The optional TensorFlow/Keras case was not run. The existing logistic-regression tests report convergence warnings.\n- Changed-file Black, isort, Flake8 and `git diff --check` passed.\n\nPython 3.12.14, NumPy 2.3.5, scikit-learn 1.8.0. The full repository suite was not run.\n\n### Related issues or pull requests\n\nNo existing fix was found in the repository's bootstrap/probability PR history. This is independent of #1213's `.632+` weighting and #1223's no-information-rate allocation change.\n\n### Pull Request Checklist\n\n- [x] Added a changelog entry.\n- [x] Added regression/control tests under `mlxtend/evaluate/tests`.\n- [x] Relevant tests pass and validation scope is recorded above.\n- [x] Changed-file style checks pass.\n",
+  "commit": "0cb08a3633ba3ca205c98b525237d82ae92c8d69",
+  "branch": "fix/oob-binary-probability-scoring-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "0cb08a3633ba3ca205c98b525237d82ae92c8d69",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  },
+  "counts_as_upstream_merged": false
+}

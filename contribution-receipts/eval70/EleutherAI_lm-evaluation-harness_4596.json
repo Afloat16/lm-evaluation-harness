@@ -1,0 +1,23 @@
+{
+  "repository": "EleutherAI/lm-evaluation-harness",
+  "pr_number": 4596,
+  "pr_url": "https://github.com/EleutherAI/lm-evaluation-harness/pull/4596",
+  "title": "Avoid squared-deviation overflow in metric uncertainty",
+  "body": "## Problem\n\nPopulation and sample standard deviation square every centered observation before taking a square root. The intermediate square can overflow or underflow even when the resulting standard deviation is representable. For example, values scaled by `1e200` raise `OverflowError`, while values scaled by `1e-200` incorrectly produce zero uncertainty.\n\nThis also interrupts real bootstrap aggregation: normalized finite log probabilities with a mean loss near 400 produce representable perplexities, but computing their bootstrap standard error overflows during squaring.\n\n## Change\n\nUse `math.hypot` to compute the centered-deviation norm, then divide by the square root of the population or sample denominator. Share that calculation between the two standard-deviation functions. Retain the existing calculation when the mean is non-finite, preserving NaN/infinity behavior and insufficient-sample errors.\n\nThis fixes intermediate squared-deviation range errors. It does not address overflow in the existing mean accumulation or an unscaled deviation norm that itself exceeds the floating-point range.\n\n## Validation\n\n- Original source: **9 failed, 15 passed** in the 24 new regression/control cases.\n- Patched source plus the complete existing `tests/test_metrics.py`: **32 passed**.\n- A 100-digit Decimal variance/square-root reference covers population and sample deviations at scales from `1e-200` to `1e200`, with exact zero absolute tolerance for small results.\n- Native `ConfigurableTask` processing and evaluator aggregation cover 32 bootstrap replicates of ordinary and large finite perplexities. A separately reproduced resampling sequence and Decimal standard deviation provide the reference; no model inference was run.\n- Controls cover constant data, non-finite observations, unchanged inputs, and insufficient observations.\n- New tests pass Ruff 0.16.3; source/test formatting and `git diff --check` pass. Production-module Ruff diagnostics decrease from 43 to 41 when the old comprehensions are removed; there are no new diagnostics. The remaining pre-existing findings are unchanged.\n\nThe full harness suite and model benchmarks were not run. This corrects uncertainty aggregation and does not claim model-quality improvements.\n\n## Related work\n\nChecked all-state standard-deviation, stderr, overflow, and numerical-precision PR/issue searches; all 47 metric-file history entries; personal PR history; and all 142 current fork branches against the prior actual-commit audit. No matching implementation was found. The existing weighted group-uncertainty change concerns a separate aggregation of independent means. The earlier perplexity exponential-range fix handles unrepresentable exponentials; this change handles uncertainty for perplexities that are already finite.\n",
+  "commit": "2d1098d34c58e469e32936525a1f9e8cec7dd25e",
+  "branch": "fix/standard-deviation-float-range-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "2d1098d34c58e469e32936525a1f9e8cec7dd25e",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.328Z"
+  },
+  "counts_as_upstream_merged": false
+}

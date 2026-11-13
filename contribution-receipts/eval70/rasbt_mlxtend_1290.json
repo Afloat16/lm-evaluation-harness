@@ -1,0 +1,23 @@
+{
+  "repository": "rasbt/mlxtend",
+  "pr_number": 1290,
+  "pr_url": "https://github.com/rasbt/mlxtend/pull/1290",
+  "title": "Fit Adaline reliably with rank-deficient features",
+  "body": "### Description\n\nAdaline's default analytical fit explicitly inverts `Xb.T @ Xb`. Duplicate or constant features, or more features than observations, make that matrix singular and prevent fitting. Nearly collinear features can also produce inaccurate fitted values because forming the normal equations squares the design matrix's condition number.\n\nSolve the augmented least-squares problem directly with `numpy.linalg.lstsq(..., rcond=None)`. Full-rank inputs retain their ordinary least-squares solution. Rank-deficient inputs receive the minimum-norm solution, including the intercept; this behavior is now documented. The iterative SGD path is unchanged.\n\n### Validation\n\nBase: `1aee767ef57b84a8191511a08955c583b65de382`.\n\n- Six new regression/control cases: **5 failed, 1 passed** before the change; **6 passed** afterward.\n- Duplicate, constant, zero-valued and wide feature matrices previously raised `LinAlgError`. On the near-collinear example, the old fitted values differed from the independent reference by up to **1.081**.\n- The independent reference uses SciPy's pivoted-QR `gelsy` solver. Tests check coefficients, fitted values, residual orthogonality, predictions and input preservation.\n- `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 OPENBLAS_NUM_THREADS=1 python -m pytest mlxtend/classifier/tests/test_adaline_least_squares.py mlxtend/classifier/tests/test_adaline.py -q`: **18 passed**.\n- Changed-file Black, isort, Flake8 and `git diff --check` passed.\n\nPython 3.12.14, NumPy 2.3.5, SciPy 1.17.0. The full repository suite and downstream model-quality benchmarks were not run.\n\n### Related issues or pull requests\n\nThe historical stable-OLS change #575 introduced alternative solvers for `LinearRegression`. This change addresses `Adaline`, whose analytical path still performs the normal-equation inverse.\n\n### Pull Request Checklist\n\n- [x] Added a changelog entry.\n- [x] Added regression/control tests.\n- [x] Documented the analytical solver's rank-deficient behavior.\n- [x] Relevant tests and changed-file style checks pass.\n",
+  "commit": "827006c66fc727b418f6ecffacba613d637e6c25",
+  "branch": "fix/adaline-rank-deficient-fit-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "827006c66fc727b418f6ecffacba613d637e6c25",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  },
+  "counts_as_upstream_merged": false
+}

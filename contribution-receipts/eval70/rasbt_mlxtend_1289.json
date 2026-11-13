@@ -1,0 +1,23 @@
+{
+  "repository": "rasbt/mlxtend",
+  "pr_number": 1289,
+  "pr_url": "https://github.com/rasbt/mlxtend/pull/1289",
+  "title": "Resample fit parameters with bootstrap training rows",
+  "body": "### Description\n\nBoth `bootstrap_point632_score` and `bias_variance_decomp` resample training rows but pass the original fit parameters to each fitted model. A `sample_weight` vector therefore becomes detached from the observations it describes. Duplicated observations can receive different weights, silently changing the model and the reported estimate.\n\nResample fit parameters that have one entry per training observation using the same bootstrap indices as X and y. Reuse scikit-learn's existing fit-parameter indexing helper, including support for lists, pandas Series and Pipeline-prefixed parameter names. Scalars, `None` and parameters of other lengths pass through unchanged. Both public docstrings now describe this behavior.\n\nA deterministic weighted-mean regression example in the new tests illustrates the effect:\n\n| Estimate | Original result | Correct weighted bootstrap |\n| --- | ---: | ---: |\n| First OOB replicate MSE | 54.163005 | 45.831706 |\n| Bias-variance decomposition expected loss | 17.846246 | 15.136038 |\n| Bias-variance decomposition variance | 3.472789 | 1.115966 |\n\nThese values are checked against weighted means computed directly from the sampled observation indices, independently of the estimator and mlxtend's implementation.\n\n### Validation\n\nBase: `1aee767ef57b84a8191511a08955c583b65de382`.\n\n- Twenty-two new regression/control cases: **18 failed, 4 passed** on unchanged master; **22 passed** with this fix.\n- The cases cover OOB and .632 scoring, the full MSE bias-variance decomposition, NumPy/list/Series weights, non-default pandas indices, Pipeline parameter names, input preservation, estimator cloning, scalar weights, and non-sample fit parameters.\n- `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 OPENBLAS_NUM_THREADS=1 python -m pytest mlxtend/evaluate/tests/test_bootstrap_fit_params.py mlxtend/evaluate/tests/test_bootstrap_point632.py mlxtend/evaluate/tests/test_bias_variance_decomp.py -q -k 'not keras'`: **38 passed, 2 deselected**.\n- Changed-file Black, isort, Flake8 and `git diff --check` passed.\n\nPython 3.12.14, NumPy 2.3.5, pandas 2.3.3, scikit-learn 1.8.0. The two optional TensorFlow tests and the full repository suite were not run. Existing logistic-regression tests emit convergence warnings.\n\n### Pull Request Checklist\n\n- [x] Added a changelog entry.\n- [x] Added regression/control tests under `mlxtend/evaluate/tests`.\n- [x] Documented fit-parameter resampling in both public docstrings.\n- [x] Relevant tests and changed-file style checks pass.\n",
+  "commit": "243f619bf8497cef2932958a133815edee844442",
+  "branch": "fix/bootstrap-fit-parameter-alignment-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "243f619bf8497cef2932958a133815edee844442",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  },
+  "counts_as_upstream_merged": false
+}

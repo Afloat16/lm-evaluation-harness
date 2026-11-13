@@ -1,0 +1,23 @@
+{
+  "repository": "evidentlyai/evidently",
+  "pr_number": 1993,
+  "pr_url": "https://github.com/evidentlyai/evidently/pull/1993",
+  "title": "Preserve representable tail probabilities in the proportion z-test",
+  "body": "## Problem\n\nThe proportion z-test computes right-tail probabilities by subtracting norm.cdf from 1. At large positive z statistics, the CDF rounds to 1 even though the tail probability is representable, so the result becomes zero. This loses the reported p-value and can change drift decisions at small custom thresholds. For two binary populations of 500 rows with proportions 0.4 and 0.7, the two-sided p-value is approximately 1.50427e-21; the current result is zero.\n\n## Change\n\nUse norm.sf for the two-sided and greater alternatives. The mathematical test and threshold comparison remain the same, and the less alternative is unchanged.\n\n## Validation\n\n- 18 new tests on the upstream base: 10 failed, 8 passed.\n- Fixed tests plus the two existing z-test cases: 20 passed on CPU.\n- Independent math.erfc references cover positive, negative, zero, and tail statistics for every alternative, with zero absolute tolerance so a zero p-value cannot pass as a tiny nonzero value.\n- Actual categorical Series cover both population orders and thresholds on either side of the expected p-value. A native ValueDrift Report verifies the reported result.\n- Ruff 0.3.7 lint/format and git diff --check pass.\n\nThis improves tail-probability accuracy. It does not imply a different decision at conventional thresholds such as 0.05, or prevent underflow for probabilities below the floating-point range. The full repository suite was not run.",
+  "commit": "ab2a23a41ae5d8de1c5436153f8bc67bd42bb1ea",
+  "branch": "fix/z-test-tail-probabilities-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "ab2a23a41ae5d8de1c5436153f8bc67bd42bb1ea",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

@@ -1,0 +1,78 @@
+{
+  "repository": "sgl-project/sglang",
+  "stars": 38809,
+  "archived": false,
+  "default_branch": "main",
+  "fork": "Afloat16/sglang",
+  "base_commit": "bd4c1afc37b3919869ec88a1987649fa5ad0f870",
+  "commit": "29d603230d76dd9cda6142e068277535f41b9f18",
+  "branch": "fix/mlx-import-lazy-cpu-views-20261112",
+  "title": "[Fix] tensor_bridge: preserve lazy CPU view values when importing into MLX",
+  "body": "## Motivation\n\nCPU Torch tensors can carry lazy conjugate or negative bits. Importing their physical storage directly into MLX loses those logical transformations, so a conjugated complex tensor or the imaginary view of a conjugate can produce incorrect values through `torch_to_mlx`, `mlx_call`, and `mlx_call_multi`.\n\n## Modifications\n\nResolve conjugate and negative bits after detaching the CPU tensor and before creating the owning MLX array. Ordinary tensors retain the existing path. The MPS borrowing path, CPU float64 handling, complex128 rejection, source ownership, and gradient-detachment contract remain unchanged.\n\nAdd seven tests for conjugate/negative/scalar/empty/noncontiguous views, source flags and gradients, independent output storage, and the public bridge call helpers.\n\n## Accuracy Tests\n\nExact-source native validation: https://github.com/Afloat16/sglang/actions/runs/43399327572\n\n- Native MLX 0.32.4 and PyTorch 2.14.1 on Linux CPU; the test asserts that the checkout's bridge is imported and no CUDA/MPS device is available.\n- Complete bridge module: **13 tests passed, 11 subtests passed, 26 MPS-only tests skipped**.\n- Restoring the original source produces **2 failing test methods and 5 failing subtests**, with 11 completed methods, 6 passing subtests and the same 26 skips. Failures compare logical tensor values, not imports or unavailable devices.\n- Repository pre-commit hooks and `git diff --check` passed.\n\nThis validates the CPU conversion path. Apple MPS borrowing and end-to-end model generation were not exercised.\n\n## Speed Tests and Profiling\n\nNo throughput improvement is claimed. Resolving a lazy view may materialize its logical values before the existing owning MLX copy; this is necessary for correct conversion.\n\n## Checklist\n\n- [x] Format code with repository pre-commit hooks.\n- [x] Add unit tests in the existing registered bridge test module.\n- [x] Follow the SGLang code style guidance.\n- Documentation: no public API change.\n- Accuracy: native tensor-value and bridge-call checks above; no model benchmark claim.",
+  "prefilled_url": "https://github.com/sgl-project/sglang/compare/main...Afloat16:fix/mlx-import-lazy-cpu-views-20261112?expand=1&title=%5BFix%5D%20tensor_bridge%3A%20preserve%20lazy%20CPU%20view%20values%20when%20importing%20into%20MLX&body=%23%23%20Motivation%0A%0ACPU%20Torch%20tensors%20can%20carry%20lazy%20conjugate%20or%20negative%20bits.%20Importing%20their%20physical%20storage%20directly%20into%20MLX%20loses%20those%20logical%20transformations%2C%20so%20a%20conjugated%20complex%20tensor%20or%20the%20imaginary%20view%20of%20a%20conjugate%20can%20produce%20incorrect%20values%20through%20%60torch_to_mlx%60%2C%20%60mlx_call%60%2C%20and%20%60mlx_call_multi%60.%0A%0A%23%23%20Modifications%0A%0AResolve%20conjugate%20and%20negative%20bits%20after%20detaching%20the%20CPU%20tensor%20and%20before%20creating%20the%20owning%20MLX%20array.%20Ordinary%20tensors%20retain%20the%20existing%20path.%20The%20MPS%20borrowing%20path%2C%20CPU%20float64%20handling%2C%20complex128%20rejection%2C%20source%20ownership%2C%20and%20gradient-detachment%20contract%20remain%20unchanged.%0A%0AAdd%20seven%20tests%20for%20conjugate%2Fnegative%2Fscalar%2Fempty%2Fnoncontiguous%20views%2C%20source%20flags%20and%20gradients%2C%20independent%20output%20storage%2C%20and%20the%20public%20bridge%20call%20helpers.%0A%0A%23%23%20Accuracy%20Tests%0A%0AExact-source%20native%20validation%3A%20https%3A%2F%2Fgithub.com%2FAfloat16%2Fsglang%2Factions%2Fruns%2F43399327572%0A%0A-%20Native%20MLX%200.32.4%20and%20PyTorch%202.14.1%20on%20Linux%20CPU%3B%20the%20test%20asserts%20that%20the%20checkout's%20bridge%20is%20imported%20and%20no%20CUDA%2FMPS%20device%20is%20available.%0A-%20Complete%20bridge%20module%3A%20**13%20tests%20passed%2C%2011%20subtests%20passed%2C%2026%20MPS-only%20tests%20skipped**.%0A-%20Restoring%20the%20original%20source%20produces%20**2%20failing%20test%20methods%20and%205%20failing%20subtests**%2C%20with%2011%20completed%20methods%2C%206%20passing%20subtests%20and%20the%20same%2026%20skips.%20Failures%20compare%20logical%20tensor%20values%2C%20not%20imports%20or%20unavailable%20devices.%0A-%20Repository%20pre-commit%20hooks%20and%20%60git%20diff%20--check%60%20passed.%0A%0AThis%20validates%20the%20CPU%20conversion%20path.%20Apple%20MPS%20borrowing%20and%20end-to-end%20model%20generation%20were%20not%20exercised.%0A%0A%23%23%20Speed%20Tests%20and%20Profiling%0A%0ANo%20throughput%20improvement%20is%20claimed.%20Resolving%20a%20lazy%20view%20may%20materialize%20its%20logical%20values%20before%20the%20existing%20owning%20MLX%20copy%3B%20this%20is%20necessary%20for%20correct%20conversion.%0A%0A%23%23%20Checklist%0A%0A-%20%5Bx%5D%20Format%20code%20with%20repository%20pre-commit%20hooks.%0A-%20%5Bx%5D%20Add%20unit%20tests%20in%20the%20existing%20registered%20bridge%20test%20module.%0A-%20%5Bx%5D%20Follow%20the%20SGLang%20code%20style%20guidance.%0A-%20Documentation%3A%20no%20public%20API%20change.%0A-%20Accuracy%3A%20native%20tensor-value%20and%20bridge-call%20checks%20above%3B%20no%20model%20benchmark%20claim.",
+  "pr_url": "https://github.com/sgl-project/sglang/pull/50286",
+  "pr_status": "open",
+  "merged_at": null,
+  "counts_as_upstream_merged": false,
+  "novelty": {
+    "classification": "genuinely_new",
+    "history": [
+      {
+        "sha": "d90318b3e20fce682a74cbd2c9d6294b364b4eb9",
+        "title": "[MLX] Upgrade to Torch 2.13/MLX 0.32+ and redesign the Torch-MLX tensor bridge (#32984)"
+      },
+      {
+        "sha": "a3059641593b985387a6abbb70c19c4ddc53cf1e",
+        "title": "[MLX] Add native MLX execution backend for Apple Silicon Mac (#20342)"
+      }
+    ],
+    "relevant_patch_read": 32984,
+    "searches": [
+      "all-state PR tensor_bridge conjugate: 0",
+      "all-state issue tensor_bridge conjugate: 0",
+      "all-state PR resolve_conj: 0",
+      "all-state PR torch_to_mlx lazy: only 32984 original redesign, no resolution",
+      "all-state PR tensor bridge conj: 0"
+    ],
+    "personal_fork": "Only main, three newly submitted source branches and validation existed before fourth candidate; no preexisting bridge work."
+  },
+  "validation": {
+    "run_id": 43399327572,
+    "job_id": 131797945337,
+    "conclusion": "success",
+    "artifact_id": 14024788980,
+    "exact_source": "29d603230d76dd9cda6142e068277535f41b9f18",
+    "torch": "2.14.1+cu130, executed on CPU",
+    "mlx": "0.32.4 native CPU",
+    "new_methods": 7,
+    "fixed": "13 passed, 26 skipped, 11 subtests passed",
+    "baseline": "7 failures (2 methods, 5 subtests), 11 completed methods, 26 skipped, 6 subtests passed",
+    "lint": "Full repository pre-commit for changed files and git diff --check passed"
+  },
+  "limitations": [
+    "Linux native CPU bridge validation; 26 MPS-only tests skipped.",
+    "No model generation or throughput claim.",
+    "Logical view resolution can materialize values before the existing owning MLX copy."
+  ],
+  "source_files": [
+    "python/sglang/srt/utils/tensor_bridge.py",
+    "test/registered/unit/utils/test_tensor_bridge.py"
+  ],
+  "pr_number": 50286,
+  "draft": false,
+  "publication": {
+    "method": "github_connector",
+    "verified_head": "29d603230d76dd9cda6142e068277535f41b9f18",
+    "maintainer_can_modify": false,
+    "submitted_body_matches_prefix": true,
+    "repository_appended_status_block": "\n\n<!-- pr-states:start -->\n---\n### CI States\n\nLatest PR Test (Base): <!-- slot:pr-test:start -->:hourglass_flowing_sand: [Run #43402450591](https://github.com/sgl-project/sglang/actions/runs/43402450591)<!-- slot:pr-test:end -->\nLatest PR Test (Extra): <!-- slot:pr-test-extra:start -->:hourglass_flowing_sand: [Run #43402450373](https://github.com/sgl-project/sglang/actions/runs/43402450373)<!-- slot:pr-test-extra:end -->\nLatest PR Test (AMD ROCm 10): <!-- slot:pr-test-amd:start -->:hourglass_flowing_sand: [Run #43402450355](https://github.com/sgl-project/sglang/actions/runs/43402450355)<!-- slot:pr-test-amd:end -->\n\n> [!TIP]\n> Base CI only covers the core cases, and its workload may not exercise your change. Use `/rerun-test` to run the tests your change touches, or copy this prompt for an agent:\n>\n> ```text\n> Find the registered tests this PR affects and run them with /rerun-test, following https://github.com/sgl-project/sglang/blob/main/.agents/skills/rerun-test/SKILL.md\n> ```\n<!-- pr-states:end -->",
+    "verified_at": "2026-11-13T09:34:55.438Z"
+  },
+  "current_upstream_snapshot": {
+    "head": "29d603230d76dd9cda6142e068277535f41b9f18",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  }
+}

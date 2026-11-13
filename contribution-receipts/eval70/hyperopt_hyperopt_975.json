@@ -1,0 +1,23 @@
+{
+  "repository": "hyperopt/hyperopt",
+  "pr_number": 975,
+  "pr_url": "https://github.com/hyperopt/hyperopt/pull/975",
+  "title": "Avoid calling the early-stop callback twice per iterator step",
+  "body": "## Problem\n\nFMinIter.__next__ calls run, which already invokes early_stop_fn and updates its state, then invokes the callback again for the same trial. Stateful patience counters advance twice: a callback configured to stop after four evaluations stops the iterator after only two. A one-time True decision can also be lost if the second call returns False.\n\n## Change\n\nRecord the early-stop decision made inside run and let __next__ consume it without another callback invocation. An iterator that has stopped does not schedule more evaluations when next is called again. An explicit run resets the flag, retaining a way to resume deliberately. Keep the existing max_evals, timeout, loss-threshold, and asynchronous polling policies.\n\n## Validation\n\n- 10 new tests on the upstream base: 9 failed, 1 passed.\n- Fixed tests plus the two existing early-stop tests: 12 passed on CPU.\n- Native FMinIter/Domain/Trials cases check callback counts and arguments, one-time True decisions, repeated next after stopping, and explicit resumption.\n- The built-in no_progress_loss callback follows the same evaluation count and seeded trial values through iteration and public fmin for two patience settings.\n- Controls cover a callback that never stops and an iterator without a callback.\n- Ruff lint/format and git diff --check pass.\n\nThe once-per-evaluation assertions cover synchronous execution. This removes the extra iterator callback; it does not redesign how asynchronous run invokes callbacks while polling, or change other stopping criteria. The full repository suite was not run.",
+  "commit": "0a3b8fdb8b1eb6ac4a4f567af026ed8ca787d019",
+  "branch": "fix/fmin-iterator-early-stop-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "0a3b8fdb8b1eb6ac4a4f567af026ed8ca787d019",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

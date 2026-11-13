@@ -1,0 +1,23 @@
+{
+  "repository": "hyperopt/hyperopt",
+  "pr_number": 970,
+  "pr_url": "https://github.com/hyperopt/hyperopt/pull/970",
+  "title": "Normalize continuous truncated lognormal mixture densities",
+  "body": "## Problem\n\n`LGMM1` samples its normal component in `[low, high)` and then exponentiates it. `LGMM1_lpdf` computes the corresponding mixture acceptance probability, but its continuous branch does not divide by it. The returned density therefore integrates to the acceptance probability instead of one. The quantized branch already applies this normalization.\n\nFor a standard lognormal restricted to `exp(-1) <= x < exp(1)`, the continuous density currently integrates to approximately 0.682689 rather than 1.\n\n## Change\n\nSubtract `log(p_accept)` from the continuous mixture log density, matching the existing quantized branch and the distribution sampled by `LGMM1`. Bounds remain in log space. Unbounded densities keep `p_accept = 1`.\n\n## Validation\n\n- Nine new regression cases: base code has 7 failures and 2 passing controls.\n- Fixed code: 19 tests pass across the new module and the existing `TestLGMM1Math` / `TestQLGMM1Math` classes.\n- Independent references use SciPy lognormal component densities, weighted normal-CDF acceptance probabilities, and numerical integration over the bounded support.\n- Coverage includes scalar, vector and matrix outputs, mixed components, unbounded densities, and quantized masses to prevent double normalization.\n- Ruff 0.15.18 lint/format and `git diff --check` pass.\n\nThis corrects probability normalization. It does not establish faster optimization or improved objective values; in a single variable's comparison the normalization term is constant across candidates. The full test suite was not run.",
+  "commit": "43b9e64c0a2ce099049e7ba1c760f3925bbb4682",
+  "branch": "fix/lognormal-mixture-truncation-density-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "43b9e64c0a2ce099049e7ba1c760f3925bbb4682",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

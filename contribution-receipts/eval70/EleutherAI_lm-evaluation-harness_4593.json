@@ -1,0 +1,23 @@
+{
+  "repository": "EleutherAI/lm-evaluation-harness",
+  "pr_number": 4593,
+  "pr_url": "https://github.com/EleutherAI/lm-evaluation-harness/pull/4593",
+  "title": "fix(chartqa): compare explicit percentages in the same units",
+  "body": "## Problem\n\nChartQA's relaxed scorer attempts a one-sided division by 100 whenever either value contains `%`, including when both values explicitly use percentages. Consequently, `1%` and `100%`, or `0.5%` and `50%`, can incorrectly receive full credit despite differing by a factor of 100. This also affects the explicit-final-answer path of the anywhere scorer.\n\n## Change\n\nApply the existing unit-conversion fallback only when exactly one value contains `%`. Values that both use percentages are compared in the same units using the existing 5% relative tolerance. The historical permissive conversion when only one value contains `%` remains unchanged. Equivalent conditional and generator-expression cleanups address existing whole-file Ruff findings without changing the non-final-answer fallback.\n\nThe adapted [Mistral reference scorer](https://github.com/mistralai/mistral-evals/blob/main/eval/metrics.py) contains the same behavior. This correction is therefore recorded as task version 0.1, inherited by chartqa, chartqa_llama, and chartqa_llama_90. The README identifies the scoring difference: affected relaxed/anywhere scores should not be directly compared with version 0.0; exact-match scoring is unchanged.\n\n## Validation\n\n- 59 new tests on the upstream base: 22 failed, 37 passed.\n- Fixed tests plus the existing core metrics tests: 67 passed.\n- Controls cover reversed and negative factor-of-100 errors, zeros, the relative-tolerance boundary, one-sided percentage conversions, ordinary numeric answers, multiple references, and the original anywhere fallback.\n- Native ConfigurableTask instances loaded from all three actual YAML configurations construct generation requests and score in-memory Dataset examples.\n- All three resolved configurations report version 0.1.\n- Pinned Ruff 0.16.3 lint/format and git diff --check pass.\n\nNo model inference, chart images, external benchmark download, or full repository suite was run. The tests establish scoring correctness for these cases, not a change in model capability.",
+  "commit": "741ab752f49c6397f6e762c3b456ed476aae49c5",
+  "branch": "fix/chartqa-percent-units-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "741ab752f49c6397f6e762c3b456ed476aae49c5",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.328Z"
+  },
+  "counts_as_upstream_merged": false
+}

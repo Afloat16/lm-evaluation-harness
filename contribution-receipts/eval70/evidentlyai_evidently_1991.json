@@ -1,0 +1,23 @@
+{
+  "repository": "evidentlyai/evidently",
+  "pr_number": 1991,
+  "pr_url": "https://github.com/evidentlyai/evidently/pull/1991",
+  "title": "Preserve the caller's NumPy random state during embedding drift bootstrap",
+  "body": "## Problem\n\nEmbedding distance and MMD bootstrap repeatedly call `np.random.seed(i)` and draw from the process-global generator. The model-based drift bootstrap does the same through `calc_roc_auc_random`. Running a drift check therefore changes the random sequence used by later training, sampling, or evaluation code in the same process.\n\n## Change\n\nUse a local `np.random.RandomState(i)` for each bootstrap repetition and for the random-AUC helper. Keep the same seeds, legacy generator algorithm, draw order, bootstrap samples, and threshold calculations. The change isolates the generator rather than changing the statistical procedure.\n\n## Validation\n\n- Twelve new native regression tests: base code has 6 failures and 6 passing controls.\n- Fixed code: 13 tests pass including the existing embedding-drift report smoke test.\n- All three drift methods are checked with bootstrap enabled and disabled. Tests compare the caller's subsequent random draws against an untouched generator.\n- Random AUC values match an independently seeded reference for seeds 0, 17 and 99.\n- Repeated bootstrap results remain independent of the external NumPy seed.\n- Each test restores the global state it found, so the checks do not change later tests' random state.\n- Pinned Ruff 0.3.7 lint/format and `git diff --check` pass.\n\nThis concerns the embedding-drift bootstrap paths. It is separate from #1985, which changes the permutation implementation under `legacy/calculations/stattests/utils.py`. The full repository suite and end-to-end training benchmarks were not run.",
+  "commit": "e5765ce77619ec08b91c40c5ccc7c04578a3a66c",
+  "branch": "fix/embedding-bootstrap-random-state-20261112",
+  "novelty": {
+    "classification": "genuinely-new"
+  },
+  "validation": {
+    "evidence_source": "Published upstream PR body preserved here; earlier local execution logs are not reconstructed after workspace reset."
+  },
+  "current_upstream_snapshot": {
+    "head": "e5765ce77619ec08b91c40c5ccc7c04578a3a66c",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.329Z"
+  },
+  "counts_as_upstream_merged": false
+}

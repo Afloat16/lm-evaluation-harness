@@ -1,0 +1,143 @@
+{
+  "repository": "sgl-project/sglang",
+  "stars": 38809,
+  "archived": false,
+  "default_branch": "main",
+  "fork": "Afloat16/sglang",
+  "base_commit": "5792cf6e5e11aebc62d41cf19828f615a8fa7e0a",
+  "commit": "968253dd7b1ecdbf43fb4c507d76ba1142a60597",
+  "branch": "fix/dynamic-grad-policy-lifecycle-20261113",
+  "title": "[Fix] DynamicGradMode: preserve context state across policy changes",
+  "body": "## Motivation\n\n`DynamicGradMode` is intended to select no-grad or inference mode at runtime. A decorator created while inference mode is disabled currently has no `mode` attribute, so enabling inference later makes its next call raise `AttributeError`. Changing the policy while a context is active also makes its exit close a different, uninitialized context and can replace the original model exception.\n\n## Modifications\n\nAlways retain the requested mode during construction and cloning. At entry, construct the public PyTorch context selected by the current policy; at exit, close that same context. Both decorator spellings and the existing no-grad fallback for `mode=False` retain their behavior. This does not change the global setter's thread-safety contract.\n\n## Accuracy Tests\n\nExact-source native validation: https://github.com/Afloat16/sglang/actions/runs/43400001300\n\n- **11 test methods and 24 subtests passed** using the checkout's real implementation and PyTorch on Linux CPU.\n- Restoring the original source yields **1 failing test method and 11 failing subtests**, with 10 completed methods and 13 passing subtests. Failures include actual attribute errors and the native model path.\n- Tests cover construction before policy changes, repeated decorator calls, cloning with explicit false mode, policy changes inside active contexts, nested caller states, and preservation of the original exception.\n- A real Linear model alternates both inference policies and then performs three SGD updates. Outputs, gradients, parameters, and caller grad state match a native PyTorch-context reference.\n- Repository pre-commit hooks and `git diff --check` passed.\n\nNo GPU execution or end-to-end server benchmark is claimed.\n\n## Speed Tests and Profiling\n\nThis is a context-lifecycle correctness fix; no speedup is claimed.\n\n## Checklist\n\n- [x] Format code with repository pre-commit hooks.\n- [x] Add registered CPU unit tests.\n- [x] Follow the SGLang code style guidance.\n- Documentation: existing public API and selection semantics are retained.\n- Accuracy: native context and model-update checks above.",
+  "prefilled_url": "https://github.com/sgl-project/sglang/compare/main...Afloat16:fix/dynamic-grad-policy-lifecycle-20261113?expand=1&title=%5BFix%5D%20DynamicGradMode%3A%20preserve%20context%20state%20across%20policy%20changes&body=%23%23%20Motivation%0A%0A%60DynamicGradMode%60%20is%20intended%20to%20select%20no-grad%20or%20inference%20mode%20at%20runtime.%20A%20decorator%20created%20while%20inference%20mode%20is%20disabled%20currently%20has%20no%20%60mode%60%20attribute%2C%20so%20enabling%20inference%20later%20makes%20its%20next%20call%20raise%20%60AttributeError%60.%20Changing%20the%20policy%20while%20a%20context%20is%20active%20also%20makes%20its%20exit%20close%20a%20different%2C%20uninitialized%20context%20and%20can%20replace%20the%20original%20model%20exception.%0A%0A%23%23%20Modifications%0A%0AAlways%20retain%20the%20requested%20mode%20during%20construction%20and%20cloning.%20At%20entry%2C%20construct%20the%20public%20PyTorch%20context%20selected%20by%20the%20current%20policy%3B%20at%20exit%2C%20close%20that%20same%20context.%20Both%20decorator%20spellings%20and%20the%20existing%20no-grad%20fallback%20for%20%60mode%3DFalse%60%20retain%20their%20behavior.%20This%20does%20not%20change%20the%20global%20setter's%20thread-safety%20contract.%0A%0A%23%23%20Accuracy%20Tests%0A%0AExact-source%20native%20validation%3A%20https%3A%2F%2Fgithub.com%2FAfloat16%2Fsglang%2Factions%2Fruns%2F43400001300%0A%0A-%20**11%20test%20methods%20and%2024%20subtests%20passed**%20using%20the%20checkout's%20real%20implementation%20and%20PyTorch%20on%20Linux%20CPU.%0A-%20Restoring%20the%20original%20source%20yields%20**1%20failing%20test%20method%20and%2011%20failing%20subtests**%2C%20with%2010%20completed%20methods%20and%2013%20passing%20subtests.%20Failures%20include%20actual%20attribute%20errors%20and%20the%20native%20model%20path.%0A-%20Tests%20cover%20construction%20before%20policy%20changes%2C%20repeated%20decorator%20calls%2C%20cloning%20with%20explicit%20false%20mode%2C%20policy%20changes%20inside%20active%20contexts%2C%20nested%20caller%20states%2C%20and%20preservation%20of%20the%20original%20exception.%0A-%20A%20real%20Linear%20model%20alternates%20both%20inference%20policies%20and%20then%20performs%20three%20SGD%20updates.%20Outputs%2C%20gradients%2C%20parameters%2C%20and%20caller%20grad%20state%20match%20a%20native%20PyTorch-context%20reference.%0A-%20Repository%20pre-commit%20hooks%20and%20%60git%20diff%20--check%60%20passed.%0A%0ANo%20GPU%20execution%20or%20end-to-end%20server%20benchmark%20is%20claimed.%0A%0A%23%23%20Speed%20Tests%20and%20Profiling%0A%0AThis%20is%20a%20context-lifecycle%20correctness%20fix%3B%20no%20speedup%20is%20claimed.%0A%0A%23%23%20Checklist%0A%0A-%20%5Bx%5D%20Format%20code%20with%20repository%20pre-commit%20hooks.%0A-%20%5Bx%5D%20Add%20registered%20CPU%20unit%20tests.%0A-%20%5Bx%5D%20Follow%20the%20SGLang%20code%20style%20guidance.%0A-%20Documentation%3A%20existing%20public%20API%20and%20selection%20semantics%20are%20retained.%0A-%20Accuracy%3A%20native%20context%20and%20model-update%20checks%20above.",
+  "pr_url": "https://github.com/sgl-project/sglang/pull/50287",
+  "pr_status": "open",
+  "merged_at": null,
+  "counts_as_upstream_merged": false,
+  "novelty": {
+    "classification": "genuinely_new",
+    "all_state_pr_search": [
+      {
+        "number": 49964,
+        "title": "[Fix] kimi_k25: Run the vision projection under the caller's grad mode",
+        "state": "open"
+      },
+      {
+        "number": 45058,
+        "title": "[Fix] scheduler: Preserve async readback grad mode and failures",
+        "state": "closed"
+      },
+      {
+        "number": 38214,
+        "title": "[Fix] glm: Precompile vision kernels before KV allocation to avoid first-image OOMs",
+        "state": "closed"
+      },
+      {
+        "number": 45474,
+        "title": "[Perf] [NVIDIA] speculative: Move the host work between Qwen3.5 MTP decode graphs into the graphs (1/2)",
+        "state": "closed"
+      },
+      {
+        "number": 43854,
+        "title": "Fix autograd retention in CUDA graph capture tail hooks",
+        "state": "closed"
+      },
+      {
+        "number": 15639,
+        "title": "Dynamic grad instead of no_grad",
+        "state": "closed"
+      },
+      {
+        "number": 14379,
+        "title": "Add FP8 Blockwise GEMM Backend Flag `--fp8-gemm-backend`",
+        "state": "closed"
+      }
+    ],
+    "actual_patches_read": [
+      15639,
+      45058,
+      49964,
+      14379
+    ],
+    "related_difference": "15639 changes how the global flag is read but retains conditional construction, clone, and exit; other PRs change call sites, not DynamicGradMode lifecycle.",
+    "setter_search_count": 0,
+    "clone_query": [
+      49120
+    ],
+    "personal_fork_branches": [
+      {
+        "name": "fix/bounded-atomic-stop-regex-20261112",
+        "sha": "3e2b9ff667f11c0a4c3eb56fd857389b3d57c102"
+      },
+      {
+        "name": "fix/layernorm-converted-parameter-dtype-20261112",
+        "sha": "32f2e8d6e96d37c61636552c6b34c80746d2ec93"
+      },
+      {
+        "name": "fix/mlx-import-lazy-cpu-views-20261112",
+        "sha": "29d603230d76dd9cda6142e068277535f41b9f18"
+      },
+      {
+        "name": "fix/pooler-half-normalization-20261112",
+        "sha": "6cfa1c2b244d2a7b9816ade3d58927e5fb9914bd"
+      },
+      {
+        "name": "fix/schema-identifier-field-names-20261112",
+        "sha": "1093b07ba3410e4c963a17965e846e5e5662aac9"
+      },
+      {
+        "name": "main",
+        "sha": "721ef92c4c764bb3c2307378bf13609fc7be7e72"
+      },
+      {
+        "name": "validation/cpu-layernorm-conversion-20261112",
+        "sha": "b417aa74178eb247786892a8889224e8015babf2"
+      },
+      {
+        "name": "validation/cpu-mlx-lazy-views-20261112",
+        "sha": "e9c4f35243bf861b20a22814a8526caaca310b08"
+      },
+      {
+        "name": "validation/cpu-pooler-normalization-20261112",
+        "sha": "749c51ee2698245b14aed1e2c1edd3187b71c23f"
+      }
+    ]
+  },
+  "validation": {
+    "run_id": 43400001300,
+    "job_id": 131800196581,
+    "conclusion": "success",
+    "artifact_id": 14025926299,
+    "exact_source": "968253dd7b1ecdbf43fb4c507d76ba1142a60597",
+    "torch": "2.14.1+cu130, executed on Linux CPU",
+    "new_methods": 11,
+    "new_subcases": 24,
+    "fixed": "11 passed methods, 24 subtests passed",
+    "baseline": "12 failures (1 method, 11 subtests), 10 completed methods, 13 subtests passed",
+    "lint": "Full repository pre-commit for changed files and git diff --check passed"
+  },
+  "limitations": [
+    "Linux CPU; no GPU/server throughput claim.",
+    "Does not add same-context recursive reentry or cross-thread global policy guarantees."
+  ],
+  "source_files": [
+    "python/sglang/srt/utils/common.py",
+    "test/registered/unit/utils/test_dynamic_grad_mode_policy.py"
+  ],
+  "pr_number": 50287,
+  "draft": false,
+  "publication": {
+    "method": "github_connector",
+    "verified_head": "968253dd7b1ecdbf43fb4c507d76ba1142a60597",
+    "maintainer_can_modify": false,
+    "submitted_body_matches_prefix": true,
+    "verified_at": "2026-11-13T09:38:47.784Z"
+  },
+  "current_upstream_snapshot": {
+    "head": "968253dd7b1ecdbf43fb4c507d76ba1142a60597",
+    "state": "open",
+    "draft": false,
+    "merged_at": null,
+    "verified_at": "2026-11-13T11:27:48.330Z"
+  }
+}
