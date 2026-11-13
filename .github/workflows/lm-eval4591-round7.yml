@@ -48,6 +48,7 @@ jobs:
           python -m pip install -e '.[ifeval]' 'pytest>=9,<10' 'spacy>=3.8,<3.9' iso639-lang pre-commit
           python -m spacy download es_core_news_sm
           python -m spacy download ca_core_news_sm
+          python -m spacy download xx_sent_ud_sm
           python -m nltk.downloader -q punkt punkt_tab
           python -m pip freeze > "$RUNNER_TEMP/lm-eval4591-round7/dependencies.txt"
           python --version
